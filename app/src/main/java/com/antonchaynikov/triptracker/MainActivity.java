@@ -6,15 +6,22 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import io.reactivex.functions.Consumer;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
 
     private final static int MAX_LOCATIONS_NUM_STORED = 6;
     private final static long LOCATION_IRRELEVANT_AFTER = 1000 * 20;
@@ -26,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private LocationSource mLocationSource;
     private TextView mLocationTextView;
+    private GoogleMap mGoogleMap;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,6 +52,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         );
         mLocationTextView = findViewById(R.id.main_activity_textView);
         findViewById(R.id.main_activity_button).setOnClickListener(this);
+        SupportMapFragment mapFragment = SupportMapFragment.newInstance();
+        mapFragment.getMapAsync(this);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.main_activity_map_frame, mapFragment)
+                .commit();
+
     }
 
     @Override
@@ -57,6 +72,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             @Override
                             public void accept(Location location) throws Exception {
                                 mLocationTextView.setText(location.toString());
+                                mGoogleMap.clear();
+                                mGoogleMap.addMarker(new MarkerOptions()
+                                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                                        .title(getString(R.string.app_name))
+                                );
                             }
                         })
                         .subscribe();
@@ -71,6 +91,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mPermissionGranted = true;
         }
         Log.d(TAG, "Permission Granted = " + mPermissionGranted);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mGoogleMap = googleMap;
     }
 
 }

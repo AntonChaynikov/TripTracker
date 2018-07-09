@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">TripTracker</string>
     <string name="button_act">Receive Coordinates</string>
+    <string name="map_marker">Here!</string>
 </resources>
