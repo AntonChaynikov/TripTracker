@@ -6,20 +6,24 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.internal.observers.ConsumerSingleObserver;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
 
@@ -27,61 +31,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final static long LOCATION_IRRELEVANT_AFTER = 1000 * 20;
     private final static int ACCESS_FINE_LOCATION_REQUEST_CODE = 1;
 
+    private final static float DEFAULT_ZOOM_LEVEL = 18;
+
     private final static String TAG = "MainActivity";
 
     private boolean mPermissionGranted;
 
-    private LocationSource mLocationSource;
+    private MapActivityViewModel mViewModel;
+
     private TextView mLocationTextView;
+    private Button mButton;
     private GoogleMap mGoogleMap;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+
         mPermissionGranted =
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED;
-        if (!mPermissionGranted) {
-            String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
-            ActivityCompat.requestPermissions(this, permissions, ACCESS_FINE_LOCATION_REQUEST_CODE);
-        }
-        mLocationSource = PlatformLocationSource.getInstance(
+                        PackageManager.PERMISSION_GRANTED;
+
+        LocationSource locationSource = PlatformLocationSource.getInstance(
                 this,
-                new PreciseLocationUpdatePolicy(LOCATION_IRRELEVANT_AFTER, MAX_LOCATIONS_NUM_STORED)
-        );
+                new PreciseLocationUpdatePolicy(LOCATION_IRRELEVANT_AFTER, MAX_LOCATIONS_NUM_STORED));
+
+        mViewModel = new MapActivityViewModel(locationSource, mPermissionGranted);
+
         mLocationTextView = findViewById(R.id.main_activity_textView);
-        findViewById(R.id.main_activity_button).setOnClickListener(this);
-        SupportMapFragment mapFragment = SupportMapFragment.newInstance();
-        mapFragment.getMapAsync(this);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.main_activity_map_frame, mapFragment)
-                .commit();
+        mButton = findViewById(R.id.main_activity_button);
+        mButton.setOnClickListener(this);
 
-    }
+        addMapFragment();
 
-    @Override
-    public void onClick(View view) {
-        Log.d(TAG, "onClick");
-        if (mPermissionGranted) {
-            mLocationSource.toggleLocationUpdates();
-            if (mLocationSource.isUpdateEnabled()) {
-                mLocationSource.getLocation()
-                        .doOnNext(new Consumer<Location>() {
-                            @Override
-                            public void accept(Location location) throws Exception {
-                                mLocationTextView.setText(location.toString());
-                                mGoogleMap.clear();
-                                mGoogleMap.addMarker(new MarkerOptions()
-                                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                                        .title(getString(R.string.app_name))
-                                );
-                            }
-                        })
-                        .subscribe();
-            }
-        }
+        subscribeToLocationChangeEvent(mViewModel.getLocationChangedEvent());
+        subscribeToButtonTextChangeEvent(mViewModel.getButtonTextChangeEvent());
+        subscribeToPermissionRequestEvent(mViewModel.getAskPermissionEvent());
     }
 
     @Override
@@ -90,12 +75,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (requestCode == ACCESS_FINE_LOCATION_REQUEST_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             mPermissionGranted = true;
         }
+        mViewModel.onPermissionRequestResult(mPermissionGranted);
         Log.d(TAG, "Permission Granted = " + mPermissionGranted);
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
+    }
+
+    @Override
+    public void onClick(View view) {
+        mViewModel.onCoordinatesButtonClick();
+    }
+
+    private Disposable subscribeToLocationChangeEvent(Observable<Location> event) {
+        return event.subscribe(new Consumer<Location>() {
+            @Override
+            public void accept(Location location) throws Exception {
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                mLocationTextView.setText(location.toString());
+                mGoogleMap.clear();
+                mGoogleMap.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .title(getString(R.string.app_name))
+                );
+                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM_LEVEL));
+            }
+        });
+    }
+
+    private Disposable subscribeToButtonTextChangeEvent(Observable<Boolean> event) {
+        return event.subscribe(new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean aBoolean) throws Exception {
+                if (aBoolean == MapActivityViewModel.BUTTON_TEXT_START) {
+                    mButton.setText(R.string.button_act);
+                } else {
+                    mButton.setText(R.string.button_stop);
+                }
+            }
+        });
+    }
+
+    private Disposable subscribeToPermissionRequestEvent(Observable<Boolean> event) {
+        return event.subscribe(new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean aBoolean) throws Exception {
+                String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
+                ActivityCompat.requestPermissions(MainActivity.this, permissions, ACCESS_FINE_LOCATION_REQUEST_CODE);
+            }
+        });
+    }
+
+    private void addMapFragment() {
+        SupportMapFragment mapFragment = SupportMapFragment.newInstance();
+        mapFragment.getMapAsync(this);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.main_activity_map_frame, mapFragment)
+                .commit();
     }
 
 }

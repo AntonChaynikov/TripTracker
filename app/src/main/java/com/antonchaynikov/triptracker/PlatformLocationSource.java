@@ -29,7 +29,7 @@ public class PlatformLocationSource implements LocationSource, LocationListener 
     private final static long NETWORK_UPDATE_INTERVAL = 1000;
     private final static float MIN_DISTANCE_TO_UPDATE = 0;
 
-    private WeakReference<ObservableEmitter<Location>> mEmitter;
+    private ObservableEmitter<Location> mEmitter;
 
     private LocationManager mLocationManager;
     private LocationUpdatePolicy mLocationUpdatePolicy;
@@ -80,7 +80,7 @@ public class PlatformLocationSource implements LocationSource, LocationListener 
         mLocationBroadcast = Observable.create(new ObservableOnSubscribe<Location>() {
             @Override
             public void subscribe(ObservableEmitter<Location> emitter) throws Exception {
-                mEmitter = new WeakReference<>(emitter);
+                mEmitter = emitter;
             }
         });
         return mLocationBroadcast;
@@ -92,7 +92,7 @@ public class PlatformLocationSource implements LocationSource, LocationListener 
         Location relevantLoc = mLocationUpdatePolicy.getRelevantLocation();
         Log.d(TAG, "Location received " + location.toString());
         Log.d(TAG, "Last RelevantLocation is  " + relevantLoc.toString());
-        mEmitter.get().onNext(relevantLoc);
+        mEmitter.onNext(relevantLoc);
     }
 
     @Override
