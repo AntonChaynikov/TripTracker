@@ -3,7 +3,11 @@ package com.antonchaynikov.triptracker;
 import android.location.Location;
 import android.util.Log;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+
 import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
@@ -15,19 +19,21 @@ public class MapActivityViewModel {
     private final static String TAG = "MapActivityViewModel";
 
     private PublishSubject<Boolean> mButtonTextState;
+    private PublishSubject<String> mEditTextState;
     private BehaviorSubject<Boolean> mAskPermissionEvent;
-    private BehaviorSubject<Location> mLocationChangeEvent;
 
     private LocationSource mLocationSource;
+    private Mapper mMapper;
 
     private boolean mPermissionGranted;
     private boolean mReceivingCoordinates;
 
-    public MapActivityViewModel(LocationSource locationSource, boolean permissionGranted) {
+    public MapActivityViewModel(LocationSource locationSource, Mapper mapper, boolean permissionGranted) {
         mButtonTextState = PublishSubject.create();
+        mEditTextState = PublishSubject.create();
         mAskPermissionEvent = BehaviorSubject.create();
-        mLocationChangeEvent = BehaviorSubject.create();
 
+        mMapper = mapper;
         mLocationSource = locationSource;
         mPermissionGranted = permissionGranted;
         mReceivingCoordinates = mLocationSource.isUpdateEnabled();
@@ -56,8 +62,8 @@ public class MapActivityViewModel {
         return mAskPermissionEvent;
     }
 
-    public Observable<Location> getLocationChangedEvent() {
-        return mLocationChangeEvent;
+    public Observable<String> getEditTextChangeEvent() {
+        return mEditTextState;
     }
 
     public void stopUpdates() {
@@ -70,12 +76,22 @@ public class MapActivityViewModel {
         mPermissionGranted = result;
     }
 
-    private void onLocationUpdated(Location location) {
-        mLocationChangeEvent.onNext(location);
+    public void onMapReady(GoogleMap googleMap) {
+        mMapper.onMapReady(googleMap);
     }
 
-    private void subscribeToLocationUpdates() {
-        mLocationSource.getLocation()
+    private void onLocationUpdated(Location location) {
+        mEditTextState.onNext(location.toString());
+        if (mMapper.isReady()) {
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            mMapper.clear();
+            mMapper.addMarker(latLng);
+            mMapper.moveCamera(latLng);
+        }
+    }
+
+    private Disposable subscribeToLocationUpdates() {
+        return mLocationSource.getLocation()
                 .doOnNext(new Consumer<Location>() {
                     @Override
                     public void accept(Location location) throws Exception {

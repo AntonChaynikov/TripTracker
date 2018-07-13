@@ -21,17 +21,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
-import io.reactivex.internal.observers.ConsumerSingleObserver;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
 
     private final static int MAX_LOCATIONS_NUM_STORED = 6;
     private final static long LOCATION_IRRELEVANT_AFTER = 1000 * 20;
     private final static int ACCESS_FINE_LOCATION_REQUEST_CODE = 1;
-
-    private final static float DEFAULT_ZOOM_LEVEL = 18;
 
     private final static String TAG = "MainActivity";
 
@@ -41,7 +39,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private TextView mLocationTextView;
     private Button mButton;
-    private GoogleMap mGoogleMap;
+
+    private CompositeDisposable mSubscriptions;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 this,
                 new PreciseLocationUpdatePolicy(LOCATION_IRRELEVANT_AFTER, MAX_LOCATIONS_NUM_STORED));
 
-        mViewModel = new MapActivityViewModel(locationSource, mPermissionGranted);
+        mViewModel = new MapActivityViewModel(locationSource, new Mapper(), mPermissionGranted);
 
         mLocationTextView = findViewById(R.id.main_activity_textView);
         mButton = findViewById(R.id.main_activity_button);
@@ -64,9 +63,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         addMapFragment();
 
-        subscribeToLocationChangeEvent(mViewModel.getLocationChangedEvent());
-        subscribeToButtonTextChangeEvent(mViewModel.getButtonTextChangeEvent());
-        subscribeToPermissionRequestEvent(mViewModel.getAskPermissionEvent());
+        mSubscriptions = new CompositeDisposable();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mSubscriptions.clear();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mSubscriptions.add(subscribeToEditTextChangeEvent(mViewModel.getEditTextChangeEvent()));
+        mSubscriptions.add(subscribeToButtonTextChangeEvent(mViewModel.getButtonTextChangeEvent()));
+        mSubscriptions.add(subscribeToPermissionRequestEvent(mViewModel.getAskPermissionEvent()));
     }
 
     @Override
@@ -81,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mGoogleMap = googleMap;
+        mViewModel.onMapReady(googleMap);
     }
 
     @Override
@@ -89,18 +100,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mViewModel.onCoordinatesButtonClick();
     }
 
-    private Disposable subscribeToLocationChangeEvent(Observable<Location> event) {
-        return event.subscribe(new Consumer<Location>() {
+    private Disposable subscribeToEditTextChangeEvent(Observable<String> event) {
+        return event.subscribe(new Consumer<String>() {
             @Override
-            public void accept(Location location) throws Exception {
-                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                mLocationTextView.setText(location.toString());
-                mGoogleMap.clear();
-                mGoogleMap.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .title(getString(R.string.app_name))
-                );
-                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM_LEVEL));
+            public void accept(String text) throws Exception {
+                mLocationTextView.setText(text);
             }
         });
     }
