@@ -51,8 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
                         PackageManager.PERMISSION_GRANTED;
 
-        LocationSource locationSource = PlatformLocationSource.getInstance(
-                this,
+        LocationSource locationSource = Injector.injectLocationSource(this,
                 new PreciseLocationUpdatePolicy(LOCATION_IRRELEVANT_AFTER, MAX_LOCATIONS_NUM_STORED));
 
         mViewModel = new MapActivityViewModel(locationSource, new Mapper(), mPermissionGranted);

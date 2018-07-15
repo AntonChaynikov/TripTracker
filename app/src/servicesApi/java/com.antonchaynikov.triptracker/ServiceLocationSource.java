@@ -1,30 +1,22 @@
 package com.antonchaynikov.triptracker;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
-
-import java.lang.ref.WeakReference;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 
-/**
-  *  Uses platform location API in android.location to provide location
-  *  instead of more high level Google Location Services API
-  */
-public class PlatformLocationSource implements LocationSource, LocationListener {
+public class ServiceLocationSource implements LocationSource, LocationListener {
 
-    private static volatile PlatformLocationSource instance;
+    private static volatile ServiceLocationSource instance;
 
-    private final static String TAG = "PlatformLocationSource";
+    private final static String TAG = "ServiceLocationSource";
+
     private final static long GPS_UPDATE_INTERVAL = 1000 * 10;
     private final static long NETWORK_UPDATE_INTERVAL = 1000;
     private final static float MIN_DISTANCE_TO_UPDATE = 0;
@@ -36,18 +28,19 @@ public class PlatformLocationSource implements LocationSource, LocationListener 
     private Observable<Location> mLocationBroadcast;
     private boolean mUpdating;
 
-    public static PlatformLocationSource getInstance(Context context, LocationUpdatePolicy locationUpdatePolicy) {
+    public static ServiceLocationSource getInstance(Context context, LocationUpdatePolicy locationUpdatePolicy) {
         if (instance == null) {
-            synchronized (PlatformLocationSource.class) {
+            synchronized (ServiceLocationSource.class) {
                 if (instance == null) {
-                    instance = new PlatformLocationSource(context, locationUpdatePolicy);
+                    instance = new ServiceLocationSource(context, locationUpdatePolicy);
                 }
             }
         }
+        Log.d(TAG, "Using as a LocationSource");
         return instance;
     }
 
-    private PlatformLocationSource(Context context, LocationUpdatePolicy locationUpdatePolicy) {
+    private ServiceLocationSource(Context context, LocationUpdatePolicy locationUpdatePolicy) {
         mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         mLocationUpdatePolicy = locationUpdatePolicy;
     }
@@ -109,5 +102,4 @@ public class PlatformLocationSource implements LocationSource, LocationListener 
     public void onProviderDisabled(String s) {
 
     }
-
 }
