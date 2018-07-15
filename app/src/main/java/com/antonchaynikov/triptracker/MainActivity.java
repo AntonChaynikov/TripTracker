@@ -83,8 +83,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == ACCESS_FINE_LOCATION_REQUEST_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            mPermissionGranted = true;
+        if (requestCode == ACCESS_FINE_LOCATION_REQUEST_CODE) {
+            mPermissionGranted = (grantResults[0] == PackageManager.PERMISSION_GRANTED);
         }
         mViewModel.onPermissionRequestResult(mPermissionGranted);
         Log.d(TAG, "Permission Granted = " + mPermissionGranted);

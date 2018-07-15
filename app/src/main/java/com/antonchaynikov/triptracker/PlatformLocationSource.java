@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -25,8 +26,8 @@ public class PlatformLocationSource implements LocationSource, LocationListener 
     private static volatile PlatformLocationSource instance;
 
     private final static String TAG = "PlatformLocationSource";
-    private final static long GPS_UPDATE_INTERVAL = 1000 * 10;
-    private final static long NETWORK_UPDATE_INTERVAL = 1000;
+    private final static long GPS_UPDATE_INTERVAL = 100;
+    private final static long NETWORK_UPDATE_INTERVAL = 100;
     private final static float MIN_DISTANCE_TO_UPDATE = 0;
 
     private ObservableEmitter<Location> mEmitter;
@@ -60,8 +61,8 @@ public class PlatformLocationSource implements LocationSource, LocationListener 
             Log.d(TAG, "Stopped updating");
         } else {
             try {
-                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_INTERVAL, MIN_DISTANCE_TO_UPDATE, this);
                 mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, NETWORK_UPDATE_INTERVAL, MIN_DISTANCE_TO_UPDATE, this);
+                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_INTERVAL, MIN_DISTANCE_TO_UPDATE, this);
                 mUpdating = true;
                 Log.d(TAG, "Started updating");
             } catch (SecurityException e) {
@@ -96,8 +97,26 @@ public class PlatformLocationSource implements LocationSource, LocationListener 
     }
 
     @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
+    public void onStatusChanged(String provider, int statusCode, Bundle bundle) {
+        String status;
+        switch (statusCode) {
+            case LocationProvider.OUT_OF_SERVICE : {
+                status = "OUT_OF_SERVICE";
+                break;
+            }
+            case LocationProvider.TEMPORARILY_UNAVAILABLE : {
+                status = "TEMPORARILY_UNAVAILABLE";
+                break;
+            }
+            case LocationProvider.AVAILABLE : {
+                status = "AVAILABLE";
+                break;
+            }
+            default: {
+                status = "undefined";
+            }
+        }
+        Log.d(TAG, "Provider - " + provider + " Status -  " + status);
     }
 
     @Override
@@ -106,8 +125,8 @@ public class PlatformLocationSource implements LocationSource, LocationListener 
     }
 
     @Override
-    public void onProviderDisabled(String s) {
-
+    public void onProviderDisabled(String provider) {
+        Log.d(TAG, "Provider - " + provider + " disabled ");
     }
 
 }
