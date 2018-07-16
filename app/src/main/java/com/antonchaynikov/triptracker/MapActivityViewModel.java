@@ -18,9 +18,9 @@ public class MapActivityViewModel {
 
     private final static String TAG = "MapActivityViewModel";
 
-    private PublishSubject<Boolean> mButtonTextState;
-    private PublishSubject<String> mEditTextState;
-    private BehaviorSubject<Boolean> mAskPermissionEvent;
+    private BehaviorSubject<Boolean> mButtonTextState;
+    private BehaviorSubject<String> mEditTextState;
+    private PublishSubject<Boolean> mAskPermissionEvent;
 
     private LocationSource mLocationSource;
     private Mapper mMapper;
@@ -29,9 +29,9 @@ public class MapActivityViewModel {
     private boolean mReceivingCoordinates;
 
     public MapActivityViewModel(LocationSource locationSource, Mapper mapper, boolean permissionGranted) {
-        mButtonTextState = PublishSubject.create();
-        mEditTextState = PublishSubject.create();
-        mAskPermissionEvent = BehaviorSubject.create();
+        mButtonTextState = BehaviorSubject.create();
+        mEditTextState = BehaviorSubject.create();
+        mAskPermissionEvent = PublishSubject.create();
 
         mMapper = mapper;
         mLocationSource = locationSource;
