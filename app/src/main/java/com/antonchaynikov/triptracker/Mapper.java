@@ -6,10 +6,25 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import io.reactivex.functions.Consumer;
 
 public class Mapper {
 
     public final static float DEFAULT_ZOOM_LEVEL = 18;
+
+    public Mapper(TrackCalculator trackCalculator) {
+        mTrackCalculator = trackCalculator;
+        mTrackCalculator.getTrackBroadcast().subscribe(new Consumer<PolylineOptions>() {
+            @Override
+            public void accept(PolylineOptions polylineOptions) throws Exception {
+                if (mGoogleMap != null) {
+                    mGoogleMap.addPolyline(polylineOptions);
+                }
+            }
+        });
+    }
 
     private GoogleMap mGoogleMap;
     private TrackCalculator mTrackCalculator;
@@ -46,7 +61,7 @@ public class Mapper {
     }
 
     public void addToPath(Location location) {
-
+        mTrackCalculator.addLocation(location);
     }
 
     public void clearPath() {
