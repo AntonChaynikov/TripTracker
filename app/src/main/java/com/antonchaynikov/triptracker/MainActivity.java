@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LocationSource locationSource = Injector.injectLocationSource(this,
                 new PreciseLocationUpdatePolicy(LOCATION_IRRELEVANT_AFTER, MAX_LOCATIONS_NUM_STORED));
 
-        mViewModel = new MapActivityViewModel(locationSource, new Mapper(), mPermissionGranted);
+        mViewModel = new MapActivityViewModel(locationSource, new Mapper(new TrackCalculator()), mPermissionGranted);
 
         mLocationTextView = findViewById(R.id.main_activity_textView);
         mButton = findViewById(R.id.main_activity_button);
