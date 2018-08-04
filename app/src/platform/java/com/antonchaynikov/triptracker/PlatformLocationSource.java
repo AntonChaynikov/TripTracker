@@ -15,6 +15,7 @@ import java.lang.ref.WeakReference;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.subjects.BehaviorSubject;
 
 /**
   *  Uses platform location API in android.location to provide location
@@ -29,11 +30,9 @@ public class PlatformLocationSource implements LocationSource, LocationListener 
     private final static long NETWORK_UPDATE_INTERVAL = 1000;
     private final static float MIN_DISTANCE_TO_UPDATE = 0;
 
-    private ObservableEmitter<Location> mEmitter;
-
     private LocationManager mLocationManager;
     private LocationUpdatePolicy mLocationUpdatePolicy;
-    private Observable<Location> mLocationBroadcast;
+    private BehaviorSubject<Location> mLocationBroadcast = BehaviorSubject.create();
     private boolean mUpdating;
 
     public static PlatformLocationSource getInstance(Context context, LocationUpdatePolicy locationUpdatePolicy) {
@@ -79,12 +78,6 @@ public class PlatformLocationSource implements LocationSource, LocationListener 
 
     @Override
     public Observable<Location> getLocation() {
-        mLocationBroadcast = Observable.create(new ObservableOnSubscribe<Location>() {
-            @Override
-            public void subscribe(ObservableEmitter<Location> emitter) throws Exception {
-                mEmitter = emitter;
-            }
-        });
         return mLocationBroadcast;
     }
 
@@ -94,7 +87,7 @@ public class PlatformLocationSource implements LocationSource, LocationListener 
         Location relevantLoc = mLocationUpdatePolicy.getRelevantLocation();
         Log.d(TAG, "Location received " + location.toString());
         Log.d(TAG, "Last RelevantLocation is  " + relevantLoc.toString());
-        mEmitter.onNext(relevantLoc);
+        mLocationBroadcast.onNext(relevantLoc);
     }
 
     @Override
