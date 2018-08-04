@@ -74,6 +74,7 @@ public class MapActivityViewModel {
 
     public void onPermissionRequestResult(boolean result) {
         mPermissionGranted = result;
+        onCoordinatesButtonClick();
     }
 
     public void onMapReady(GoogleMap googleMap) {
