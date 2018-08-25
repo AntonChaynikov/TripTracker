@@ -75,6 +75,13 @@ references:
       name: Decode Google Cloud credentials
       command: echo $GCLOUD_SERVICE_KEY | base64 -di > $HOME/client-secret.json
 
+  # Google Play Service acc key
+
+  decode_gplay_key: &decode_gplay_key
+    run:
+      name: Decode Google Play service acc key
+      command: echo $GSTORE_KEY | base64 -di > $HOME/$GSTORE_KEY_PATH
+
   # Android signing key
 
   decode_signing_key: &decode_signing_key
