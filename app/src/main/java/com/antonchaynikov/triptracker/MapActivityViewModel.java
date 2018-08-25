@@ -93,12 +93,9 @@ public class MapActivityViewModel {
 
     private Disposable subscribeToLocationUpdates() {
         return mLocationSource.getLocation()
-                .doOnNext(new Consumer<Location>() {
-                    @Override
-                    public void accept(Location location) throws Exception {
-                        Log.d(TAG, location.toString());
-                        onLocationUpdated(location);
-                    }
+                .doOnNext(location -> {
+                    Log.d(TAG, location.toString());
+                    onLocationUpdated(location);
                 })
                 .subscribe();
     }
