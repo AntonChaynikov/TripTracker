@@ -1,8 +1,9 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.github.triplet.play'
 
 def versionMajor = 1
 def versionMinor = 0
-def versionPatch = 1
+def versionPatch = 0
 def versionBuild = 2
 def versionSuffix = versionBuild > 0 ? "-beta" : ""
 
@@ -11,13 +12,22 @@ ext {
     STORE_PASSWORD = System.getenv('TRIP_STORE_PASSWORD')
     KEY_ALIAS = System.getenv('TRIP_KEY_ALIAS')
     KEY_PASSWORD = System.getenv('TRIP_KEY_PASSWORD')
+    GSTORE_KEY_PATH = System.getenv('GSTORE_KEY_PATH')
 }
 
 android {
     compileSdkVersion 28
 
+    playAccountConfigs {
+        defaultAccountConfig {
+            serviceAccountEmail = "gps-logger-gplay@api-7194191596450161697-308117.iam.gserviceaccount.com"
+            jsonFile = file(GSTORE_KEY_PATH)
+        }
+    }
+
     defaultConfig {
         applicationId "com.antonchaynikov.triptracker"
+        playAccountConfig = playAccountConfigs.defaultAccountConfig
         minSdkVersion 19
         targetSdkVersion 28
         versionCode versionMajor * 100000 + versionMinor * 10000 + versionPatch * 1000 + versionBuild
@@ -40,6 +50,7 @@ android {
             keyPassword KEY_PASSWORD
         }
     }
+
     flavorDimensions "basic"
     productFlavors {
         platform {
@@ -49,9 +60,16 @@ android {
             applicationIdSuffix ".servicesApi"
         }
     }
+
     buildTypes {
+        debug {
+            minifyEnabled false
+            multiDexEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -60,6 +78,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+}
+
+play {
+    track = 'alpha'
 }
 
 dependencies {
