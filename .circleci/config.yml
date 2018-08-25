@@ -138,8 +138,11 @@ jobs:
           command: ./gradlew androidDependencies
       - *save_cache
       - run:
-          name: Run unit tests
-          command: ./gradlew -PciBuild=true :app:testDebugUnitTest
+          name: Run platform unit tests
+          command: ./gradlew -PciBuild=true :app:testPlatformDebugUnitTest
+      - run:
+          name: Run servicesApi unit tests
+          command: ./gradlew -PciBuild=true :app:testServicesApiDebugUnitTest
       - *persist_debug_workspace
       - store_artifacts:
           path: app/build/reports/
@@ -162,8 +165,11 @@ jobs:
           name: Set Google Cloud target project
           command: gcloud config set project  gps-trip-logger
       - run:
-          name: Run instrumented test on Firebase Test Lab
-          command: gcloud firebase test android run --app app/build/outputs/apk/debug/*debug.apk --test app/build/outputs/apk/androidTest/debug/*androidTest.apk --no-record-video --environment-variables coverage=true,coverageFile=/sdcard/coverage.ec --directories-to-pull=/sdcard --timeout 20m
+          name: Run platform instrumented test on Firebase Test Lab
+          command: gcloud firebase test android run --app app/build/outputs/apk/platform/debug/*debug.apk --test app/build/outputs/apk/androidTest/platform/debug/*androidTest.apk --no-record-video --environment-variables coverage=true,coverageFile=/sdcard/coverage.ec --directories-to-pull=/sdcard --timeout 20m
+      - run:
+          name: Run servicesApi instrumented test on Firebase Test Lab
+          command: gcloud firebase test android run --app app/build/outputs/apk/servicesApi/debug/*debug.apk --test app/build/outputs/apk/androidTest/servicesApi/debug/*androidTest.apk --no-record-video --environment-variables coverage=true,coverageFile=/sdcard/coverage.ec --directories-to-pull=/sdcard --timeout 20m
       - run:
           name: Create directory to store test results
           command: mkdir firebase
