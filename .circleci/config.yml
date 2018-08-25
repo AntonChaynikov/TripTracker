@@ -88,7 +88,7 @@ references:
     run:
       name: Decode Android signing key
       command: echo $SIGNING_KEY | base64 -di > $HOME/$TRIP_KEY_PATH
-  run:
+    run:
       name: Validating
       command: echo $HOME/$TRIP_KEY_PATH
 
