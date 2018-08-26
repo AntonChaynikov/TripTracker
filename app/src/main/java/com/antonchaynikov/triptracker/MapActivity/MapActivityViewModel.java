@@ -1,4 +1,4 @@
-package com.antonchaynikov.triptracker;
+package com.antonchaynikov.triptracker.MapActivity;
 
 import android.location.Location;
 import android.util.Log;
@@ -8,7 +8,6 @@ import com.google.android.gms.maps.model.LatLng;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 

@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "964383537574",
+    "firebase_url": "https://gps-trip-logger.firebaseio.com",
+    "project_id": "gps-trip-logger",
+    "storage_bucket": "gps-trip-logger.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:964383537574:android:761f48719b0af93c",
+        "android_client_info": {
+          "package_name": "com.antonchaynikov.triptracker.platform"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "964383537574-6hnqdh6idjnlmffscvm0rshm5mefd6b5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCQn8K8LoY4DlxQxv8iX9xQHVN1TJeu_s"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:964383537574:android:bc4396c5d59357e4",
+        "android_client_info": {
+          "package_name": "com.antonchaynikov.triptracker.servicesApi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "964383537574-6hnqdh6idjnlmffscvm0rshm5mefd6b5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCQn8K8LoY4DlxQxv8iX9xQHVN1TJeu_s"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

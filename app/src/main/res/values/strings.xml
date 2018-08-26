@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">TripTracker</string>
     <string name="button_act">Receive Coordinates</string>
-    <string name="button_stop">Stop Recieving Coordinates</string>
+    <string name="button_stop">Stop Receiving Coordinates</string>
     <string name="map_marker">Here!</string>
+    <string name="authentication_button_text">Login</string>
 </resources>

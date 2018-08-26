@@ -1,6 +1,8 @@
-package com.antonchaynikov.triptracker;
+package com.antonchaynikov.triptracker.MapActivity;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,10 +13,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.antonchaynikov.triptracker.Injector;
+import com.antonchaynikov.triptracker.R;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.firebase.auth.FirebaseUser;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
@@ -27,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final static long LOCATION_IRRELEVANT_AFTER = 1000 * 20;
     private final static int ACCESS_FINE_LOCATION_REQUEST_CODE = 1;
 
+    private final static String EXTRA_USER = "com.antonchaynikov.triptracker.MapActivity.user";
+
     private final static String TAG = "MainActivity";
 
     private boolean mPermissionGranted;
@@ -37,6 +45,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button mButton;
 
     private CompositeDisposable mSubscriptions;
+
+    public static Intent getStartIntent(Context context, FirebaseUser user) {
+        return new Intent(context, MainActivity.class)
+                .putExtra(EXTRA_USER, user);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mSubscriptions.add(subscribeToEditTextChangeEvent(mViewModel.getEditTextChangeEvent()));
         mSubscriptions.add(subscribeToButtonTextChangeEvent(mViewModel.getButtonTextChangeEvent()));
         mSubscriptions.add(subscribeToPermissionRequestEvent(mViewModel.getAskPermissionEvent()));
+        FirebaseUser user = getIntent().getParcelableExtra(EXTRA_USER);
+        Toast.makeText(this, user.getDisplayName(), Toast.LENGTH_LONG).show();
     }
 
     @Override

@@ -7,6 +7,9 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.antonchaynikov.triptracker.MapActivity.LocationSource;
+import com.antonchaynikov.triptracker.MapActivity.LocationUpdatePolicy;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;

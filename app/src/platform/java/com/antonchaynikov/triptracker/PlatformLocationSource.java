@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import com.antonchaynikov.triptracker.MapActivity.LocationSource;
+import com.antonchaynikov.triptracker.MapActivity.LocationUpdatePolicy;
+
 import java.lang.ref.WeakReference;
 
 import io.reactivex.Observable;

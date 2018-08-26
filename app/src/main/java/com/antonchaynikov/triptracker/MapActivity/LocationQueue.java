@@ -1,4 +1,4 @@
-package com.antonchaynikov.triptracker;
+package com.antonchaynikov.triptracker.MapActivity;
 
 import android.location.Location;
 import android.util.Log;
