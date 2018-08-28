@@ -93,6 +93,9 @@ references:
     run:
       name: Decode Android signing key
       command: echo $SIGNING_KEY | base64 -di > key-store.jks
+    run:
+      name: Validate
+      command: ls
 
 jobs:
 
