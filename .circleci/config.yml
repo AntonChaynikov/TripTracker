@@ -87,15 +87,12 @@ references:
   export_signing_key: &export_signing_key
     run:
       name: Export Android key store environment variable
-      command: echo 'export TRIP_KEY_PATH="$TRIP_KEY_PATH"' >> $BASH_ENV
+      command: echo 'export SIGNING_KEY="$SIGNING_KEY"' >> $BASH_ENV
 
   decode_signing_key: &decode_signing_key
     run:
       name: Decode Android signing key
-      command: echo $SIGNING_KEY | base64 -di > $TRIP_KEY_PATH
-    run:
-      name: Validating
-      command: echo $TRIP_KEY_PATH
+      command: echo $SIGNING_KEY | base64 -di > key-store.jks
 
 jobs:
 
