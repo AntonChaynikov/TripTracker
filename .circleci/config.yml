@@ -84,18 +84,16 @@ references:
 
   # Android signing key
 
-  export_signing_key: &export_signing_key
-    run:
-      name: Export Android key store environment variable
-      command: echo 'export SIGNING_KEY="$SIGNING_KEY"' >> $BASH_ENV
-
   decode_signing_key: &decode_signing_key
     run:
       name: Decode Android signing key
       command: echo $SIGNING_KEY | base64 -di > key-store.jks
     run:
-      name: Validate
+      name: Validate key
       command: ls
+    run:
+      name: Validate key
+      command: echo $SIGNING_KEY
 
 jobs:
 
@@ -125,7 +123,6 @@ jobs:
     steps:
       - checkout
       - *restore_cache
-      - *export_signing_key
       - *decode_signing_key
       - run:
           name: Download dependencies
