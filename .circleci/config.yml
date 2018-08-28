@@ -84,6 +84,10 @@ references:
 
   # Android signing key
 
+  export_signing_key: &export_signing_key
+    run:
+      name: Export Android key path environment variable
+      command: echo 'export $TRIP_KEY_PATH="$TRIP_KEY_PATH"' >> $BASH_ENV
   decode_signing_key: &decode_signing_key
     run:
       name: Decode Android signing key
@@ -117,6 +121,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache
+      - *export_signing_key
       - *decode_signing_key
       - run:
           name: Download dependencies
