@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:964383537574:android:761f48719b0af93c",
+        "mobilesdk_app_id": "1:964383537574:android:18d704c427535e1b",
         "android_client_info": {
-          "package_name": "com.antonchaynikov.triptracker.platform"
+          "package_name": "com.antonchaynikov.triptracker"
         }
       },
       "oauth_client": [
@@ -39,12 +39,36 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:964383537574:android:bc4396c5d59357e4",
+        "mobilesdk_app_id": "1:964383537574:android:761f48719b0af93c",
         "android_client_info": {
-          "package_name": "com.antonchaynikov.triptracker.servicesApi"
+          "package_name": "com.antonchaynikov.triptracker.platform"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "964383537574-n6jmj9jv2jrcpp7ifh8rqcmqf2t0fh1m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.antonchaynikov.triptracker.platform",
+            "certificate_hash": "99cfabf35341a5a6d90ef2fae3885514c34f9b06"
+          }
+        },
+        {
+          "client_id": "964383537574-op77vlo9vqj43oqb7ib9crssvbuhhehn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.antonchaynikov.triptracker.platform",
+            "certificate_hash": "40b4ee603f88cac41e5dfadd25a68854c0745c20"
+          }
+        },
+        {
+          "client_id": "964383537574-qmf988m26pghe3t3e5i13esn9dn027t2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.antonchaynikov.triptracker.platform",
+            "certificate_hash": "76faa953913763dfdd22eb5b6364c4575e5caaeb"
+          }
+        },
         {
           "client_id": "964383537574-6hnqdh6idjnlmffscvm0rshm5mefd6b5.apps.googleusercontent.com",
           "client_type": 3
@@ -60,8 +84,65 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "964383537574-6hnqdh6idjnlmffscvm0rshm5mefd6b5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:964383537574:android:bc4396c5d59357e4",
+        "android_client_info": {
+          "package_name": "com.antonchaynikov.triptracker.servicesApi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "964383537574-5evf8gd5himvu4pstmj3bj4ius9vc1k8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.antonchaynikov.triptracker.servicesApi",
+            "certificate_hash": "99cfabf35341a5a6d90ef2fae3885514c34f9b06"
+          }
+        },
+        {
+          "client_id": "964383537574-7ac83uk3of82pcufccuckp5nf0o4pkng.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.antonchaynikov.triptracker.servicesApi",
+            "certificate_hash": "40b4ee603f88cac41e5dfadd25a68854c0745c20"
+          }
+        },
+        {
+          "client_id": "964383537574-6hnqdh6idjnlmffscvm0rshm5mefd6b5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCQn8K8LoY4DlxQxv8iX9xQHVN1TJeu_s"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "964383537574-6hnqdh6idjnlmffscvm0rshm5mefd6b5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2

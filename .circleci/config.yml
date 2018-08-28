@@ -87,13 +87,7 @@ references:
   decode_signing_key: &decode_signing_key
     run:
       name: Decode Android signing key
-      command: echo $SIGNING_KEY | base64 -di > key-store.jks
-    run:
-      name: Validate key
-      command: ls
-    run:
-      name: Validate key
-      command: echo $SIGNING_KEY
+      command: echo $SIGNING_KEY | base64 -di > $TRIP_KEY_PATH
 
 jobs:
 
