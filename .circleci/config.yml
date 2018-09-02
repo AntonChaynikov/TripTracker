@@ -201,6 +201,8 @@ jobs:
       - checkout
       - *attach_release_workspace
       - *restore_cache
+      - *decode_signing_key
+      - *export_signing_key
       - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
