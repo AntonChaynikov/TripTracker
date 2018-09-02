@@ -125,6 +125,7 @@ jobs:
       - checkout
       - *restore_cache
       - *decode_signing_key
+      - *check_existence
       - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
