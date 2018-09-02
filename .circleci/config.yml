@@ -94,7 +94,7 @@ references:
   check_existence: &check_existence
     run:
       name: Check if env var exists
-      command: echo $SIGNING_KEY
+      command: ls
 
 jobs:
 
