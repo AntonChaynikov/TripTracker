@@ -88,13 +88,18 @@ references:
     run:
       name: Decode Android signing key
       command: echo $SIGNING_KEY | base64 -di > key.jks
+  export_signing_key: &export_signing_key
     run:
       name: Export path to env var
       command:  echo 'export TRIP_KEY_PATH="$PWD/key.jks"' >> $BASH_ENV
   check_existence: &check_existence
     run:
       name: Check if env var exists
-      command: ls
+      command: ls $TRIP_KEY_PATH
+  check_existence_var: &check_existence_var
+      run:
+        name: Check env var
+        command: echo $SIGNING_KEY
 
 jobs:
 
@@ -124,7 +129,9 @@ jobs:
     steps:
       - checkout
       - *restore_cache
+      - *check_existence_var
       - *decode_signing_key
+      - *export_signing_key
       - *check_existence
       - run:
           name: Download dependencies
