@@ -91,6 +91,10 @@ references:
     run:
       name: Export path to env var
       command:  echo 'export TRIP_KEY_PATH="$PWD/key.jks"' >> $BASH_ENV
+  check_existence: &check_existence
+    run:
+      name: Check if env var exists
+      command: echo $SIGNING_KEY
 
 jobs:
 
