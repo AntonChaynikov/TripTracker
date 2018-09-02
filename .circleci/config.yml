@@ -90,7 +90,7 @@ references:
       command: echo $SIGNING_KEY | base64 -di > key.jks
     run:
       name: Export path to env var
-      commant:  echo 'export TRIP_KEY_PATH="$PWD/key.jks"' >> $BASH_ENV
+      command:  echo 'export TRIP_KEY_PATH="$PWD/key.jks"' >> $BASH_ENV
 
 jobs:
 
