@@ -92,14 +92,6 @@ references:
     run:
       name: Export path to env var
       command:  echo 'export TRIP_KEY_PATH="$PWD/key.jks"' >> $BASH_ENV
-  check_existence: &check_existence
-    run:
-      name: Check if env var exists
-      command: ls $TRIP_KEY_PATH
-  check_existence_var: &check_existence_var
-      run:
-        name: Check env var
-        command: echo $SIGNING_KEY
 
 jobs:
 
@@ -129,10 +121,8 @@ jobs:
     steps:
       - checkout
       - *restore_cache
-      - *check_existence_var
       - *decode_signing_key
       - *export_signing_key
-      - *check_existence
       - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
@@ -219,7 +209,7 @@ jobs:
           command: echo 'Deploying'
       - run:
           name: Deploy to Google Play alpha
-          command: ./gradlew publishRelease
+          command: ./gradlew publishPlatformRelease
 
 workflows:
   version: 2
