@@ -80,7 +80,11 @@ references:
   decode_gplay_key: &decode_gplay_key
     run:
       name: Decode Google Play service acc key
-      command: echo $GSTORE_KEY | base64 -di > $HOME/$GSTORE_KEY_PATH
+      command: echo $GSTORE_KEY | base64 -di > gstore.json
+  export_gplay_key: &export_gplay_key
+    run:
+      name: Export path to env var
+      command:  echo 'export $GSTORE_KEY_PATH="$PWD/gstore.json"' >> $BASH_ENV
 
   # Android signing key
 
@@ -203,6 +207,8 @@ jobs:
       - *restore_cache
       - *decode_signing_key
       - *export_signing_key
+      - *decode_gplay_key
+      - *export_gplay_key
       - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
