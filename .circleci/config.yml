@@ -80,14 +80,23 @@ references:
   decode_gplay_key: &decode_gplay_key
     run:
       name: Decode Google Play service acc key
-      command: echo $GSTORE_KEY | base64 -di > $HOME/$GSTORE_KEY_PATH
+      command: echo $GSTORE_KEY | base64 -di > gstore.json
+
+  export_gplay_key: &export_gplay_key
+      run:
+        name: Export path to env var
+        command:  echo 'export GSTORE_KEY_PATH="$PWD/gstore.json"' >> $BASH_ENV
 
   # Android signing key
 
   decode_signing_key: &decode_signing_key
     run:
       name: Decode Android signing key
-      command: echo $SIGNING_KEY | base64 -di > ${HOME}/$TRIP_KEY_PATH
+      command: echo $SIGNING_KEY | base64 -di > key.jks
+  export_signing_key: &export_signing_key
+    run:
+      name: Export path to env var
+      command:  echo 'export TRIP_KEY_PATH="$PWD/key.jks"' >> $BASH_ENV
 
 jobs:
 
@@ -118,6 +127,7 @@ jobs:
       - checkout
       - *restore_cache
       - *decode_signing_key
+      - *export_signing_key
       - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
@@ -196,6 +206,10 @@ jobs:
       - checkout
       - *attach_release_workspace
       - *restore_cache
+      - *decode_signing_key
+      - *export_signing_key
+      - *decode_gplay_key
+      - *export_gplay_key
       - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
@@ -204,7 +218,7 @@ jobs:
           command: echo 'Deploying'
       - run:
           name: Deploy to Google Play alpha
-          command: ./gradlew publishRelease
+          command: ./gradlew publishPlatformRelease
 
 workflows:
   version: 2
