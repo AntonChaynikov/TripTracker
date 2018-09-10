@@ -1,13 +1,20 @@
 package com.antonchaynikov.triptracker.MapActivity;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.AlarmManagerCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -15,12 +22,17 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.antonchaynikov.triptracker.AlarmListener;
 import com.antonchaynikov.triptracker.Injector;
 import com.antonchaynikov.triptracker.R;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
@@ -54,8 +66,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        checkGooglePlayServicesAvailability();
         setContentView(R.layout.main_activity);
-
         mPermissionGranted =
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
                         PackageManager.PERMISSION_GRANTED;
@@ -68,10 +80,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mLocationTextView = findViewById(R.id.main_activity_textView);
         mButton = findViewById(R.id.main_activity_button);
         mButton.setOnClickListener(this);
-
         addMapFragment();
-
         mSubscriptions = new CompositeDisposable();
+        AlarmManager alarmManager = (AlarmManager) getSystemService(AppCompatActivity.ALARM_SERVICE);
+        if (alarmManager != null) {
+            PendingIntent intent = PendingIntent.getBroadcast(this, 0, AlarmListener.makeIntent(this), 0);
+            AlarmManagerCompat.setExactAndAllowWhileIdle(alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP, TimeUnit.SECONDS.toMillis(15), intent);
+            Toast.makeText(this, "Alarm set",Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -83,11 +99,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onResume() {
         super.onResume();
+        checkGooglePlayServicesAvailability();
         mSubscriptions.add(subscribeToEditTextChangeEvent(mViewModel.getEditTextChangeEvent()));
         mSubscriptions.add(subscribeToButtonTextChangeEvent(mViewModel.getButtonTextChangeEvent()));
         mSubscriptions.add(subscribeToPermissionRequestEvent(mViewModel.getAskPermissionEvent()));
-        FirebaseUser user = getIntent().getParcelableExtra(EXTRA_USER);
-        Toast.makeText(this, user.getDisplayName(), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -111,34 +126,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private Disposable subscribeToEditTextChangeEvent(Observable<String> event) {
-        return event.subscribe(new Consumer<String>() {
-            @Override
-            public void accept(String text) throws Exception {
-                mLocationTextView.setText(text);
-            }
-        });
+        return event.subscribe(text -> mLocationTextView.setText(text));
     }
 
     private Disposable subscribeToButtonTextChangeEvent(Observable<Boolean> event) {
-        return event.subscribe(new Consumer<Boolean>() {
-            @Override
-            public void accept(Boolean aBoolean) throws Exception {
-                if (aBoolean == MapActivityViewModel.BUTTON_TEXT_START) {
-                    mButton.setText(R.string.button_act);
-                } else {
-                    mButton.setText(R.string.button_stop);
-                }
+        return event.subscribe(aBoolean -> {
+            if (aBoolean == MapActivityViewModel.BUTTON_TEXT_START) {
+                mButton.setText(R.string.button_act);
+            } else {
+                mButton.setText(R.string.button_stop);
             }
         });
     }
 
     private Disposable subscribeToPermissionRequestEvent(Observable<Boolean> event) {
-        return event.subscribe(new Consumer<Boolean>() {
-            @Override
-            public void accept(Boolean aBoolean) throws Exception {
-                String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
-                ActivityCompat.requestPermissions(MainActivity.this, permissions, ACCESS_FINE_LOCATION_REQUEST_CODE);
-            }
+        return event.subscribe(aBoolean -> {
+            String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
+            ActivityCompat.requestPermissions(MainActivity.this, permissions, ACCESS_FINE_LOCATION_REQUEST_CODE);
         });
     }
 
@@ -151,4 +155,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .commit();
     }
 
+    private void checkGooglePlayServicesAvailability() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int status = apiAvailability.isGooglePlayServicesAvailable(getApplicationContext());
+        if (status != ConnectionResult.SUCCESS) {
+            apiAvailability.makeGooglePlayServicesAvailable(this);
+        }
+    }
 }
