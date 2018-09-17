@@ -1,23 +1,15 @@
 package com.antonchaynikov.triptracker;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.antonchaynikov.triptracker.MapActivity.LocationSource;
-import com.antonchaynikov.triptracker.MapActivity.LocationUpdatePolicy;
-
-import java.lang.ref.WeakReference;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.subjects.BehaviorSubject;
 
 /**
@@ -34,25 +26,23 @@ public class PlatformLocationSource implements LocationSource, LocationListener 
     private final static float MIN_DISTANCE_TO_UPDATE = 0;
 
     private LocationManager mLocationManager;
-    private LocationUpdatePolicy mLocationUpdatePolicy;
     private BehaviorSubject<Location> mLocationBroadcast = BehaviorSubject.create();
     private boolean mUpdating;
 
-    public static PlatformLocationSource getInstance(Context context, LocationUpdatePolicy locationUpdatePolicy) {
+    public static PlatformLocationSource getInstance(Context context) {
         Log.d(TAG, "Using as a LocationSource");
         if (instance == null) {
             synchronized (PlatformLocationSource.class) {
                 if (instance == null) {
-                    instance = new PlatformLocationSource(context, locationUpdatePolicy);
+                    instance = new PlatformLocationSource(context);
                 }
             }
         }
         return instance;
     }
 
-    private PlatformLocationSource(Context context, LocationUpdatePolicy locationUpdatePolicy) {
+    private PlatformLocationSource(Context context) {
         mLocationManager = (LocationManager) context.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-        mLocationUpdatePolicy = locationUpdatePolicy;
     }
 
     @Override
@@ -60,13 +50,11 @@ public class PlatformLocationSource implements LocationSource, LocationListener 
         if (isUpdateEnabled()) {
             mLocationManager.removeUpdates(this);
             mUpdating = false;
-            Log.d(TAG, "Stopped updating");
         } else {
             try {
                 mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_INTERVAL, MIN_DISTANCE_TO_UPDATE, this);
                 mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, NETWORK_UPDATE_INTERVAL, MIN_DISTANCE_TO_UPDATE, this);
                 mUpdating = true;
-                Log.d(TAG, "Started updating");
 
             } catch (SecurityException e) {
                 Log.e(TAG, "Failed to get location. No permission granted" + e);
@@ -80,22 +68,17 @@ public class PlatformLocationSource implements LocationSource, LocationListener 
     }
 
     @Override
-    public Observable<Location> getLocation() {
+    public Observable<Location> getLocationUpdates() {
         return mLocationBroadcast;
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        mLocationUpdatePolicy.updateLastLocationRecieved(location);
-        Location relevantLoc = mLocationUpdatePolicy.getRelevantLocation();
-        Log.d(TAG, "Location received " + location.toString());
-        Log.d(TAG, "Last RelevantLocation is  " + relevantLoc.toString());
-        mLocationBroadcast.onNext(relevantLoc);
+        mLocationBroadcast.onNext(location);
     }
 
     @Override
     public void onStatusChanged(String s, int i, Bundle bundle) {
-
     }
 
     @Override

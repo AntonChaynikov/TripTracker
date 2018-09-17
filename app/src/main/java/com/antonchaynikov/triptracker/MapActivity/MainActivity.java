@@ -25,12 +25,9 @@ import com.google.firebase.auth.FirebaseUser;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
 
-    private final static int MAX_LOCATIONS_NUM_STORED = 6;
-    private final static long LOCATION_IRRELEVANT_AFTER = 1000 * 20;
     private final static int ACCESS_FINE_LOCATION_REQUEST_CODE = 1;
 
     private final static String EXTRA_USER = "com.antonchaynikov.triptracker.MapActivity.user";
@@ -60,10 +57,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
                         PackageManager.PERMISSION_GRANTED;
 
-        LocationSource locationSource = Injector.injectLocationSource(this,
-                new PreciseLocationUpdatePolicy(LOCATION_IRRELEVANT_AFTER, MAX_LOCATIONS_NUM_STORED));
+        LocationSource locationSource = Injector.injectLocationSource(this);
 
-        mViewModel = new MapActivityViewModel(locationSource, new Mapper(new TrackCalculator()), mPermissionGranted);
+        mViewModel = new MapActivityViewModel();
 
         mLocationTextView = findViewById(R.id.main_activity_textView);
         mButton = findViewById(R.id.main_activity_button);
@@ -83,9 +79,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onResume() {
         super.onResume();
-        mSubscriptions.add(subscribeToEditTextChangeEvent(mViewModel.getEditTextChangeEvent()));
-        mSubscriptions.add(subscribeToButtonTextChangeEvent(mViewModel.getButtonTextChangeEvent()));
-        mSubscriptions.add(subscribeToPermissionRequestEvent(mViewModel.getAskPermissionEvent()));
+        //mSubscriptions.add(subscribeToEditTextChangeEvent(mViewModel.getEditTextChangeEvent()));
+        //mSubscriptions.add(subscribeToButtonTextChangeEvent(mViewModel.getButtonTextChangeEvent()));
+        //mSubscriptions.add(subscribeToPermissionRequestEvent(mViewModel.getAskPermissionEvent()));
         FirebaseUser user = getIntent().getParcelableExtra(EXTRA_USER);
         Toast.makeText(this, user.getDisplayName(), Toast.LENGTH_LONG).show();
     }
@@ -96,49 +92,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (requestCode == ACCESS_FINE_LOCATION_REQUEST_CODE) {
             mPermissionGranted = (grantResults[0] == PackageManager.PERMISSION_GRANTED);
         }
-        mViewModel.onPermissionRequestResult(mPermissionGranted);
+       // mViewModel.onPermissionRequestResult(mPermissionGranted);
         Log.d(TAG, "Permission Granted = " + mPermissionGranted);
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mViewModel.onMapReady(googleMap);
+        //mViewModel.onMapReady(googleMap);
     }
 
     @Override
     public void onClick(View view) {
-        mViewModel.onCoordinatesButtonClick();
+        mViewModel.toggleCoordinatesUpdate();
     }
 
     private Disposable subscribeToEditTextChangeEvent(Observable<String> event) {
-        return event.subscribe(new Consumer<String>() {
-            @Override
-            public void accept(String text) throws Exception {
-                mLocationTextView.setText(text);
-            }
-        });
+        return event.subscribe(text -> mLocationTextView.setText(text));
     }
 
     private Disposable subscribeToButtonTextChangeEvent(Observable<Boolean> event) {
-        return event.subscribe(new Consumer<Boolean>() {
-            @Override
-            public void accept(Boolean aBoolean) throws Exception {
-                if (aBoolean == MapActivityViewModel.BUTTON_TEXT_START) {
-                    mButton.setText(R.string.button_act);
-                } else {
-                    mButton.setText(R.string.button_stop);
-                }
+        return event.subscribe(aBoolean -> {
+            if (aBoolean) {
+                mButton.setText(R.string.button_act);
+            } else {
+                mButton.setText(R.string.button_stop);
             }
         });
     }
 
     private Disposable subscribeToPermissionRequestEvent(Observable<Boolean> event) {
-        return event.subscribe(new Consumer<Boolean>() {
-            @Override
-            public void accept(Boolean aBoolean) throws Exception {
-                String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
-                ActivityCompat.requestPermissions(MainActivity.this, permissions, ACCESS_FINE_LOCATION_REQUEST_CODE);
-            }
+        return event.subscribe(aBoolean -> {
+            String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
+            ActivityCompat.requestPermissions(MainActivity.this, permissions, ACCESS_FINE_LOCATION_REQUEST_CODE);
         });
     }
 
