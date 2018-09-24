@@ -59,7 +59,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         LocationSource locationSource = Injector.injectLocationSource(this);
 
-        mViewModel = new MapActivityViewModel();
+        mViewModel = new MapActivityViewModel(
+                ContextCompat.checkSelfPermission(
+                        this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
 
         mLocationTextView = findViewById(R.id.main_activity_textView);
         mButton = findViewById(R.id.main_activity_button);

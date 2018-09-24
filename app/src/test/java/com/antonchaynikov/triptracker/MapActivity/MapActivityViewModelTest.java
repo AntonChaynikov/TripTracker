@@ -1,25 +1,33 @@
 package com.antonchaynikov.triptracker.MapActivity;
 
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
 import static org.junit.Assert.*;
 
-@RunWith(BlockJUnit4ClassRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class MapActivityViewModelTest {
 
     private MapActivityViewModel mTestSubject;
+
+    @Spy
+    private Consumer c;
 
     private boolean mIsLocationPermissionGrantedInitially = false;
 
     @Before
     public void setUp() {
         mTestSubject = new MapActivityViewModel(mIsLocationPermissionGrantedInitially);
+        c = o -> {};
     }
 
     @Test
@@ -57,12 +65,10 @@ public class MapActivityViewModelTest {
     }
 
     @Test
-    public void shouldRequestPermissionIfNotAlreadyGranted() {
-        boolean permissionRequested = false;
-        mTestSubject.getLocationPermissionRequestEvent().subscribe(o -> {
-            return;
-        });
-        throw new AssertionError("Location permission should have been requested");
+    public void shouldRequestPermissionIfNotAlreadyGranted() throws Exception{
+        Consumer c = o -> {};
+        mTestSubject.getLocationPermissionRequestEvent().subscribe(c);
+        Mockito.verify(c, Mockito.times(1)).accept(Matchers.anyObject());
     }
 
 
