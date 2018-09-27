@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LocationSource locationSource = Injector.injectLocationSource(this);
 
         mViewModel = new MapActivityViewModel(
+                locationSource,
                 ContextCompat.checkSelfPermission(
                         this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
 

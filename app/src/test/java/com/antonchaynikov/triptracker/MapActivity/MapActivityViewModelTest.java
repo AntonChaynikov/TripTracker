@@ -1,5 +1,7 @@
 package com.antonchaynikov.triptracker.MapActivity;
 
+import android.location.Location;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import org.junit.Before;
@@ -11,10 +13,14 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.SingleOnSubscribe;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MapActivityViewModelTest {
@@ -25,7 +31,9 @@ public class MapActivityViewModelTest {
     private Consumer rawConsumer;
     @Spy
     private Consumer<LatLng> latLngConsumer;
-    private LatLng testLocation = new LatLng(1,1);
+    private LatLng testLatLng = new LatLng(1,1);
+    private Location testLocation = new Location("test");
+
     @Mock
     private LocationSource mockLocationSource;
 
@@ -33,6 +41,7 @@ public class MapActivityViewModelTest {
 
     @Before
     public void setUp() throws Exception {
+        when(mockLocationSource.getLocationUpdates()).thenReturn(Observable.just(testLocation));
         mTestSubject = new MapActivityViewModel(mockLocationSource, mIsLocationPermissionGrantedInitially);
         Mockito.doNothing().when(rawConsumer).accept(ArgumentMatchers.any());
         Mockito.doNothing().when(latLngConsumer).accept(ArgumentMatchers.any());
@@ -87,8 +96,4 @@ public class MapActivityViewModelTest {
         mTestSubject.toggleCoordinatesUpdate();
         Mockito.verify(rawConsumer, Mockito.times(1)).accept(testLocation);
     }
-
-
-
-
 }

@@ -1,13 +1,11 @@
 package com.antonchaynikov.triptracker.MapActivity;
 
 import android.arch.lifecycle.ViewModel;
-import android.location.Location;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import io.reactivex.Observable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
@@ -22,7 +20,7 @@ public class MapActivityViewModel extends ViewModel {
     private boolean mIsLocationPermissionGranted;
 
     private BehaviorSubject<Integer> mLocationUpdateStatusChangeEvent = BehaviorSubject.create();
-    private BehaviorSubject mLocationPermissionRequestEvent = BehaviorSubject.create();
+    private BehaviorSubject<Object> mLocationPermissionRequestEvent = BehaviorSubject.create();
     private PublishSubject<LatLng> mNewLocationReceivedEvent = PublishSubject.create();
 
     private Object mStubBroadcast = new Object();
@@ -56,7 +54,7 @@ public class MapActivityViewModel extends ViewModel {
     }
 
     @NonNull
-    public Observable getLocationPermissionRequestEvent() {
+    public Observable<Object> getLocationPermissionRequestEvent() {
         return mLocationPermissionRequestEvent;
     }
 

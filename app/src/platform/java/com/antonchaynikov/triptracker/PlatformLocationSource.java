@@ -46,19 +46,23 @@ public class PlatformLocationSource implements LocationSource, LocationListener 
     }
 
     @Override
-    public void toggleLocationUpdates() {
-        if (isUpdateEnabled()) {
-            mLocationManager.removeUpdates(this);
-            mUpdating = false;
-        } else {
+    public void startUpdates() {
+        if (!isUpdateEnabled()) {
             try {
                 mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_INTERVAL, MIN_DISTANCE_TO_UPDATE, this);
                 mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, NETWORK_UPDATE_INTERVAL, MIN_DISTANCE_TO_UPDATE, this);
                 mUpdating = true;
-
             } catch (SecurityException e) {
                 Log.e(TAG, "Failed to get location. No permission granted" + e);
             }
+        }
+    }
+
+    @Override
+    public void stopUpdates() {
+        if (isUpdateEnabled()) {
+            mLocationManager.removeUpdates(this);
+            mUpdating = false;
         }
     }
 
