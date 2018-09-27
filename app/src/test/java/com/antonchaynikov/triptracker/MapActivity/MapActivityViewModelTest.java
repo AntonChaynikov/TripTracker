@@ -26,11 +26,9 @@ import static org.mockito.Mockito.when;
 public class MapActivityViewModelTest {
 
     private MapActivityViewModel mTestSubject;
+    @Spy private Consumer rawConsumer;
+    @Spy private Consumer<LatLng> latLngConsumer;
 
-    @Spy
-    private Consumer rawConsumer;
-    @Spy
-    private Consumer<LatLng> latLngConsumer;
     private LatLng testLatLng = new LatLng(1,1);
     private Location testLocation = new Location("test");
 
@@ -41,6 +39,8 @@ public class MapActivityViewModelTest {
 
     @Before
     public void setUp() throws Exception {
+        testLocation.setLatitude(testLatLng.latitude);
+        testLocation.setLongitude(testLatLng.longitude);
         when(mockLocationSource.getLocationUpdates()).thenReturn(Observable.just(testLocation));
         mTestSubject = new MapActivityViewModel(mockLocationSource, mIsLocationPermissionGrantedInitially);
         Mockito.doNothing().when(rawConsumer).accept(ArgumentMatchers.any());
@@ -69,7 +69,6 @@ public class MapActivityViewModelTest {
         subscription = mTestSubject
                 .getLocationUpdateStatusChangeEvent()
                 .subscribe(getStatusConsumer(expectedUpdateStatus));
-
     }
 
     private Consumer<Integer> getStatusConsumer(int expectedUpdateStatus) {
@@ -90,7 +89,7 @@ public class MapActivityViewModelTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void shouldBroadcastLocationsWhetUpdatesToggledOn() throws Exception {
+    public void shouldBroadcastLocationsWhenUpdatesToggledOn() throws Exception {
         mTestSubject.getNewLocationReceivedEvent().subscribe(latLngConsumer);
         mTestSubject.onLocationPermissionGranted();
         mTestSubject.toggleCoordinatesUpdate();
