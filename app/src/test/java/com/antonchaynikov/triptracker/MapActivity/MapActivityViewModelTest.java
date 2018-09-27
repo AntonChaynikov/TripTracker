@@ -1,10 +1,12 @@
 package com.antonchaynikov.triptracker.MapActivity;
 
-import org.hamcrest.Matcher;
+import com.google.android.gms.maps.model.LatLng;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -20,14 +22,20 @@ public class MapActivityViewModelTest {
     private MapActivityViewModel mTestSubject;
 
     @Spy
-    private Consumer c;
+    private Consumer rawConsumer;
+    @Spy
+    private Consumer<LatLng> latLngConsumer;
+    private LatLng testLocation = new LatLng(1,1);
+    @Mock
+    private LocationSource mockLocationSource;
 
     private boolean mIsLocationPermissionGrantedInitially = false;
 
     @Before
-    public void setUp() {
-        mTestSubject = new MapActivityViewModel(mIsLocationPermissionGrantedInitially);
-        c = o -> {};
+    public void setUp() throws Exception {
+        mTestSubject = new MapActivityViewModel(mockLocationSource, mIsLocationPermissionGrantedInitially);
+        Mockito.doNothing().when(rawConsumer).accept(ArgumentMatchers.any());
+        Mockito.doNothing().when(latLngConsumer).accept(ArgumentMatchers.any());
     }
 
     @Test
@@ -64,12 +72,23 @@ public class MapActivityViewModelTest {
             };
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void shouldRequestPermissionIfNotAlreadyGranted() throws Exception{
-        Consumer c = o -> {};
-        mTestSubject.getLocationPermissionRequestEvent().subscribe(c);
-        Mockito.verify(c, Mockito.times(1)).accept(Matchers.anyObject());
+        mTestSubject.getLocationPermissionRequestEvent().subscribe(rawConsumer);
+        Mockito.verify(rawConsumer, Mockito.times(1)).accept(ArgumentMatchers.any());
     }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void shouldBroadcastLocationsWhetUpdatesToggledOn() throws Exception {
+        mTestSubject.getNewLocationReceivedEvent().subscribe(latLngConsumer);
+        mTestSubject.onLocationPermissionGranted();
+        mTestSubject.toggleCoordinatesUpdate();
+        Mockito.verify(rawConsumer, Mockito.times(1)).accept(testLocation);
+    }
+
+
 
 
 }

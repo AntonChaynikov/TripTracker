@@ -6,7 +6,9 @@ import io.reactivex.Observable;
 
 public interface LocationSource {
 
-    void toggleLocationUpdates();
+    void startUpdates();
+
+    void stopUpdates();
 
     boolean isUpdateEnabled();
 
