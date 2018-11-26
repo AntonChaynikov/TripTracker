@@ -1,7 +1,8 @@
-package com.antonchaynikov.triptracker.MapActivity;
+package com.antonchaynikov.triptracker.data;
 
 import android.location.Location;
 
+import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 
 public interface LocationSource {
@@ -12,5 +13,6 @@ public interface LocationSource {
 
     boolean isUpdateEnabled();
 
+    @NonNull
     Observable<Location> getLocationUpdates();
 }

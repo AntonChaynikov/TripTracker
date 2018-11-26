@@ -4,7 +4,7 @@ apply plugin: 'com.github.triplet.play'
 def versionMajor = 1
 def versionMinor = 0
 def versionPatch = 0
-def versionBuild = 4
+def versionBuild = 5
 def versionSuffix = versionBuild > 0 ? "-beta" : ""
 
 ext {
@@ -33,7 +33,7 @@ android {
         versionCode versionMajor * 100000 + versionMinor * 10000 + versionPatch * 1000 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}${versionSuffix}"
         setProperty("archivesBaseName", "$rootProject.name-v$versionName")
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
@@ -68,7 +68,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -88,25 +88,36 @@ play {
     track = 'alpha'
 }
 
+ext {
+    ANDROIDX_APPCOMPAT = '1.0.2'
+    ANDROIDX_SUPPORT_V4 =  '1.0.0'
+    CONSTRAINT_LAYOUT = '2.0.0-alpha2'
+    RX_JAVA = '2.1.16'
+    GOOGLE_MAPS_SDK = '16.0.0'
+    GOOGLE_PLAY_SERVICES_BASE = '16.0.1'
+    FIREBASE_CORE = '16.0.5'
+    FIREBASE_UI_AUTH = '4.2.1'
+    MOCKITO_CORE = '2.22.0'
+    JUNIT = '4.12'
+    ANDROIDX_TEST_RUNNER = '1.1.0'
+    ESPRESSO_CORE = '3.1.0'
+}
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:28.0.0-alpha3'
-    implementation 'com.android.support:cardview-v7:28.0.0-alpha3'
-    implementation 'com.android.support:customtabs:28.0.0-alpha3'
-    implementation 'com.android.support:design:28.0.0-alpha3'
-    implementation 'com.android.support:support-media-compat:28.0.0-alpha3'
-    implementation 'com.android.support:support-v4:28.0.0-alpha3'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-    implementation 'org.mockito:mockito-core:2.22.0'
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
-    implementation 'com.google.android.gms:play-services-maps:15.0.1'
-    implementation 'com.google.firebase:firebase-core:16.0.1'
-    implementation 'com.firebaseui:firebase-ui-auth:4.1.0'
+    implementation "androidx.appcompat:appcompat:$ANDROIDX_APPCOMPAT"
+    implementation "androidx.legacy:legacy-support-v4:$ANDROIDX_SUPPORT_V4"
+    implementation "androidx.constraintlayout:constraintlayout:$CONSTRAINT_LAYOUT"
+    implementation "io.reactivex.rxjava2:rxjava:$RX_JAVA"
+    implementation "com.google.android.gms:play-services-maps:$GOOGLE_MAPS_SDK"
+    implementation "com.google.firebase:firebase-core:$FIREBASE_CORE"
+    implementation "com.firebaseui:firebase-ui-auth:$FIREBASE_UI_AUTH"
+    implementation "com.google.android.gms:play-services-base:$GOOGLE_PLAY_SERVICES_BASE"
 
-
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    testImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
+    testImplementation "junit:junit:$JUNIT"
+    androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"
 }
 
 apply plugin: 'com.google.gms.google-services'

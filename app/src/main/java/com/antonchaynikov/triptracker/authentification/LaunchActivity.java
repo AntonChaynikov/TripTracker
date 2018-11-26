@@ -1,7 +1,7 @@
-package com.antonchaynikov.triptracker.LaunchActivity;
+package com.antonchaynikov.triptracker.authentification;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.antonchaynikov.triptracker.R;
 

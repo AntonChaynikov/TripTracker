@@ -20,10 +20,10 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".MapActivity.MainActivity"
+        <activity android:name=".mainscreen.MainActivity"
             tools:ignore="InnerclassSeparator" />
 
-        <activity android:name=".LaunchActivity.LaunchActivity"
+        <activity android:name=".authentification.LaunchActivity"
             tools:ignore="InnerclassSeparator">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
