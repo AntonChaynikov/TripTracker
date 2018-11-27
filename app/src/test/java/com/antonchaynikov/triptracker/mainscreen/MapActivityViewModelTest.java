@@ -16,6 +16,7 @@ import java.util.List;
 
 import io.reactivex.subjects.PublishSubject;
 
+import static com.antonchaynikov.triptracker.mainscreen.MapActivityViewModel.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
@@ -46,8 +47,8 @@ public class MapActivityViewModelTest {
             locationBroadcast.onNext(mockLocation);
             return null;
         }).when(mockLocationSource).startUpdates();
-       // when(mockLocationSource.isUpdateEnabled()).thenReturn(true);
-       // doNothing().when(mockLocationSource).stopUpdates();
+
+        when(mockLocationSource.isUpdateEnabled()).thenReturn(true);
         when(mockLocationSource.getLocationUpdates()).thenReturn(locationBroadcast);
 
         mTestSubject = new MapActivityViewModel(mockLocationSource,true);
@@ -117,5 +118,45 @@ public class MapActivityViewModelTest {
         // 1 and only 1 event should be broadcasted
         assertEquals(0, events.size());
     }
+
+    @Test
+    public void onStartTripButtonClick_shouldBroadcastOnLocationBroadcastStatusChangedEvent_ifLocationServiceAvailable() {
+
+        // Location permission is present
+        mTestSubject.setLocationPermissionStatus(true);
+
+        when(mockLocationSource.isUpdateEnabled()).thenReturn(true);
+
+        List<LocationBroadcastStatus> events = new LinkedList<>();
+        mTestSubject.getOnLocationBroadcastStatusChangedEventBroadcast()
+                .subscribe(events::add);
+
+        mTestSubject.onStartTripButtonClick();
+
+        // 1 and only 1 event should be broadcasted
+        assertEquals(2, events.size());
+        assertEquals(LocationBroadcastStatus.BROADCASTING, events.get(1));
+    }
+
+    @Test
+    public void onStartTripButtonClick_shouldNotBroadcastOnLocationBroadcastStatusChangedEvent_ifLocationServiceUnavailable() {
+
+        // Location permission is present
+        mTestSubject.setLocationPermissionStatus(true);
+
+        when(mockLocationSource.isUpdateEnabled()).thenReturn(false);
+
+        List<LocationBroadcastStatus> events = new LinkedList<>();
+        mTestSubject.getOnLocationBroadcastStatusChangedEventBroadcast()
+                .subscribe(events::add);
+
+        mTestSubject.onStartTripButtonClick();
+
+        // 1 and only 1 event should be broadcasted
+        assertEquals(1, events.size());
+        assertEquals(LocationBroadcastStatus.IDLE, events.get(0));
+    }
+
+
 
 }

@@ -11,11 +11,16 @@ import androidx.lifecycle.ViewModel;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
+
+import static com.antonchaynikov.triptracker.mainscreen.MapActivityViewModel.LocationBroadcastStatus.BROADCASTING;
+import static com.antonchaynikov.triptracker.mainscreen.MapActivityViewModel.LocationBroadcastStatus.IDLE;
 
 public class MapActivityViewModel extends ViewModel {
 
     private PublishSubject<Boolean> mRequestLocationPermissionEventBroadcast = PublishSubject.create();
+    private BehaviorSubject<LocationBroadcastStatus> mOnLocationBroadcastStatusChangedEventBroadcast = BehaviorSubject.createDefault(IDLE);
     private PublishSubject<LatLng> mNewLocationEventBroadcast = PublishSubject.create();
 
     private LocationSource mLocationSource;
@@ -33,17 +38,26 @@ public class MapActivityViewModel extends ViewModel {
         mIsLocationPermissionGranted = isGranted;
     }
 
-    public PublishSubject<Boolean> getRequestLocationPermissionEventBroadcast() {
+    public Observable<Boolean> getRequestLocationPermissionEventBroadcast() {
         return mRequestLocationPermissionEventBroadcast;
     }
 
-    public PublishSubject<LatLng> getNewLocationEventBroadcast() {
+    public Observable<LatLng> getNewLocationEventBroadcast() {
         return mNewLocationEventBroadcast;
+    }
+
+    public Observable<LocationBroadcastStatus>getOnLocationBroadcastStatusChangedEventBroadcast() {
+        return mOnLocationBroadcastStatusChangedEventBroadcast;
     }
 
     public void onStartTripButtonClick() {
         if (mIsLocationPermissionGranted) {
-            mLocationSource.startUpdates();
+            if (mLocationSource.isUpdateEnabled()) {
+                mLocationSource.startUpdates();
+                mOnLocationBroadcastStatusChangedEventBroadcast.onNext(BROADCASTING);
+            } else {
+
+            }
         } else {
             mRequestLocationPermissionEventBroadcast.onNext(true);
         }
@@ -56,5 +70,9 @@ public class MapActivityViewModel extends ViewModel {
     private Disposable subscribeToLocationUpdates(@NonNull Observable<Location> locations) {
         return locations.subscribe(location -> mNewLocationEventBroadcast.onNext(
                 new LatLng(location.getLatitude(), location.getLongitude())));
+    }
+
+    enum LocationBroadcastStatus {
+        BROADCASTING, IDLE
     }
 }
