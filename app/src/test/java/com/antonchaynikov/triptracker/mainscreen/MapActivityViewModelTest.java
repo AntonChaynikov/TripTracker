@@ -2,6 +2,7 @@ package com.antonchaynikov.triptracker.mainscreen;
 
 import android.location.Location;
 
+import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.data.LocationSource;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -19,6 +20,7 @@ import io.reactivex.subjects.PublishSubject;
 import static com.antonchaynikov.triptracker.mainscreen.MapActivityViewModel.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -133,9 +135,10 @@ public class MapActivityViewModelTest {
 
         mTestSubject.onStartTripButtonClick();
 
-        // 1 and only 1 event should be broadcasted
+        // IDLE and then BROADCASTING statuses should be broadcasted
         assertEquals(2, events.size());
         assertEquals(LocationBroadcastStatus.BROADCASTING, events.get(1));
+        verify(mockLocationSource).startUpdates();
     }
 
     @Test
@@ -157,6 +160,54 @@ public class MapActivityViewModelTest {
         assertEquals(LocationBroadcastStatus.IDLE, events.get(0));
     }
 
+    @Test
+    public void onFinishTripButtonClick_shouldBroadcastOnLocationBroadcastStatusChangedEvent_ifTripStarted() {
+
+        // Location permission is present
+        mTestSubject.setLocationPermissionStatus(true);
+        when(mockLocationSource.isUpdateEnabled()).thenReturn(true);
+
+        List<LocationBroadcastStatus> events = new LinkedList<>();
+        mTestSubject.getOnLocationBroadcastStatusChangedEventBroadcast()
+                .subscribe(events::add);
+
+        mTestSubject.onStartTripButtonClick();
+        events.clear();
+        mTestSubject.onFinishTripButtonClick();
+
+        // 1 and only 1 event should be broadcasted
+        assertEquals(1, events.size());
+        assertEquals(LocationBroadcastStatus.IDLE, events.get(0));
+    }
+
+    @Test
+    public void onFinishTripButtonClick_shouldCallLocationSourceToHalt() {
+
+        // Location permission is present
+        mTestSubject.setLocationPermissionStatus(true);
+        when(mockLocationSource.isUpdateEnabled()).thenReturn(true);
+
+        mTestSubject.onStartTripButtonClick();
+        mTestSubject.onFinishTripButtonClick();
+
+        verify(mockLocationSource).stopUpdates();
+    }
+
+    @Test
+    public void onStartTripButtonClick_shouldBroadcastCorrectErrorMessage_ifLocationServisUnavailable() {
+
+        // Location permission is present
+        mTestSubject.setLocationPermissionStatus(true);
+        when(mockLocationSource.isUpdateEnabled()).thenReturn(false);
+
+        List<Integer> events = new LinkedList<>();
+        mTestSubject.getShowSnackbarMessageBroadcast()
+                .subscribe(events::add);
+
+        mTestSubject.onStartTripButtonClick();
+
+        assertTrue(R.string.snackbar_location_service_unavailable == events.get(0));
+    }
 
 
 }

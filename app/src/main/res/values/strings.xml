@@ -4,4 +4,5 @@
     <string name="button_stop">Stop Receiving Coordinates</string>
     <string name="map_marker">Here!</string>
     <string name="authentication_button_text">Login</string>
+    <string name="snackbar_location_service_unavailable">Location service is unavailable</string>
 </resources>
