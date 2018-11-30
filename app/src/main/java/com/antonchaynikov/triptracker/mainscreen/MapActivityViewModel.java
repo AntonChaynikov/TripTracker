@@ -22,7 +22,7 @@ import static com.antonchaynikov.triptracker.mainscreen.MapActivityViewModel.Loc
 public class MapActivityViewModel extends ViewModel {
 
     private PublishSubject<Boolean> mRequestLocationPermissionEventBroadcast = PublishSubject.create();
-    private BehaviorSubject<LocationBroadcastStatus> mOnLocationBroadcastStatusChangedEventBroadcast = BehaviorSubject.createDefault(IDLE);
+    private BehaviorSubject<LocationBroadcastStatus> mOnLocationBroadcastStatusChangedEventBroadcast;
     private PublishSubject<LatLng> mNewLocationEventBroadcast = PublishSubject.create();
     private PublishSubject<Integer> mShowSnackbarMessageBroadcast = PublishSubject.create();
 
@@ -36,7 +36,12 @@ public class MapActivityViewModel extends ViewModel {
         mIsLocationPermissionGranted = isLocationPermissionGranted;
         mLocationSource = locationSource;
         mSubscriptions.add(subscribeToLocationUpdates(mLocationSource.getLocationUpdates()));
-        mLocationBroadcastStatus = IDLE;
+        if (mLocationSource.isLocationsUpdateEnabled()) {
+            mLocationBroadcastStatus = BROADCASTING;
+        } else {
+            mLocationBroadcastStatus = IDLE;
+        }
+        mOnLocationBroadcastStatusChangedEventBroadcast = BehaviorSubject.createDefault(mLocationBroadcastStatus);
     }
 
     @VisibleForTesting
@@ -62,9 +67,10 @@ public class MapActivityViewModel extends ViewModel {
 
     public void onStartTripButtonClick() {
         if (mIsLocationPermissionGranted) {
-            if (mLocationSource.isUpdateEnabled()) {
+            if (mLocationSource.isUpdateAvailable()) {
                 mLocationSource.startUpdates();
-                mOnLocationBroadcastStatusChangedEventBroadcast.onNext(BROADCASTING);
+                mLocationBroadcastStatus = BROADCASTING;
+                mOnLocationBroadcastStatusChangedEventBroadcast.onNext(mLocationBroadcastStatus);
             } else {
                 showSnackbarMessage(R.string.snackbar_location_service_unavailable);
             }
@@ -75,7 +81,8 @@ public class MapActivityViewModel extends ViewModel {
 
     public void onFinishTripButtonClick() {
         mLocationSource.stopUpdates();
-        mOnLocationBroadcastStatusChangedEventBroadcast.onNext(IDLE);
+        mLocationBroadcastStatus = IDLE;
+        mOnLocationBroadcastStatusChangedEventBroadcast.onNext(mLocationBroadcastStatus);
     }
 
     public void clear() {

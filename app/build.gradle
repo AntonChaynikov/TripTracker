@@ -115,7 +115,7 @@ dependencies {
     implementation "com.google.firebase:firebase-core:$FIREBASE_CORE"
     implementation "com.firebaseui:firebase-ui-auth:$FIREBASE_UI_AUTH"
     implementation "com.google.android.gms:play-services-base:$GOOGLE_PLAY_SERVICES_BASE"
-
+    
     testImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     testImplementation "junit:junit:$JUNIT"
     androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"

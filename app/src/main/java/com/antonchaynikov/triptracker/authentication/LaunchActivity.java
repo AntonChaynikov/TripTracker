@@ -1,4 +1,4 @@
-package com.antonchaynikov.triptracker.authentification;
+package com.antonchaynikov.triptracker.authentication;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;

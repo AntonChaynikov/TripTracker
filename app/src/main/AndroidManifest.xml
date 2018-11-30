@@ -23,7 +23,7 @@
         <activity android:name=".mainscreen.MapActivity"
             tools:ignore="InnerclassSeparator" />
 
-        <activity android:name=".authentification.LaunchActivity"
+        <activity android:name=".authentication.LaunchActivity"
             tools:ignore="InnerclassSeparator">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

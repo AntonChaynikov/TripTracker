@@ -11,7 +11,9 @@ public interface LocationSource {
 
     void stopUpdates();
 
-    boolean isUpdateEnabled();
+    boolean isUpdateAvailable();
+
+    boolean isLocationsUpdateEnabled();
 
     @NonNull
     Observable<Location> getLocationUpdates();
