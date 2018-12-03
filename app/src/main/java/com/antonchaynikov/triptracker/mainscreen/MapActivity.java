@@ -1,6 +1,7 @@
 package com.antonchaynikov.triptracker.mainscreen;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.antonchaynikov.triptracker.R;
+import com.antonchaynikov.triptracker.data.LocationService;
 import com.antonchaynikov.triptracker.data.LocationSourceInjector;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -68,12 +70,14 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         addMapFragment();
         mSubscriptions = new CompositeDisposable();
 
+        startLocationService();
+
         initViewModel();
     }
 
     private void initViewModel() {
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        mViewModel = new MapActivityViewModel(LocationSourceInjector.get(locationManager), mPermissionGranted);
+
+        mViewModel = new MapActivityViewModel(LocationSourceInjector.get(), mPermissionGranted);
 
         mSubscriptions.add(mViewModel.getOnLocationBroadcastStatusChangedEventBroadcast()
                 .subscribe(this::onLocationBroadcastStatusChanged)
@@ -174,6 +178,24 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
 
     private void showSnackbarMessage(@StringRes int stringId) {
         Snackbar.make(mRootView, stringId, Snackbar.LENGTH_LONG).show();
+    }
+
+    private boolean isServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void startLocationService() {
+        Intent service = new Intent(this, LocationService.class);
+        if (!isServiceRunning(LocationService.class)) {
+            ActivityCompat.startForegroundService(this, service);
+        }
+        bindService(service, LocationSourceInjector.getServiceConnection(), Context.BIND_AUTO_CREATE);
     }
 
 }

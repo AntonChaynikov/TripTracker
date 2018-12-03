@@ -1,9 +1,12 @@
 package com.antonchaynikov.triptracker.data;
 
+import android.content.ComponentName;
+import android.content.ServiceConnection;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.IBinder;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,25 +14,22 @@ import androidx.annotation.VisibleForTesting;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
-class PlatformLocationSource implements LocationSource, LocationListener {
+class PlatformLocationSource implements LocationSource, ServiceConnection {
 
-    private volatile static LocationSource sInstance;
-    private LocationManager mLocationManager;
+    private volatile static PlatformLocationSource sInstance;
     private PublishSubject<Location> mLocationsBroadcast;
-    private Filter<Location> mFilter;
     private boolean mIsLocationsUpdateEnabled;
+    private LocationService mLocationService;
 
-    private PlatformLocationSource(LocationManager locationManager, Filter<Location> filter) {
+    private PlatformLocationSource() {
         mLocationsBroadcast = PublishSubject.create();
-        mLocationManager = locationManager;
-        mFilter = (filter == null)? (location -> true) : filter;
     }
 
-    static LocationSource getLocationSource(@NonNull LocationManager locationManager, @Nullable Filter<Location> filter) {
+    static PlatformLocationSource getLocationSource() {
         if (sInstance == null) {
             synchronized (PlatformLocationSource.class) {
                 if (sInstance == null) {
-                    sInstance = new PlatformLocationSource(locationManager, filter);
+                    sInstance = new PlatformLocationSource();
                 }
             }
         }
@@ -43,22 +43,23 @@ class PlatformLocationSource implements LocationSource, LocationListener {
 
     @Override
     public void startUpdates() throws SecurityException {
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, this);
         mIsLocationsUpdateEnabled = true;
+        if (isUpdateAvailable()) {
+            mLocationService.startUpdates(new LocationFilter());
+        }
     }
 
     @Override
     public void stopUpdates() {
-        mLocationManager.removeUpdates(this);
         mIsLocationsUpdateEnabled = false;
-
+        if (mLocationService != null) {
+            mLocationService.stopUpdates();
+        }
     }
 
     @Override
     public boolean isUpdateAvailable() {
-        return mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
-                mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        return mLocationService != null && mLocationService.isUpdateAvailable();
     }
 
     @Override
@@ -73,22 +74,15 @@ class PlatformLocationSource implements LocationSource, LocationListener {
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-        if (mFilter.isRelevant(location)) {
-            mLocationsBroadcast.onNext(location);
-        }
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        mLocationService = ((LocationService.LocalServiceBinder)service).getLocationService();
+        mLocationService
+                .getLocationUpdates()
+                .subscribe(mLocationsBroadcast);
     }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
+    public void onServiceDisconnected(ComponentName name) {
+        mLocationService = null;
     }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-    }
-
 }
