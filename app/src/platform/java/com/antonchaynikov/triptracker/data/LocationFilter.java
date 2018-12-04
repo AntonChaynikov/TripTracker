@@ -65,4 +65,8 @@ public class LocationFilter implements Filter<Location> {
         return distance / 1000f / (elapsedSeconds / 60 / 60);
     }
 
+    public void reset() {
+        mLastLocationReceived = null;
+    }
+
 }

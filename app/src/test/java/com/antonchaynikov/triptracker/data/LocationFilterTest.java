@@ -31,7 +31,6 @@ public class LocationFilterTest {
         when(mockLocation.getAccuracy()).thenReturn(TEST_ACCURACY_MARGIN);
         when(mockLocation.getTime()).thenReturn(0L);
         when(newLocation.getTime()).thenReturn(1000L);
-        //when(newLocation.distanceTo(any(Location.class))).thenReturn(TEST_DISTANCE_MARGIN);
         when(mockLocation.distanceTo(any(Location.class))).thenReturn(TEST_DISTANCE_MARGIN);
         testSubject = new LocationFilter(TEST_ACCURACY_MARGIN, TEST_VELOCITY_MARGIN, TEST_DISTANCE_MARGIN);
         testSubject.isRelevant(mockLocation);

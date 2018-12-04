@@ -3,7 +3,7 @@ package com.antonchaynikov.triptracker.mainscreen;
 import android.location.Location;
 
 import com.antonchaynikov.triptracker.R;
-import com.antonchaynikov.triptracker.data.LocationSource;
+import com.antonchaynikov.triptracker.data.TripSource;
 import com.google.android.gms.maps.model.LatLng;
 
 import androidx.annotation.NonNull;
@@ -26,17 +26,17 @@ public class MapActivityViewModel extends ViewModel {
     private PublishSubject<LatLng> mNewLocationEventBroadcast = PublishSubject.create();
     private PublishSubject<Integer> mShowSnackbarMessageBroadcast = PublishSubject.create();
 
-    private LocationSource mLocationSource;
+    private TripSource mTripSource;
     private boolean mIsLocationPermissionGranted;
     private CompositeDisposable mSubscriptions = new CompositeDisposable();
 
     private LocationBroadcastStatus mLocationBroadcastStatus;
 
-    MapActivityViewModel(@NonNull LocationSource locationSource, boolean isLocationPermissionGranted) {
+    MapActivityViewModel(@NonNull TripSource tripSource, boolean isLocationPermissionGranted) {
         mIsLocationPermissionGranted = isLocationPermissionGranted;
-        mLocationSource = locationSource;
-        mSubscriptions.add(subscribeToLocationUpdates(mLocationSource.getLocationUpdates()));
-        if (mLocationSource.isLocationsUpdateEnabled()) {
+        mTripSource = tripSource;
+        mSubscriptions.add(subscribeToLocationUpdates(mTripSource.getLocationUpdates()));
+        if (mTripSource.isLocationsUpdateEnabled()) {
             mLocationBroadcastStatus = BROADCASTING;
         } else {
             mLocationBroadcastStatus = IDLE;
@@ -67,8 +67,8 @@ public class MapActivityViewModel extends ViewModel {
 
     public void onStartTripButtonClick() {
         if (mIsLocationPermissionGranted) {
-            if (mLocationSource.isUpdateAvailable()) {
-                mLocationSource.startUpdates();
+            if (mTripSource.isLocationsUpdateAvailable()) {
+                mTripSource.startTrip();
                 mLocationBroadcastStatus = BROADCASTING;
                 mOnLocationBroadcastStatusChangedEventBroadcast.onNext(mLocationBroadcastStatus);
             } else {
@@ -80,7 +80,7 @@ public class MapActivityViewModel extends ViewModel {
     }
 
     public void onFinishTripButtonClick() {
-        mLocationSource.stopUpdates();
+        mTripSource.finishTrip();
         mLocationBroadcastStatus = IDLE;
         mOnLocationBroadcastStatusChangedEventBroadcast.onNext(mLocationBroadcastStatus);
     }

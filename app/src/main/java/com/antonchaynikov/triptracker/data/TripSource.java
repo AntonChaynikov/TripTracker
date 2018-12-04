@@ -5,13 +5,13 @@ import android.location.Location;
 import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 
-public interface LocationSource {
+public interface TripSource {
 
-    void startUpdates();
+    void startTrip();
 
-    void stopUpdates();
+    Trip finishTrip();
 
-    boolean isUpdateAvailable();
+    boolean isLocationsUpdateAvailable();
 
     boolean isLocationsUpdateEnabled();
 

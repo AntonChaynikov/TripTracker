@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.antonchaynikov.triptracker.R;
+import com.antonchaynikov.triptracker.data.LocationFilter;
 import com.antonchaynikov.triptracker.data.LocationService;
 import com.antonchaynikov.triptracker.data.LocationSourceInjector;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -77,7 +78,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
 
     private void initViewModel() {
 
-        mViewModel = new MapActivityViewModel(LocationSourceInjector.get(), mPermissionGranted);
+        mViewModel = new MapActivityViewModel(LocationSourceInjector.get(new LocationFilter()), mPermissionGranted);
 
         mSubscriptions.add(mViewModel.getOnLocationBroadcastStatusChangedEventBroadcast()
                 .subscribe(this::onLocationBroadcastStatusChanged)
@@ -195,7 +196,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         if (!isServiceRunning(LocationService.class)) {
             ActivityCompat.startForegroundService(this, service);
         }
-        bindService(service, LocationSourceInjector.getServiceConnection(), Context.BIND_AUTO_CREATE);
+        bindService(service, LocationSourceInjector.getServiceConnection(new LocationFilter()), Context.BIND_AUTO_CREATE);
     }
 
 }

@@ -21,12 +21,12 @@ public class LocationService extends Service implements LocationListener {
     private ReplaySubject<Location> mLocationsBroadcast;
     private Filter<Location> mFilter;
 
-    public class LocalServiceBinder extends Binder {
+    private boolean mIsReceivingLocations;
 
+    public class LocalServiceBinder extends Binder {
         public LocationService getLocationService() {
             return LocationService.this;
         }
-
     }
 
     @Nullable
@@ -43,27 +43,30 @@ public class LocationService extends Service implements LocationListener {
 
     @Override
     public void onDestroy() {
-
     }
 
-    public void startUpdates(@NonNull Filter<Location> locationFilter) throws SecurityException {
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, this);
-        mFilter = locationFilter;
+    public Observable<Location> startUpdates(@NonNull Filter<Location> locationFilter) throws SecurityException {
+        if (mIsReceivingLocations) {
+            return mLocationsBroadcast;
+        } else {
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, this);
+            mFilter = locationFilter;
+            mIsReceivingLocations = true;
+            mLocationsBroadcast = ReplaySubject.create();
+            return mLocationsBroadcast;
+        }
+
     }
 
     public void stopUpdates() {
         mLocationManager.removeUpdates(this);
+        mIsReceivingLocations = false;
     }
 
     public boolean isUpdateAvailable() {
         return mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
                 mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-    }
-
-    @NonNull
-    public Observable<Location> getLocationUpdates() {
-        return mLocationsBroadcast;
     }
 
     @Override

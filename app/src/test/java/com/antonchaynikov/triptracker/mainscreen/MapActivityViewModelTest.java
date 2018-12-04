@@ -3,7 +3,7 @@ package com.antonchaynikov.triptracker.mainscreen;
 import android.location.Location;
 
 import com.antonchaynikov.triptracker.R;
-import com.antonchaynikov.triptracker.data.LocationSource;
+import com.antonchaynikov.triptracker.data.TripSource;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.junit.Before;
@@ -29,7 +29,7 @@ public class MapActivityViewModelTest {
     private MapActivityViewModel mTestSubject;
 
     @Mock
-    private LocationSource mockLocationSource;
+    private TripSource mockTripSource;
 
     private PublishSubject<Location> locationBroadcast;
     @Mock
@@ -44,16 +44,16 @@ public class MapActivityViewModelTest {
         when(mockLocation.getLatitude()).thenReturn(51d);
         when(mockLocation.getLongitude()).thenReturn(15d);
 
-        // setup LocationSource
+        // setup TripSource
         doAnswer(invocation -> {
             locationBroadcast.onNext(mockLocation);
             return null;
-        }).when(mockLocationSource).startUpdates();
+        }).when(mockTripSource).startTrip();
 
-        when(mockLocationSource.isUpdateAvailable()).thenReturn(true);
-        when(mockLocationSource.getLocationUpdates()).thenReturn(locationBroadcast);
+        when(mockTripSource.isLocationsUpdateAvailable()).thenReturn(true);
+        when(mockTripSource.getLocationUpdates()).thenReturn(locationBroadcast);
 
-        mTestSubject = new MapActivityViewModel(mockLocationSource,true);
+        mTestSubject = new MapActivityViewModel(mockTripSource,true);
     }
 
     @Test
@@ -127,7 +127,7 @@ public class MapActivityViewModelTest {
         // Location permission is present
         mTestSubject.setLocationPermissionStatus(true);
 
-        when(mockLocationSource.isUpdateAvailable()).thenReturn(true);
+        when(mockTripSource.isLocationsUpdateAvailable()).thenReturn(true);
 
         List<LocationBroadcastStatus> events = new LinkedList<>();
         mTestSubject.getOnLocationBroadcastStatusChangedEventBroadcast()
@@ -138,7 +138,7 @@ public class MapActivityViewModelTest {
         // IDLE and then BROADCASTING statuses should be broadcasted
         assertEquals(2, events.size());
         assertEquals(LocationBroadcastStatus.BROADCASTING, events.get(1));
-        verify(mockLocationSource).startUpdates();
+        verify(mockTripSource).startTrip();
     }
 
     @Test
@@ -147,7 +147,7 @@ public class MapActivityViewModelTest {
         // Location permission is present
         mTestSubject.setLocationPermissionStatus(true);
 
-        when(mockLocationSource.isUpdateAvailable()).thenReturn(false);
+        when(mockTripSource.isLocationsUpdateAvailable()).thenReturn(false);
 
         List<LocationBroadcastStatus> events = new LinkedList<>();
         mTestSubject.getOnLocationBroadcastStatusChangedEventBroadcast()
@@ -165,7 +165,7 @@ public class MapActivityViewModelTest {
 
         // Location permission is present
         mTestSubject.setLocationPermissionStatus(true);
-        when(mockLocationSource.isUpdateAvailable()).thenReturn(true);
+        when(mockTripSource.isLocationsUpdateAvailable()).thenReturn(true);
 
         List<LocationBroadcastStatus> events = new LinkedList<>();
         mTestSubject.getOnLocationBroadcastStatusChangedEventBroadcast()
@@ -185,12 +185,12 @@ public class MapActivityViewModelTest {
 
         // Location permission is present
         mTestSubject.setLocationPermissionStatus(true);
-        when(mockLocationSource.isUpdateAvailable()).thenReturn(true);
+        when(mockTripSource.isLocationsUpdateAvailable()).thenReturn(true);
 
         mTestSubject.onStartTripButtonClick();
         mTestSubject.onFinishTripButtonClick();
 
-        verify(mockLocationSource).stopUpdates();
+        verify(mockTripSource).finishTrip();
     }
 
     @Test
@@ -198,7 +198,7 @@ public class MapActivityViewModelTest {
 
         // Location permission is present
         mTestSubject.setLocationPermissionStatus(true);
-        when(mockLocationSource.isUpdateAvailable()).thenReturn(false);
+        when(mockTripSource.isLocationsUpdateAvailable()).thenReturn(false);
 
         List<Integer> events = new LinkedList<>();
         mTestSubject.getShowSnackbarMessageBroadcast()
@@ -211,8 +211,8 @@ public class MapActivityViewModelTest {
 
     @Test
     public void shouldBroadcastBroadcastingStatus_ifCreatedAndLocationSourceIsUpdatingLocations() {
-        when(mockLocationSource.isLocationsUpdateEnabled()).thenReturn(true);
-        mTestSubject = new MapActivityViewModel(mockLocationSource,true);
+        when(mockTripSource.isLocationsUpdateEnabled()).thenReturn(true);
+        mTestSubject = new MapActivityViewModel(mockTripSource,true);
 
         List<LocationBroadcastStatus> events = new LinkedList<>();
         mTestSubject.getOnLocationBroadcastStatusChangedEventBroadcast()
