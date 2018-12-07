@@ -5,7 +5,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.LocationManager;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
@@ -99,6 +98,10 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         super.onDestroy();
         mSubscriptions.dispose();
         mViewModel.clear();
+        unbindService(LocationSourceInjector.getServiceConnection(new LocationFilter()));
+        if (isServiceRunning(LocationService.class) && mViewModel.isTripStopped()) {
+            stopService(new Intent(this, LocationService.class));
+        }
     }
 
     @Override
@@ -166,6 +169,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     private void onNewLocationReceived(@NonNull LatLng coordinates) {
+        Log.d("Activity", "Location accounted");
         if (mGoogleMap != null) {
             CameraPosition campos = new CameraPosition.Builder()
                     .target(coordinates)

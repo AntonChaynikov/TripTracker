@@ -1,6 +1,7 @@
 package com.antonchaynikov.triptracker.mainscreen;
 
 import android.location.Location;
+import android.util.Log;
 
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.data.TripSource;
@@ -85,13 +86,19 @@ public class MapActivityViewModel extends ViewModel {
         mOnLocationBroadcastStatusChangedEventBroadcast.onNext(mLocationBroadcastStatus);
     }
 
+    public boolean isTripStopped() {
+        return mLocationBroadcastStatus == IDLE;
+    }
+
     public void clear() {
         mSubscriptions.clear();
     }
 
     private Disposable subscribeToLocationUpdates(@NonNull Observable<Location> locations) {
-        return locations.subscribe(location -> mNewLocationEventBroadcast.onNext(
-                new LatLng(location.getLatitude(), location.getLongitude())));
+        return locations.subscribe(location -> {
+                    mNewLocationEventBroadcast.onNext(new LatLng(location.getLatitude(), location.getLongitude()));
+                }
+        );
     }
 
     private void showSnackbarMessage(@StringRes int stringId) {

@@ -8,11 +8,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
+import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.PublishSubject;
 
 import static org.junit.Assert.assertEquals;
@@ -40,8 +43,8 @@ public class PlatformLocationSourceTest {
     @Before
     public void setUp() throws Exception {
         when(mockBinder.getLocationService()).thenReturn(mockLocationService);
-        when(mockLocationService.startUpdates(any(Filter.class))).thenReturn(locationsBroadcast);
         when(mockLocationService.isUpdateAvailable()).thenReturn(true);
+        when(mockLocationService.getLocationsStream()).thenReturn(locationsBroadcast);
         mTestSubject = PlatformLocationSource.getLocationSource(mockFilter);
     }
 
@@ -144,6 +147,30 @@ public class PlatformLocationSourceTest {
 
         assertEquals(1, elements.size());
         assertEquals(mockLocation, elements.get(0));
+    }
+
+    @Test
+    public void getLocationUpdates_shouldBroadcastAllTripsLocations() {
+        mTestSubject.onServiceConnected(new ComponentName("foo", "bar"), mockBinder);
+        Disposable subscription = mTestSubject
+                .getLocationUpdates()
+                .subscribe();
+
+        mTestSubject.startTrip();
+
+        Location location = Mockito.mock(Location.class);
+        locationsBroadcast.onNext(mockLocation);
+        locationsBroadcast.onNext(location);
+
+        // unsubscribe from broadcast without ending the trip
+        subscription.dispose();
+
+        List<Location> locations = new LinkedList<>();
+        mTestSubject
+                .getLocationUpdates()
+                .subscribe(locations::add);
+
+        assertEquals(2, locations.size());
     }
 
 }
