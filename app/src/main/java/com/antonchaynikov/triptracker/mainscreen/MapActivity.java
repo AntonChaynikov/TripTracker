@@ -6,19 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.antonchaynikov.triptracker.R;
-import com.antonchaynikov.triptracker.data.LocationFilter;
 import com.antonchaynikov.triptracker.data.LocationService;
-import com.antonchaynikov.triptracker.data.LocationSourceInjector;
+import com.antonchaynikov.triptracker.viewmodel.ViewModelActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -29,9 +23,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseUser;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import io.reactivex.disposables.CompositeDisposable;
 
-public class MapActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
+public class MapActivity extends ViewModelActivity implements View.OnClickListener, OnMapReadyCallback {
 
     private final static int ACCESS_FINE_LOCATION_REQUEST_CODE = 1;
 
@@ -46,8 +44,6 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     private GoogleMap mGoogleMap;
 
     private CompositeDisposable mSubscriptions;
-
-    private MapActivityViewModel.LocationBroadcastStatus mLocationBroadcastStatus;
 
     public static Intent getStartIntent(Context context, FirebaseUser user) {
         return new Intent(context, MapActivity.class)
@@ -76,29 +72,13 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     private void initViewModel() {
-
-        mViewModel = new MapActivityViewModel(LocationSourceInjector.get(new LocationFilter()), mPermissionGranted);
-
-        mSubscriptions.add(mViewModel.getOnLocationBroadcastStatusChangedEventBroadcast()
-                .subscribe(this::onLocationBroadcastStatusChanged)
-        );
-        mSubscriptions.add(mViewModel.getNewLocationEventBroadcast()
-                .subscribe(this::onNewLocationReceived)
-        );
-        mSubscriptions.add(mViewModel.getRequestLocationPermissionEventBroadcast()
-                .subscribe(event -> onLocationPermissionRequested())
-        );
-        mSubscriptions.add(mViewModel.getShowSnackbarMessageBroadcast()
-                .subscribe(this::showSnackbarMessage)
-        );
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mSubscriptions.dispose();
-        mViewModel.clear();
-        unbindService(LocationSourceInjector.getServiceConnection(new LocationFilter()));
+
         if (isServiceRunning(LocationService.class) && mViewModel.isTripStopped()) {
             stopService(new Intent(this, LocationService.class));
         }
@@ -110,7 +90,6 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         if (requestCode == ACCESS_FINE_LOCATION_REQUEST_CODE) {
             mPermissionGranted = (grantResults[0] == PackageManager.PERMISSION_GRANTED);
         }
-        Log.d(TAG, "Permission Granted = " + mPermissionGranted);
     }
 
     @Override
@@ -120,20 +99,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onClick(View view) {
-        switch (mLocationBroadcastStatus) {
-            case BROADCASTING: {
-                mViewModel.onFinishTripButtonClick();
-                break;
-            }
-            case IDLE: {
-                mViewModel.onStartTripButtonClick();
-                break;
-            }
-            default: {
-                Log.e(TAG, "Unknown status received");
-                break;
-            }
-        }
+
     }
 
     private void addMapFragment() {
@@ -148,24 +114,6 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     private void onLocationPermissionRequested() {
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
         ActivityCompat.requestPermissions(this, permissions, ACCESS_FINE_LOCATION_REQUEST_CODE);
-    }
-
-    private void onLocationBroadcastStatusChanged(@NonNull MapActivityViewModel.LocationBroadcastStatus status) {
-        mLocationBroadcastStatus = status;
-        switch (status) {
-            case BROADCASTING: {
-                mButton.setText(R.string.button_stop);
-                break;
-            }
-            case IDLE: {
-                mButton.setText(R.string.button_act);
-                break;
-            }
-            default: {
-                Log.e(TAG, "Unknown status received");
-                break;
-            }
-        }
     }
 
     private void onNewLocationReceived(@NonNull LatLng coordinates) {
@@ -200,7 +148,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         if (!isServiceRunning(LocationService.class)) {
             ActivityCompat.startForegroundService(this, service);
         }
-        bindService(service, LocationSourceInjector.getServiceConnection(new LocationFilter()), Context.BIND_AUTO_CREATE);
+
     }
 
 }

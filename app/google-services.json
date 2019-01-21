@@ -31,6 +31,14 @@
           }
         },
         {
+          "client_id": "964383537574-vhe9i8om0p974amsdjmp0h5uuhe8302t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.antonchaynikov.triptracker.platform",
+            "certificate_hash": "02ea5f1351c395e8f0d012ad36f83b28b7e5fd5a"
+          }
+        },
+        {
           "client_id": "964383537574-6hnqdh6idjnlmffscvm0rshm5mefd6b5.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -80,6 +88,14 @@
           "android_info": {
             "package_name": "com.antonchaynikov.triptracker.servicesApi",
             "certificate_hash": "40b4ee603f88cac41e5dfadd25a68854c0745c20"
+          }
+        },
+        {
+          "client_id": "964383537574-ug5r73kjah2fb6o3mghhmm8kjt06vfgi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.antonchaynikov.triptracker.servicesApi",
+            "certificate_hash": "02ea5f1351c395e8f0d012ad36f83b28b7e5fd5a"
           }
         },
         {

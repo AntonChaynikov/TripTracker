@@ -7,13 +7,10 @@ def versionPatch = 0
 def versionBuild = 5
 def versionSuffix = versionBuild > 0 ? "-beta" : ""
 
-ext {
-    KEY_PATH = System.getenv('TRIP_KEY_PATH')
-    STORE_PASSWORD = System.getenv('TRIP_STORE_PASSWORD')
-    KEY_ALIAS = System.getenv('TRIP_KEY_ALIAS')
-    KEY_PASSWORD = System.getenv('TRIP_KEY_PASSWORD')
-    GSTORE_KEY_PATH = System.getenv('GSTORE_KEY_PATH')
-}
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
     compileSdkVersion 28
@@ -21,7 +18,7 @@ android {
     playAccountConfigs {
         defaultAccountConfig {
             serviceAccountEmail = "gps-logger-gplay@api-7194191596450161697-308117.iam.gserviceaccount.com"
-            jsonFile = file(GSTORE_KEY_PATH)
+            jsonFile = file(keystoreProperties['google_play_key'])
         }
     }
 
@@ -37,17 +34,11 @@ android {
     }
 
     signingConfigs {
-        config {
-            storeFile file(KEY_PATH)
-            storePassword STORE_PASSWORD
-            keyAlias KEY_ALIAS
-            keyPassword KEY_PASSWORD
-        }
         release {
-            storeFile file(KEY_PATH)
-            storePassword STORE_PASSWORD
-            keyAlias KEY_ALIAS
-            keyPassword KEY_PASSWORD
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
         }
     }
 
@@ -91,13 +82,16 @@ play {
 ext {
     ANDROIDX_APPCOMPAT = '1.0.2'
     ANDROIDX_SUPPORT_V4 =  '1.0.0'
-    CONSTRAINT_LAYOUT = '2.0.0-alpha2'
+    CONSTRAINT_LAYOUT = '2.0.0-alpha3'
     RX_JAVA = '2.1.16'
     RX_ANDROID = '2.1.0'
     GOOGLE_MAPS_SDK = '16.0.0'
-    GOOGLE_PLAY_SERVICES_BASE = '16.0.1'
-    FIREBASE_CORE = '16.0.5'
+    GOOGLE_PLAY_SERVICES_BASE = '16.1.0'
+    FIREBASE_CORE = '16.0.6'
     FIREBASE_UI_AUTH = '4.2.1'
+    ROOM = '2.1.0-alpha03'
+    GOOGLE_PALY_SERVICES_LOCATION = '16.0.0'
+
     MOCKITO_CORE = '2.22.0'
     JUNIT = '4.12'
     ANDROIDX_TEST_RUNNER = '1.1.0'
