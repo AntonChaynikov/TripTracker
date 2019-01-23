@@ -5,4 +5,5 @@
     <string name="map_marker">Here!</string>
     <string name="authentication_button_text">Login</string>
     <string name="snackbar_location_service_unavailable">Location service is unavailable</string>
+    <string name="notification_location_service">Covertly spying on you</string>
 </resources>

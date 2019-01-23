@@ -71,7 +71,9 @@ android {
     }
 
     testOptions {
-        unitTests.returnDefaultValues = true
+        unitTests {
+            returnDefaultValues = true
+        }
     }
 }
 
@@ -89,10 +91,11 @@ ext {
     GOOGLE_PLAY_SERVICES_BASE = '16.1.0'
     FIREBASE_CORE = '16.0.6'
     FIREBASE_UI_AUTH = '4.2.1'
+    FIREBASE_FIRESTORE = '17.1.5'
     ROOM = '2.1.0-alpha03'
     GOOGLE_PALY_SERVICES_LOCATION = '16.0.0'
-
-    MOCKITO_CORE = '2.22.0'
+    JODA_TIME = '2.10.1'
+    MOCKITO_CORE = '2.23.4'
     JUNIT = '4.12'
     ANDROIDX_TEST_RUNNER = '1.1.0'
     ESPRESSO_CORE = '3.1.0'
@@ -109,9 +112,12 @@ dependencies {
     implementation "com.google.firebase:firebase-core:$FIREBASE_CORE"
     implementation "com.firebaseui:firebase-ui-auth:$FIREBASE_UI_AUTH"
     implementation "com.google.android.gms:play-services-base:$GOOGLE_PLAY_SERVICES_BASE"
-    
+    implementation "com.google.firebase:firebase-firestore:$FIREBASE_FIRESTORE"
+    implementation "joda-time:joda-time:$JODA_TIME"
+
     testImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     testImplementation "junit:junit:$JUNIT"
+
     androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"
 }

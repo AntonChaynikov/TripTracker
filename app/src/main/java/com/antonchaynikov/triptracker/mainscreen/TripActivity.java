@@ -1,17 +1,26 @@
 package com.antonchaynikov.triptracker.mainscreen;
 
 import android.Manifest;
-import android.app.ActivityManager;
+
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
+
 import android.view.View;
 import android.widget.Button;
 
 import com.antonchaynikov.triptracker.R;
-import com.antonchaynikov.triptracker.data.LocationService;
+import com.antonchaynikov.triptracker.data.location.LocationFilter;
+import com.antonchaynikov.triptracker.data.location.LocationSource;
+import com.antonchaynikov.triptracker.data.location.PlatformLocationService;
+
+import com.antonchaynikov.triptracker.data.location.ServiceManager;
+import com.antonchaynikov.triptracker.data.repository.FireStoreDB;
+import com.antonchaynikov.triptracker.data.tripmanager.StatisticsCalculator;
+import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
+import com.antonchaynikov.triptracker.mainscreen.uistate.MapActivityUiState;
 import com.antonchaynikov.triptracker.viewmodel.ViewModelActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,15 +38,15 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import io.reactivex.disposables.CompositeDisposable;
 
-public class MapActivity extends ViewModelActivity implements View.OnClickListener, OnMapReadyCallback {
+public class TripActivity extends ViewModelActivity implements View.OnClickListener, OnMapReadyCallback {
 
     private final static int ACCESS_FINE_LOCATION_REQUEST_CODE = 1;
 
-    private final static String EXTRA_USER = "com.antonchaynikov.triptracker.MapActivity.user";
-    private final static String TAG = MapActivity.class.getSimpleName();
+    private final static String EXTRA_USER = "com.antonchaynikov.triptracker.TripActivity.user";
+    private final static String TAG = TripActivity.class.getSimpleName();
 
     private boolean mPermissionGranted;
-    private MapActivityViewModel mViewModel;
+    private TripViewModel mViewModel;
 
     private View mRootView;
     private Button mButton;
@@ -46,8 +55,12 @@ public class MapActivity extends ViewModelActivity implements View.OnClickListen
     private CompositeDisposable mSubscriptions;
 
     public static Intent getStartIntent(Context context, FirebaseUser user) {
-        return new Intent(context, MapActivity.class)
+        return new Intent(context, TripActivity.class)
                 .putExtra(EXTRA_USER, user);
+    }
+
+    public static PendingIntent getNotificationContentIntent(@NonNull Context context) {
+        return null;
     }
 
     @Override
@@ -66,22 +79,29 @@ public class MapActivity extends ViewModelActivity implements View.OnClickListen
         addMapFragment();
         mSubscriptions = new CompositeDisposable();
 
-        startLocationService();
-
         initViewModel();
     }
 
     private void initViewModel() {
+        LocationSource locationSource = LocationSource.getInstance(new LocationFilter());
+        ServiceManager serviceManager = ServiceManager.getInstance(this, locationSource, PlatformLocationService.class);
+        mViewModel = new TripViewModel(
+                TripManager.getInstance(
+                        FireStoreDB.getInstance(),
+                        locationSource,
+                        new StatisticsCalculator()),
+                serviceManager,
+                mPermissionGranted);
+        mSubscriptions.add(mViewModel.getAskLocationPermissionEventObserver().subscribe(event -> onLocationPermissionRequested()));
+        mSubscriptions.add(mViewModel.getUiStateChangeEventObservable().subscribe(this::onUiStateUpdate));
+        mSubscriptions.add(mViewModel.getShowSnackbarMessageBroadcast().subscribe(this::showSnackbarMessage));
+        mSubscriptions.add(mViewModel.getMapOptionsObservable().subscribe(this::handleMapOptionsUpdate));
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mSubscriptions.dispose();
-
-        if (isServiceRunning(LocationService.class) && mViewModel.isTripStopped()) {
-            stopService(new Intent(this, LocationService.class));
-        }
     }
 
     @Override
@@ -90,6 +110,7 @@ public class MapActivity extends ViewModelActivity implements View.OnClickListen
         if (requestCode == ACCESS_FINE_LOCATION_REQUEST_CODE) {
             mPermissionGranted = (grantResults[0] == PackageManager.PERMISSION_GRANTED);
         }
+        mViewModel.onLocationPermissionUpdate(mPermissionGranted);
     }
 
     @Override
@@ -99,7 +120,7 @@ public class MapActivity extends ViewModelActivity implements View.OnClickListen
 
     @Override
     public void onClick(View view) {
-
+        mViewModel.onActionButtonClicked();
     }
 
     private void addMapFragment() {
@@ -116,39 +137,28 @@ public class MapActivity extends ViewModelActivity implements View.OnClickListen
         ActivityCompat.requestPermissions(this, permissions, ACCESS_FINE_LOCATION_REQUEST_CODE);
     }
 
-    private void onNewLocationReceived(@NonNull LatLng coordinates) {
-        Log.d("Activity", "Location accounted");
+    private void onUiStateUpdate(@NonNull MapActivityUiState state) {
+        mButton.setText(state.getActionButtomTextId());
+    }
+
+    private void handleMapOptionsUpdate(@NonNull MapOptions options) {
         if (mGoogleMap != null) {
-            CameraPosition campos = new CameraPosition.Builder()
-                    .target(coordinates)
-                    .zoom(20)
-                    .build();
-            mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(campos));
-            mGoogleMap.addMarker(new MarkerOptions()
-                    .position(coordinates));
+            if (options.shouldDeleteMarkers()) {
+                mGoogleMap.clear();
+            } else {
+                LatLng coords = new LatLng(options.getCoordinatesLatitude(), options.getCoordinatesLongitude());
+                CameraPosition campos = new CameraPosition.Builder()
+                        .target(coords)
+                        .zoom(options.getCameraZoomLevel())
+                        .build();
+                mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(campos));
+                mGoogleMap.addMarker(new MarkerOptions()
+                        .position(coords));
+            }
         }
     }
 
     private void showSnackbarMessage(@StringRes int stringId) {
         Snackbar.make(mRootView, stringId, Snackbar.LENGTH_LONG).show();
     }
-
-    private boolean isServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void startLocationService() {
-        Intent service = new Intent(this, LocationService.class);
-        if (!isServiceRunning(LocationService.class)) {
-            ActivityCompat.startForegroundService(this, service);
-        }
-
-    }
-
 }

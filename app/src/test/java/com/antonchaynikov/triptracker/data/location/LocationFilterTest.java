@@ -1,19 +1,19 @@
-package com.antonchaynikov.triptracker.data;
+package com.antonchaynikov.triptracker.data.location;
 
 import android.location.Location;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.junit.Assert.*;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class LocationFilterTest {
 
     private static final float TEST_ACCURACY_MARGIN = LocationFilter.DEFAULT_ACCURACY;
@@ -28,6 +28,7 @@ public class LocationFilterTest {
 
     @Before
     public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
         when(mockLocation.getAccuracy()).thenReturn(TEST_ACCURACY_MARGIN);
         when(mockLocation.getTime()).thenReturn(0L);
         when(newLocation.getTime()).thenReturn(1000L);

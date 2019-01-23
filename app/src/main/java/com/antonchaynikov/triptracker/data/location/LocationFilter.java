@@ -1,4 +1,4 @@
-package com.antonchaynikov.triptracker.data;
+package com.antonchaynikov.triptracker.data.location;
 
 import android.location.Location;
 import android.util.Log;
@@ -12,7 +12,7 @@ public class LocationFilter implements Filter<Location> {
     public static final float DEFAULT_VELOCITY_LIMIT = 30; // km/h
     public static final float DEFAULT_DISTANCE_MARGIN = 15; // m
 
-    private static String TAG = LocationFilter.class.getSimpleName();
+    private static final String TAG = LocationFilter.class.getSimpleName();
 
     private double mAccuracyMargin;
     private double mVelocityLimit;
@@ -68,5 +68,4 @@ public class LocationFilter implements Filter<Location> {
     public void reset() {
         mLastLocationReceived = null;
     }
-
 }

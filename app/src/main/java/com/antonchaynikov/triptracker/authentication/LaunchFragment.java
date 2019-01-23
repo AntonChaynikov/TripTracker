@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.antonchaynikov.triptracker.mainscreen.MapActivity;
+import com.antonchaynikov.triptracker.mainscreen.TripActivity;
 import com.antonchaynikov.triptracker.R;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
@@ -52,7 +52,7 @@ public class LaunchFragment extends Fragment {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                startActivity(MapActivity.getStartIntent(getContext(), user));
+                startActivity(TripActivity.getStartIntent(getContext(), user));
             }
         }
     }
