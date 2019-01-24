@@ -170,12 +170,26 @@ jobs:
           name: Deploy to Google Play alpha
           command: ./gradlew publishPlatformRelease
 
+  report_code_cov:
+    <<: *android
+    steps:
+      - checkout
+      - *restore_cache
+      - *decode_keystore_file
+      -run:
+        name: Code coverage report
+        command: ./gradlew jacocoTestReport
+      -run:
+        name: Upload report
+        command: bash <(curl -s https://codecov.io/bash)
+
 workflows:
   version: 2
   workflow:
     jobs:
     - build_debug
     - build_release
+    - report_code_cov
     - test_unit:
         requires:
           - build_debug
