@@ -42,12 +42,14 @@ android {
         }
     }
 
-    flavorDimensions "basic"
+    flavorDimensions "LocationServiceType"
     productFlavors {
         platform {
+            dimension "LocationServiceType"
             applicationIdSuffix ".platform"
         }
         servicesApi {
+            dimension "LocationServiceType"
             applicationIdSuffix ".servicesApi"
         }
     }

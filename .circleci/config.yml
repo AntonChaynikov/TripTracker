@@ -89,7 +89,7 @@ jobs:
       - *save_cache
       - run:
           name: Gradle build (debug)
-          command: ./gradlew -PciBuild=true :app:assembleDebug :app:assembleAndroidTest
+          command: ./gradlew -PciBuild=true :app:assemblePlatformDebug :app:assembleAndroidTest
       - *persist_debug_workspace
       - store_artifacts:
           path: app/build/outputs/apk/
@@ -109,7 +109,7 @@ jobs:
       - *save_cache
       - run:
           name: Gradle build (release)
-          command: ./gradlew -PciBuild=true :app:assembleRelease
+          command: ./gradlew -PciBuild=true :app:assemblePlatformRelease
       - *persist_release_workspace
       - store_artifacts:
           path: app/build/outputs/apk/
