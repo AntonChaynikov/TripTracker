@@ -28,7 +28,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MapActivityViewModelTest {
+public class TripViewModelTest {
 
     @ClassRule
     public static final RxImmediateSchedulerRule schedulers = new RxImmediateSchedulerRule();
@@ -208,9 +208,11 @@ public class MapActivityViewModelTest {
         Trip trip = new Trip().updateStatistics(12.01341235, 1.0045);
         statsStream.onNext(trip);
 
-        assertEquals(1, statisticsObserver.valueCount());
+        // 2 broadcasts happening - default during vm creation and expected one
+        assertEquals(2, statisticsObserver.valueCount());
 
-        TripStatistics statistics = statisticsObserver.values().get(0);
+        // We are interested int the last value
+        TripStatistics statistics = statisticsObserver.values().get(1);
 
         assertEquals("12.01", statistics.getDistance());
         assertEquals("1", statistics.getSpeed());
@@ -226,4 +228,30 @@ public class MapActivityViewModelTest {
         assertEquals(1, mapOptionsObserver.valueCount());
     }
 
+    @Test
+    public void shouldBroadcastDefaultStatistics_whenCreated() {
+        TestObserver<TripStatistics> statisticsObserver = TestObserver.create();
+        mTestSubject.getTripStatisticsStreamObservable().subscribe(statisticsObserver);
+
+        TripStatistics statistics = statisticsObserver.values().get(0);
+        assertEquals("0", statistics.getDistance());
+        assertEquals("0", statistics.getSpeed());
+    }
+
+    @Test
+    public void shouldBroadcastDefaultStatistics_whenTripEnds() {
+        TestObserver<TripStatistics> statisticsObserver = TestObserver.create();
+        mTestSubject.getTripStatisticsStreamObservable().subscribe(statisticsObserver);
+
+        //Starting
+        mTestSubject.onActionButtonClicked();
+        //Finishing
+        mTestSubject.onActionButtonClicked();
+
+        // Two values are expected - 1. emitted during creation, 2. emitted after trip ended
+        assertEquals(2, statisticsObserver.valueCount());
+        TripStatistics statistics = statisticsObserver.values().get(1);
+        assertEquals("0", statistics.getDistance());
+        assertEquals("0", statistics.getSpeed());
+    }
 }

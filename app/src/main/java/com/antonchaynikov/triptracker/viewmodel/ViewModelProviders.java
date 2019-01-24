@@ -1,7 +1,5 @@
 package com.antonchaynikov.triptracker.viewmodel;
 
-import com.antonchaynikov.triptracker.viewmodel.ViewModelFactory;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -25,9 +23,7 @@ public class ViewModelProviders {
                     T viewModelInstance = null;
                     try {
                         viewModelInstance = clazz.newInstance();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InstantiationException e) {
+                    } catch (IllegalAccessException | InstantiationException e) {
                         e.printStackTrace();
                     }
                     return viewModelInstance;

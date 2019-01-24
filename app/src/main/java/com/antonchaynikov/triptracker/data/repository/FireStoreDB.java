@@ -4,20 +4,15 @@ import android.util.Log;
 
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import org.joda.time.LocalDateTime;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.CompletableSubject;
 
 public class FireStoreDB implements Repository {
 
@@ -44,7 +39,12 @@ public class FireStoreDB implements Repository {
 
     @Override
     public Completable startTrip(@NonNull Trip trip) {
-        return Completable.complete();
+        CompletableSubject completable = CompletableSubject.create();
+        mDatabase.collection(TRIPS_COLLECTION_NAME)
+                .document(Long.toString(trip.getStartDate()))
+                .set(trip)
+                .addOnCompleteListener(task -> completable.onComplete());
+        return completable;
     }
 
     @Override
@@ -59,11 +59,20 @@ public class FireStoreDB implements Repository {
 
     @Override
     public Completable finishTrip(@NonNull Trip trip, long date) {
-        return Completable.complete();
+        CompletableSubject completable = CompletableSubject.create();
+        trip.setEndDate(date);
+        mDatabase.collection(TRIPS_COLLECTION_NAME)
+                .document(Long.toString(trip.getStartDate()))
+                .update(Trip.FIELD_NAME_END_DATE, date)
+                .addOnCompleteListener(task -> completable.onComplete());
+        return completable;
     }
 
     @Override
     public void addCoordinate(@NonNull TripCoordinate coordinate, @NonNull Trip trip) {
-
+        mDatabase.collection(TRIPS_COLLECTION_NAME)
+                .document(Long.toString(trip.getStartDate()))
+                .collection(Trip.FIELD_NAME_COLLECTION_COORDINATES)
+                .add(coordinate);
     }
 }

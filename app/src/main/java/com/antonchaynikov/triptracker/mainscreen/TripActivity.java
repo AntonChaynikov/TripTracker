@@ -8,8 +8,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.data.location.LocationFilter;
@@ -21,7 +24,10 @@ import com.antonchaynikov.triptracker.data.repository.FireStoreDB;
 import com.antonchaynikov.triptracker.data.tripmanager.StatisticsCalculator;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
 import com.antonchaynikov.triptracker.mainscreen.uistate.MapActivityUiState;
+import com.antonchaynikov.triptracker.viewmodel.BasicViewModel;
 import com.antonchaynikov.triptracker.viewmodel.ViewModelActivity;
+import com.antonchaynikov.triptracker.viewmodel.ViewModelFactory;
+import com.antonchaynikov.triptracker.viewmodel.ViewModelProviders;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -34,6 +40,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import io.reactivex.disposables.CompositeDisposable;
@@ -51,6 +58,8 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
     private View mRootView;
     private Button mButton;
     private GoogleMap mGoogleMap;
+    private TextView tvDistance;
+    private TextView tvSpeed;
 
     private CompositeDisposable mSubscriptions;
 
@@ -67,13 +76,18 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        Toolbar toolbar = findViewById(R.id.trip_toolbar);
+        setSupportActionBar(toolbar);
+
+        tvDistance = findViewById(R.id.tv_statistics_distance);
+        tvSpeed = findViewById(R.id.tv_statistics_speed);
 
         mPermissionGranted =
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
                         PackageManager.PERMISSION_GRANTED;
 
-        mRootView = findViewById(R.id.vg_map_activity_layout);
-        mButton = findViewById(R.id.btn_main_activity_location);
+        mRootView = findViewById(R.id.vg_trip_activity_map_frame);
+        mButton = findViewById(R.id.btn_trip_activity_location);
         mButton.setOnClickListener(this);
 
         addMapFragment();
@@ -82,20 +96,34 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
         initViewModel();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_trip_activity, menu);
+        return true;
+    }
+
     private void initViewModel() {
         LocationSource locationSource = LocationSource.getInstance(new LocationFilter());
         ServiceManager serviceManager = ServiceManager.getInstance(this, locationSource, PlatformLocationService.class);
-        mViewModel = new TripViewModel(
-                TripManager.getInstance(
-                        FireStoreDB.getInstance(),
-                        locationSource,
-                        new StatisticsCalculator()),
-                serviceManager,
-                mPermissionGranted);
+        ViewModelFactory factory = new ViewModelFactory() {
+            @Override
+            public <T extends BasicViewModel> T create(@NonNull Class<T> clazz) {
+                return (T) new TripViewModel(
+                        TripManager.getInstance(
+                                FireStoreDB.getInstance(),
+                                locationSource,
+                                new StatisticsCalculator()),
+                        serviceManager,
+                        mPermissionGranted);
+            }
+        };
+        mViewModel = ViewModelProviders.of(this, factory).get(TripViewModel.class);
         mSubscriptions.add(mViewModel.getAskLocationPermissionEventObserver().subscribe(event -> onLocationPermissionRequested()));
         mSubscriptions.add(mViewModel.getUiStateChangeEventObservable().subscribe(this::onUiStateUpdate));
         mSubscriptions.add(mViewModel.getShowSnackbarMessageBroadcast().subscribe(this::showSnackbarMessage));
         mSubscriptions.add(mViewModel.getMapOptionsObservable().subscribe(this::handleMapOptionsUpdate));
+        mSubscriptions.add(mViewModel.getTripStatisticsStreamObservable().subscribe(this::handleStatisticsUpdate));
     }
 
     @Override
@@ -128,7 +156,7 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
         mapFragment.getMapAsync(this);
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.main_activity_map_frame, mapFragment)
+                .add(R.id.vg_trip_activity_map_frame, mapFragment)
                 .commit();
     }
 
@@ -156,6 +184,11 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
                         .position(coords));
             }
         }
+    }
+
+    private void handleStatisticsUpdate(@NonNull TripStatistics statistics) {
+        tvDistance.setText(getString(R.string.statistics_distance, statistics.getDistance()));
+        tvSpeed.setText(getString(R.string.statistics_speed, statistics.getSpeed()));
     }
 
     private void showSnackbarMessage(@StringRes int stringId) {

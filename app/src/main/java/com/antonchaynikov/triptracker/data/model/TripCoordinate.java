@@ -1,5 +1,7 @@
 package com.antonchaynikov.triptracker.data.model;
 
+import com.google.firebase.firestore.PropertyName;
+
 import androidx.annotation.Nullable;
 
 public class TripCoordinate {
@@ -8,8 +10,11 @@ public class TripCoordinate {
     public static final String FIELD_NAME_LATITUDE = "latitude";
     public static final String FIELD_NAME_LONGITUDE = "longitude";
 
+    @PropertyName(FIELD_NAME_LATITUDE)
     private double latitude;
+    @PropertyName(FIELD_NAME_LONGITUDE)
     private double longitude;
+    @PropertyName(FIELD_NAME_DATE)
     private double date;
 
     public TripCoordinate() {

@@ -96,7 +96,9 @@ public class TripManager {
     }
 
     private void handleCoordinatesUpdate(@NonNull Location coordinate) {
-        mCoordinatesStream.onNext(new TripCoordinate(coordinate.getTime(), coordinate.getLatitude(), coordinate.getLongitude()));
+        TripCoordinate tripCoordinate = new TripCoordinate(coordinate.getTime(), coordinate.getLatitude(), coordinate.getLongitude());
+        mCoordinatesStream.onNext(tripCoordinate);
+        mRepository.addCoordinate(tripCoordinate, mCurrentStartedTrip);
         mStatisticsCalculator.addCoordinate(coordinate);
         mTripUpdatesStream.onNext(mCurrentStartedTrip.updateStatistics(
                 mStatisticsCalculator.getDistance(),

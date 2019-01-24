@@ -6,6 +6,10 @@ class TripStatistics {
     private String mDistance;
     private String mSpeed;
 
+    static TripStatistics getDefaultStatistics() {
+        return new TripStatistics("0", "0");
+    }
+
     TripStatistics(@NonNull String speed, @NonNull String distance) {
         mDistance = distance;
         mSpeed = speed;

@@ -1,5 +1,7 @@
 package com.antonchaynikov.triptracker.mainscreen;
 
+import android.util.Log;
+
 import com.antonchaynikov.triptracker.data.location.ServiceManager;
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
@@ -19,9 +21,11 @@ import static com.antonchaynikov.triptracker.mainscreen.uistate.MapActivityUiSta
 
 class TripViewModel extends BasicViewModel {
 
+    private static final String TAG = TripViewModel.class.getCanonicalName();
+
     private BehaviorSubject<MapActivityUiState> mUiStateChangeEventObservable;
     private PublishSubject<Boolean> mAskLocationPermissionEventObservable = PublishSubject.create();
-    private PublishSubject<TripStatistics> mTripStatisticsStreamObservable = PublishSubject.create();
+    private BehaviorSubject<TripStatistics> mTripStatisticsStreamObservable;
 
     private PublishSubject<MapOptions> mMapOptionsObservable = PublishSubject.create();
 
@@ -37,6 +41,7 @@ class TripViewModel extends BasicViewModel {
     TripViewModel(@NonNull TripManager tripManager, @NonNull ServiceManager serviceManager, boolean isLocationPermissionGranted) {
         mUiState = MapActivityUiState.getDefaultState();
         mUiStateChangeEventObservable = BehaviorSubject.createDefault(mUiState);
+        mTripStatisticsStreamObservable = BehaviorSubject.createDefault(TripStatistics.getDefaultStatistics());
         mIsLocationPermissionGranted = isLocationPermissionGranted;
         mServiceManager = serviceManager;
         mTripManager = tripManager;
@@ -82,9 +87,9 @@ class TripViewModel extends BasicViewModel {
 
     private void startTrip() {
         mServiceManager.startLocationService();
-        mSubscriptions.add(mTripManager.startTrip().subscribe(() -> {
-            mUiStateChangeEventObservable.onNext(mUiState.transform(STARTED));
-        }));
+        mSubscriptions.add(mTripManager.startTrip().subscribe(() ->
+            mUiStateChangeEventObservable.onNext(mUiState.transform(STARTED))
+        ));
     }
 
     private void stopTrip() {
@@ -93,6 +98,7 @@ class TripViewModel extends BasicViewModel {
             mUiStateChangeEventObservable.onNext(mUiState.transform(IDLE));
             mMapOptionsObservable.onNext(new MapOptions(true));
         }));
+        mTripStatisticsStreamObservable.onNext(TripStatistics.getDefaultStatistics());
     }
 
     private void handleTripUpdate(@NonNull Trip trip) {
@@ -110,6 +116,7 @@ class TripViewModel extends BasicViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
+        Log.d(TAG, "Destroying this ViewModel instance");
         mSubscriptions.dispose();
     }
 }

@@ -26,8 +26,8 @@ public class PlatformLocationService extends LocationService implements Location
     @Override
     public void startUpdates(@NonNull Filter<Location> locationFilter) throws SecurityException {
         if (!mIsReceivingLocations) {
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
             mFilter = locationFilter;
             mIsReceivingLocations = true;
         }
