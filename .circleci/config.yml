@@ -65,7 +65,7 @@ references:
   decode_gplay_key: &decode_gplay_key
     run:
       name: Decode Google Play service acc key
-      command: echo $GOOGLE_PLAY_KEY > ../google_play_key.json
+      command: echo $GOOGLE_PLAY_KEY > google_play_key.json
 
   # Android signing key
   decode_keystore_file: &decode_keystore_file
@@ -178,7 +178,7 @@ jobs:
       - *decode_keystore_file
       - run:
           name: Code coverage report
-          command: ./gradlew jacocoTestReport
+          command: ./gradlew jacocoTestPlatformDebugUnitTestReport
       - run:
           name: Upload report
           command: bash <(curl -s https://codecov.io/bash)
@@ -189,7 +189,6 @@ workflows:
     jobs:
     - build_debug
     - build_release
-    - report_code_cov
     - test_unit:
         requires:
           - build_debug
@@ -204,4 +203,7 @@ workflows:
         requires:
           - build_release
           - test_unit
+          - test_instrumented
+    - report_code_cov
+        requires:
           - test_instrumented
