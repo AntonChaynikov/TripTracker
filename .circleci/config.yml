@@ -177,11 +177,11 @@ jobs:
       - *restore_cache
       - *decode_keystore_file
       - run:
-        name: Code coverage report
-        command: ./gradlew jacocoTestReport
+          name: Code coverage report
+          command: ./gradlew jacocoTestReport
       - run:
-        name: Upload report
-        command: bash <(curl -s https://codecov.io/bash)
+          name: Upload report
+          command: bash <(curl -s https://codecov.io/bash)
 
 workflows:
   version: 2
