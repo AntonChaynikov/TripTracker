@@ -204,6 +204,6 @@ workflows:
           - build_release
           - test_unit
           - test_instrumented
-    - report_code_cov
+    - report_code_cov:
         requires:
           - test_instrumented
