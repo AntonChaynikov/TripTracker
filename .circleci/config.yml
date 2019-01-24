@@ -124,6 +124,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache
+      - *decode_keystore_file
       - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
@@ -145,6 +146,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache
+      - *decode_keystore_file
       - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
