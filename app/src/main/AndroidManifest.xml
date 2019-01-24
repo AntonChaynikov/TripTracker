@@ -3,12 +3,13 @@
     package="com.antonchaynikov.triptracker">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <uses-feature android:name="android.hardware.location.gps"/>
     <uses-feature android:name="android.hardware.location.network"/>
 
-
     <application
+        android:name="androidx.multidex.MultiDexApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -16,26 +17,25 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".MapActivity.MainActivity"
+        <activity android:name=".mainscreen.TripActivity"
             tools:ignore="InnerclassSeparator" />
 
-        <activity android:name=".LaunchActivity.LaunchActivity"
+        <activity android:name=".authentication.LaunchActivity"
             tools:ignore="InnerclassSeparator">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <receiver android:name=".AlarmListener"/>
-        <service
-            android:name=".TripFirebaseMessagingService">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-            </intent-filter>
-        </service>
+
+        <service android:name=".data.location.PlatformLocationService" />
     </application>
 </manifest>

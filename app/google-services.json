@@ -8,37 +8,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:964383537574:android:18d704c427535e1b",
-        "android_client_info": {
-          "package_name": "com.antonchaynikov.triptracker"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "964383537574-6hnqdh6idjnlmffscvm0rshm5mefd6b5.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDCQn8K8LoY4DlxQxv8iX9xQHVN1TJeu_s"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:964383537574:android:761f48719b0af93c",
         "android_client_info": {
           "package_name": "com.antonchaynikov.triptracker.platform"
@@ -46,7 +15,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "964383537574-n6jmj9jv2jrcpp7ifh8rqcmqf2t0fh1m.apps.googleusercontent.com",
+          "client_id": "964383537574-snf8fmag313t59fsvf4isqnicpc2vv5a.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.antonchaynikov.triptracker.platform",
@@ -54,7 +23,7 @@
           }
         },
         {
-          "client_id": "964383537574-op77vlo9vqj43oqb7ib9crssvbuhhehn.apps.googleusercontent.com",
+          "client_id": "964383537574-d9b4n6d80noqjd2ssur6u56trppvci0b.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.antonchaynikov.triptracker.platform",
@@ -62,11 +31,11 @@
           }
         },
         {
-          "client_id": "964383537574-qmf988m26pghe3t3e5i13esn9dn027t2.apps.googleusercontent.com",
+          "client_id": "964383537574-vhe9i8om0p974amsdjmp0h5uuhe8302t.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.antonchaynikov.triptracker.platform",
-            "certificate_hash": "76faa953913763dfdd22eb5b6364c4575e5caaeb"
+            "certificate_hash": "02ea5f1351c395e8f0d012ad36f83b28b7e5fd5a"
           }
         },
         {
@@ -119,6 +88,14 @@
           "android_info": {
             "package_name": "com.antonchaynikov.triptracker.servicesApi",
             "certificate_hash": "40b4ee603f88cac41e5dfadd25a68854c0745c20"
+          }
+        },
+        {
+          "client_id": "964383537574-ug5r73kjah2fb6o3mghhmm8kjt06vfgi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.antonchaynikov.triptracker.servicesApi",
+            "certificate_hash": "02ea5f1351c395e8f0d012ad36f83b28b7e5fd5a"
           }
         },
         {
