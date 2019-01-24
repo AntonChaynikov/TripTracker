@@ -81,6 +81,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache
+      - *decode_keystore_file
       - *decode_gplay_key
       - run:
           name: Download dependencies

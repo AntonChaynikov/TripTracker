@@ -95,6 +95,7 @@ ext {
     ROOM = '2.1.0-alpha03'
     GOOGLE_PALY_SERVICES_LOCATION = '16.0.0'
     JODA_TIME = '2.10.1'
+    JODA_CONVERT = '2.1.2'
     MOCKITO_CORE = '2.23.4'
     JUNIT = '4.12'
     ANDROIDX_TEST_RUNNER = '1.1.0'
@@ -114,6 +115,7 @@ dependencies {
     implementation "com.google.android.gms:play-services-base:$GOOGLE_PLAY_SERVICES_BASE"
     implementation "com.google.firebase:firebase-firestore:$FIREBASE_FIRESTORE"
     implementation "joda-time:joda-time:$JODA_TIME"
+    implementation "org.joda:joda-convert:$JODA_CONVERT:classic"
 
     testImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     testImplementation "junit:junit:$JUNIT"
