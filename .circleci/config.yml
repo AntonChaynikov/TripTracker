@@ -176,10 +176,10 @@ jobs:
       - checkout
       - *restore_cache
       - *decode_keystore_file
-      -run:
+      - run:
         name: Code coverage report
         command: ./gradlew jacocoTestReport
-      -run:
+      - run:
         name: Upload report
         command: bash <(curl -s https://codecov.io/bash)
 
