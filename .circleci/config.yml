@@ -40,14 +40,6 @@ references:
       root: *workspace
       paths:
         - app/build
-  attach_firebase_workspace: &attach_firebase_workspace
-    attach_workspace:
-      at: *workspace
-  persist_firebase_workspace: &persist_firebase_workspace
-    persist_to_workspace:
-      root: *workspace
-      paths:
-        - firebase
 
   ## Docker image configurations
 
@@ -59,54 +51,37 @@ references:
       TERM: dumb
       _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
       GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
-  gcloud_config: &gcloud_config
-    working_directory: *workspace
-    docker:
-      - image: google/cloud-sdk:latest
-    environment:
-      TERM: dumb
 
 ## Keys
 
-  # Google Cloud Service
-
-  decode_gcloud_key: &decode_gcloud_key
+  # google-services.json
+  decode_google_services_key: &decode_google_services_key
     run:
-      name: Decode Google Cloud credentials
-      command: echo $GCLOUD_SERVICE_KEY | base64 -di > $HOME/client-secret.json
+      name: Decode google services key
+      command: echo GOOGLE_SERVICES_KEY > google-services.json
+
 
   # Google Play Service acc key
-
   decode_gplay_key: &decode_gplay_key
     run:
       name: Decode Google Play service acc key
-      command: echo $GSTORE_KEY | base64 -di > gstore.json
-
-  export_gplay_key: &export_gplay_key
-      run:
-        name: Export path to env var
-        command:  echo 'export GSTORE_KEY_PATH="$PWD/gstore.json"' >> $BASH_ENV
+      command: echo $GOOGLE_PLAY_KEY > google_play_key.json
 
   # Android signing key
-
-  decode_signing_key: &decode_signing_key
+  decode_keystore_file: &decode_keystore_file
     run:
-      name: Decode Android signing key
-      command: echo $SIGNING_KEY | base64 -di > key.jks
-  export_signing_key: &export_signing_key
-    run:
-      name: Export path to env var
-      command:  echo 'export TRIP_KEY_PATH="$PWD/key.jks"' >> $BASH_ENV
+      name: Decode keystore.properties
+      command: echo $KEYSTORE | base64 -di > keystore.properties
 
 jobs:
 
   ## Build debug APK and instrumented test APK
-
   build_debug:
     <<: *android_config
     steps:
       - checkout
       - *restore_cache
+      - *decode_gplay_key
       - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
@@ -120,14 +95,13 @@ jobs:
           destination: /apk/
 
   ## Build release APK
-
   build_release:
     <<: *android_config
     steps:
       - checkout
       - *restore_cache
-      - *decode_signing_key
-      - *export_signing_key
+      - *decode_keystore_file
+      - *decode_gplay_key
       - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
@@ -144,7 +118,6 @@ jobs:
           destination: /mapping/
 
   ## Run unit tests
-
   test_unit:
     <<: *android_config
     steps:
@@ -169,47 +142,24 @@ jobs:
           destination: /test-results/
 
   ## Run instrumented tests
-
   test_instrumented:
-    <<: *gcloud_config
+    <<: *android_config
     steps:
-      - *attach_debug_workspace
-      - *decode_gcloud_key
+      - checkout
+      - *restore_cache
       - run:
-          name: Authenticate with Google Cloud
-          command: gcloud auth activate-service-account firebase-adminsdk-3zsqi@gps-trip-logger.iam.gserviceaccount.com --key-file $HOME/client-secret.json
-      - run:
-          name: Set Google Cloud target project
-          command: gcloud config set project  gps-trip-logger
-      - run:
-          name: Run platform instrumented test on Firebase Test Lab
-          command: gcloud firebase test android run --app app/build/outputs/apk/platform/debug/*debug.apk --test app/build/outputs/apk/androidTest/platform/debug/*androidTest.apk --device model=sailfish,version=26,locale=en_US,orientation=portrait --no-record-video --environment-variables coverage=true,coverageFile=/sdcard/coverage.ec --directories-to-pull=/sdcard --timeout 20m
-      - run:
-          name: Run servicesApi instrumented test on Firebase Test Lab
-          command: gcloud firebase test android run --app app/build/outputs/apk/servicesApi/debug/*debug.apk --test app/build/outputs/apk/androidTest/servicesApi/debug/*androidTest.apk --device model=sailfish,version=26,locale=en_US,orientation=portrait --no-record-video --environment-variables coverage=true,coverageFile=/sdcard/coverage.ec --directories-to-pull=/sdcard --timeout 20m
-      - run:
-          name: Create directory to store test results
-          command: mkdir firebase
-      - run:
-          name: Download instrumented test results from Firebase Test Lab
-          command: gsutil -m cp -r -U "`gsutil ls gs://test-lab-9td3tnt7fd09a-kqr91929f8ba0 | tail -1`*" /root/workspace/firebase/
-      - *persist_firebase_workspace
-      - store_artifacts:
-          path: firebase/
-          destination: /firebase/
+          name: Download dependencies
+          command: ./gradlew androidDependencies
 
   ## Deploy release APK to Google Play Alpha
-
   deploy:
     <<: *android_config
     steps:
       - checkout
       - *attach_release_workspace
       - *restore_cache
-      - *decode_signing_key
-      - *export_signing_key
+      - *decode_keystore_file
       - *decode_gplay_key
-      - *export_gplay_key
       - run:
           name: Download dependencies
           command: ./gradlew androidDependencies

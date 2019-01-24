@@ -18,7 +18,7 @@ android {
     playAccountConfigs {
         defaultAccountConfig {
             serviceAccountEmail = "gps-logger-gplay@api-7194191596450161697-308117.iam.gserviceaccount.com"
-            jsonFile = file(keystoreProperties['google_play_key'])
+            jsonFile = file('google_play_key.json')
         }
     }
 
