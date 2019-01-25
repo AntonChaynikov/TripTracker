@@ -77,7 +77,7 @@ references:
   decode_fabric_key: &decode_fabric_key
     run:
       name: Decode fabric.properties
-      command: echo $FABRIC_PROPERTIES | base64 -di > keystore.properties
+      command: echo $FABRIC_PROPERTIES > fabric.properties
 
 jobs:
 
