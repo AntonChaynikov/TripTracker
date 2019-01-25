@@ -70,13 +70,14 @@ public final class TripManager {
     public Completable startTrip() {
         Trip trip = new Trip(DateTime.now().getMillis());
         return mRepository
-                .startTrip(trip)
+                .addTrip(trip)
                 .doOnComplete(() -> onTripStarted(trip));
     }
 
     public Completable finishTrip() {
+        mCurrentStartedTrip.setEndDate(DateTime.now().getMillis());
         return mRepository
-                .finishTrip(mCurrentStartedTrip, DateTime.now().getMillis())
+                .updateTrip(mCurrentStartedTrip)
                 .doOnComplete(this::onTripFinished);
     }
 

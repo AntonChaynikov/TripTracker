@@ -1,7 +1,6 @@
 package com.antonchaynikov.triptracker.mainscreen;
 
 import com.antonchaynikov.triptracker.RxImmediateSchedulerRule;
-import com.antonchaynikov.triptracker.data.location.ServiceManager;
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
@@ -36,8 +35,6 @@ public class TripViewModelTest {
     private TripViewModel mTestSubject;
     @Mock
     private TripManager mockTripManager;
-    @Mock
-    private ServiceManager mockServiceManager;
 
     private PublishSubject<Trip> statsStream;
     private PublishSubject<TripCoordinate> coordsStream;
@@ -51,7 +48,7 @@ public class TripViewModelTest {
         doReturn(Completable.complete()).when(mockTripManager).finishTrip();
         doReturn(statsStream).when(mockTripManager).getTripUpdatesStream();
         doReturn(coordsStream).when(mockTripManager).getCoordinatesStream();
-        mTestSubject = new TripViewModel(mockTripManager, mockServiceManager, true);
+        mTestSubject = new TripViewModel(mockTripManager, true);
     }
 
     @Test

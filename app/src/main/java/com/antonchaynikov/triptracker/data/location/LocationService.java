@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import io.reactivex.Observable;
+import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
 public abstract class LocationService extends Service {
@@ -28,6 +29,7 @@ public abstract class LocationService extends Service {
     protected PublishSubject<Location> mLocationsBroadcast;
     protected boolean mIsLocationAvailable;
 
+    private BehaviorSubject<Boolean> mGeolocationAvailabilityUpdatesBroadcast;
     private final IBinder mBinder = new LocationService.LocationServiceBinder();
 
     @Nullable
@@ -57,6 +59,7 @@ public abstract class LocationService extends Service {
 
         mIsLocationAvailable = true;
         mLocationsBroadcast = PublishSubject.create();
+        mGeolocationAvailabilityUpdatesBroadcast = BehaviorSubject.createDefault(mIsLocationAvailable);
     }
 
     @Override
@@ -68,12 +71,19 @@ public abstract class LocationService extends Service {
 
     public abstract void stopUpdates();
 
-    public Observable<Location> getLocationsStream() {
-        return mLocationsBroadcast;
+    public Observable<Boolean> getGeolocationAvailabilityUpdatesBroadcast() {
+        return mGeolocationAvailabilityUpdatesBroadcast;
     }
 
-    public boolean isUpdateAvailable() {
-        return mIsLocationAvailable;
+    protected void onGeolocationServiceAvailabilityChanged(boolean isAvailable) {
+        boolean isStatusChanging = mIsLocationAvailable ^ isAvailable;
+        if (isStatusChanging) {
+            mGeolocationAvailabilityUpdatesBroadcast.onNext(isAvailable);
+        }
+    }
+
+    public Observable<Location> getLocationsStream() {
+        return mLocationsBroadcast;
     }
 
     class LocationServiceBinder extends Binder {

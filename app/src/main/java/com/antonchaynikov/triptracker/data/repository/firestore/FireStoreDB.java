@@ -1,7 +1,8 @@
-package com.antonchaynikov.triptracker.data.repository;
+package com.antonchaynikov.triptracker.data.repository.firestore;
 
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
+import com.antonchaynikov.triptracker.data.repository.Repository;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import io.reactivex.subjects.CompletableSubject;
 public final class FireStoreDB implements Repository {
 
     private static final String TRIPS_COLLECTION_NAME = "trips";
+    private static final String COORDINATES_COLLECTION_NAME = "coordinates";
 
     private static volatile FireStoreDB sInstance;
 
@@ -35,7 +37,7 @@ public final class FireStoreDB implements Repository {
     }
 
     @Override
-    public Completable startTrip(@NonNull Trip trip) {
+    public Completable addTrip(@NonNull Trip trip) {
         CompletableSubject completable = CompletableSubject.create();
         mDatabase.collection(TRIPS_COLLECTION_NAME)
                 .document(Long.toString(trip.getStartDate()))
@@ -55,21 +57,15 @@ public final class FireStoreDB implements Repository {
     }
 
     @Override
-    public Completable finishTrip(@NonNull Trip trip, long date) {
-        CompletableSubject completable = CompletableSubject.create();
-        trip.setEndDate(date);
-        mDatabase.collection(TRIPS_COLLECTION_NAME)
-                .document(Long.toString(trip.getStartDate()))
-                .update(Trip.FIELD_NAME_END_DATE, date)
-                .addOnCompleteListener(task -> completable.onComplete());
-        return completable;
+    public Completable updateTrip(@NonNull Trip trip) {
+        return addTrip(trip);
     }
 
     @Override
     public void addCoordinate(@NonNull TripCoordinate coordinate, @NonNull Trip trip) {
         mDatabase.collection(TRIPS_COLLECTION_NAME)
                 .document(Long.toString(trip.getStartDate()))
-                .collection(Trip.FIELD_NAME_COLLECTION_COORDINATES)
+                .collection(COORDINATES_COLLECTION_NAME)
                 .add(coordinate);
     }
 }

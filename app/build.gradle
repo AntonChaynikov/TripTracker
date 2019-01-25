@@ -113,6 +113,7 @@ ext {
     JODA_TIME = '2.10.1'
     JODA_CONVERT = '2.1.2'
     MOCKITO_CORE = '2.23.4'
+    MOCKITO_INLINE = '2.13.0';
     JUNIT = '4.12'
     ANDROIDX_TEST_RUNNER = '1.1.0'
     ESPRESSO_CORE = '3.1.0'
@@ -137,6 +138,7 @@ dependencies {
 
     testImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     testImplementation "junit:junit:$JUNIT"
+    testImplementation "org.mockito:mockito-inline:$MOCKITO_INLINE"
 
     androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"

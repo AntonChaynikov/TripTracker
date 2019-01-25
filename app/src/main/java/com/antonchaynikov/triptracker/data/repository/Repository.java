@@ -11,13 +11,13 @@ import io.reactivex.Observable;
 
 public interface Repository {
 
-    Completable startTrip(@NonNull Trip trip);
+    Completable addTrip(@NonNull Trip trip);
 
     Observable<List<Trip>> getAllTrips();
 
     Observable<Trip> getTripById(@NonNull String id);
 
-    Completable finishTrip(@NonNull Trip trip, long date);
+    Completable updateTrip(@NonNull Trip trip);
 
     void addCoordinate(@NonNull TripCoordinate coordinate, @NonNull Trip trip);
 

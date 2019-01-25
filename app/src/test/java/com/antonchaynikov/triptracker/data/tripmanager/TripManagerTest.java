@@ -22,8 +22,6 @@ import io.reactivex.subjects.PublishSubject;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -52,8 +50,8 @@ public class TripManagerTest {
 
         MockitoAnnotations.initMocks(this);
 
-        doReturn(CompletableSubject.complete()).when(mockRepository).startTrip(any(Trip.class));
-        doReturn(CompletableSubject.complete()).when(mockRepository).finishTrip(any(Trip.class), anyLong());
+        doReturn(CompletableSubject.complete()).when(mockRepository).addTrip(any(Trip.class));
+        doReturn(CompletableSubject.complete()).when(mockRepository).updateTrip(any(Trip.class));
         doReturn(coordinateObservable).when(mockLocationSource).getLocationUpdates();
         doNothing().when(mockStatisticsCalculator).addCoordinate(any(Location.class));
 
@@ -78,7 +76,7 @@ public class TripManagerTest {
 
     @Test
     public void finishTrip_shouldCallRepository_withCurrentTime_withCorrectTrip() {
-        ArgumentCaptor<Long> argumentCaptor = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<Trip> argumentCaptor = ArgumentCaptor.forClass(Trip.class);
         Disposable sd = mTestSubject.startTrip().subscribe();
         Trip trip = mTestSubject.getCurrentTrip();
 
@@ -86,9 +84,9 @@ public class TripManagerTest {
         Disposable fd = mTestSubject.finishTrip().subscribe();
         long timeAfterFinish = System.currentTimeMillis();
 
-        verify(mockRepository).finishTrip(eq(trip), argumentCaptor.capture());
+        verify(mockRepository).updateTrip(argumentCaptor.capture());
 
-        long timeOfFinish = argumentCaptor.getValue();
+        long timeOfFinish = argumentCaptor.getValue().getEndDate();
 
         assertTrue(timeBeforeFinish <= timeOfFinish && timeAfterFinish >= timeOfFinish);
     }

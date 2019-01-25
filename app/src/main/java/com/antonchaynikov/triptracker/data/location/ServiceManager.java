@@ -14,42 +14,39 @@ public final class ServiceManager<T extends LocationService> {
     private static volatile ServiceManager<? extends LocationService> sInstance;
 
     private Context mAppContext;
-    private LocationSource mLocationSource;
     private Class<T> mServiceClass;
 
-    private ServiceManager(@NonNull Context context, @NonNull LocationSource locationSource, @NonNull Class<T> serviceClass ) {
+    private ServiceManager(@NonNull Context context, @NonNull Class<T> serviceClass) {
         mAppContext = context.getApplicationContext();
-        mLocationSource = locationSource;
         mServiceClass = serviceClass;
     }
 
     public static <K extends LocationService> ServiceManager getInstance(
             @NonNull Context context,
-            @NonNull LocationSource locationSource,
             @NonNull Class<K> serviceClass) {
 
         if (sInstance == null) {
             synchronized (ServiceManager.class) {
                 if (sInstance == null) {
-                    sInstance = new ServiceManager<>(context, locationSource, serviceClass);
+                    sInstance = new ServiceManager<>(context, serviceClass);
                 }
             }
         }
         return sInstance;
     }
 
-    public  void startLocationService() {
+    void startLocationService(@NonNull LocationSource requester) {
         Intent service = new Intent(mAppContext, mServiceClass);
         if (!isServiceRunning()) {
             ActivityCompat.startForegroundService(mAppContext, service);
         }
-        mAppContext.bindService(service, mLocationSource, Context.BIND_AUTO_CREATE);
+        mAppContext.bindService(service, requester, Context.BIND_AUTO_CREATE);
     }
 
-    public void stopLocationService() {
-        mAppContext.unbindService(mLocationSource);
+    void stopLocationService(@NonNull LocationSource requester) {
+        mAppContext.unbindService(requester);
         if (isServiceRunning()) {
-            mAppContext.stopService(new Intent(mAppContext,  mServiceClass));
+            mAppContext.stopService(new Intent(mAppContext, mServiceClass));
         }
     }
 

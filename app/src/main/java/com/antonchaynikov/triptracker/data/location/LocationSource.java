@@ -16,24 +16,27 @@ public final class LocationSource implements ServiceConnection {
     private static volatile LocationSource sInstance;
 
     private PublishSubject<Location> mLocationsBroadcast;
+    private PublishSubject<Boolean> mGeolocationAvailabilityBroadcast;
+    private PublishSubject<IBinder> mServiceConnectionEvent;
+    private ServiceManager<?> mServiceManager;
     private LocationService mLocationService;
     private Filter<Location> mLocationFilter;
-    private Disposable mLocationsStreamSubscription;
 
-    private boolean mIsLocationsUpdateEnabled;
+    private Disposable mUpdateRequestDisposable;
 
-    private boolean mWaitingForService;
-
-    private LocationSource(@NonNull Filter<Location> filter) {
+    private LocationSource(@NonNull Filter<Location> filter, @NonNull ServiceManager<?> serviceManager) {
         mLocationsBroadcast = PublishSubject.create();
+        mServiceConnectionEvent = PublishSubject.create();
+        mGeolocationAvailabilityBroadcast = PublishSubject.create();
         mLocationFilter = filter;
+        mServiceManager = serviceManager;
     }
 
-    public static LocationSource getInstance(@NonNull Filter<Location> filter) {
+    public static LocationSource getInstance(@NonNull Filter<Location> filter, @NonNull ServiceManager<?> serviceManager) {
         if (sInstance == null) {
             synchronized (LocationSource.class) {
                 if (sInstance == null) {
-                    sInstance = new LocationSource(filter);
+                    sInstance = new LocationSource(filter, serviceManager);
                 }
             }
         }
@@ -41,37 +44,32 @@ public final class LocationSource implements ServiceConnection {
     }
 
     @VisibleForTesting
-    void resetInstance() {
+    static void resetInstance() {
         sInstance = null;
     }
 
     public void startUpdates() throws SecurityException {
-        if (isLocationsUpdateAvailable() && !mIsLocationsUpdateEnabled) {
-            mLocationService.startUpdates(mLocationFilter);
-            mLocationsStreamSubscription = mLocationService.getLocationsStream().subscribe(mLocationsBroadcast::onNext);
-            mIsLocationsUpdateEnabled = true;
-        } else {
-            mWaitingForService = true;
-        }
+        mServiceManager.startLocationService(this);
+        mUpdateRequestDisposable = Observable.just(true)
+                .zipWith(mServiceConnectionEvent, (areUpdatesRequested, iBinder) -> iBinder)
+                .subscribe(this::requestUpdates);
+    }
+
+    private void requestUpdates(@NonNull IBinder iBinder) {
+        mLocationService = ((LocationService.LocationServiceBinder) iBinder).getLocationService();
+        Disposable d = mLocationService.getLocationsStream().subscribe(mLocationsBroadcast::onNext);
+        d = mLocationService.getGeolocationAvailabilityUpdatesBroadcast().subscribe(mGeolocationAvailabilityBroadcast::onNext);
+        mLocationService.startUpdates(mLocationFilter);
     }
 
     public void finishUpdates() {
-        mIsLocationsUpdateEnabled = false;
         if (mLocationService != null) {
             mLocationService.stopUpdates();
         }
-        mLocationFilter.reset();
-        if (mLocationsStreamSubscription != null) {
-            mLocationsStreamSubscription.dispose();
+        mServiceManager.stopLocationService(this);
+        if (mUpdateRequestDisposable != null) {
+            mUpdateRequestDisposable.dispose();
         }
-    }
-
-    public boolean isLocationsUpdateAvailable() {
-        return mLocationService != null && mLocationService.isUpdateAvailable();
-    }
-
-    public boolean isLocationsUpdateEnabled() {
-        return mIsLocationsUpdateEnabled;
     }
 
     @NonNull
@@ -79,13 +77,14 @@ public final class LocationSource implements ServiceConnection {
         return mLocationsBroadcast;
     }
 
+    @NonNull
+    public Observable<Boolean> getGeolocationAvailabilityUpdates() {
+        return mGeolocationAvailabilityBroadcast;
+    }
+
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        mLocationService = ((LocationService.LocationServiceBinder) service).getLocationService();
-        if (mWaitingForService) {
-            mWaitingForService = false;
-            startUpdates();
-        }
+        mServiceConnectionEvent.onNext(service);
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.antonchaynikov.triptracker.mainscreen;
 
 import android.util.Log;
 
-import com.antonchaynikov.triptracker.data.location.ServiceManager;
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
@@ -30,7 +29,6 @@ class TripViewModel extends BasicViewModel {
     private PublishSubject<MapOptions> mMapOptionsObservable = PublishSubject.create();
 
     private TripManager mTripManager;
-    private ServiceManager mServiceManager;
 
     private CompositeDisposable mSubscriptions = new CompositeDisposable();
 
@@ -38,12 +36,11 @@ class TripViewModel extends BasicViewModel {
 
     private MapActivityUiState mUiState;
 
-    TripViewModel(@NonNull TripManager tripManager, @NonNull ServiceManager serviceManager, boolean isLocationPermissionGranted) {
+    TripViewModel(@NonNull TripManager tripManager, boolean isLocationPermissionGranted) {
         mUiState = MapActivityUiState.getDefaultState();
         mUiStateChangeEventObservable = BehaviorSubject.createDefault(mUiState);
         mTripStatisticsStreamObservable = BehaviorSubject.createDefault(TripStatistics.getDefaultStatistics());
         mIsLocationPermissionGranted = isLocationPermissionGranted;
-        mServiceManager = serviceManager;
         mTripManager = tripManager;
         mSubscriptions.add(mTripManager.getTripUpdatesStream().subscribe(this::handleTripUpdate));
         mSubscriptions.add(mTripManager.getCoordinatesStream().subscribe(this::handleLocationUpdate));
@@ -86,14 +83,12 @@ class TripViewModel extends BasicViewModel {
     }
 
     private void startTrip() {
-        mServiceManager.startLocationService();
         mSubscriptions.add(mTripManager.startTrip().subscribe(() ->
-            mUiStateChangeEventObservable.onNext(mUiState.transform(STARTED))
+                mUiStateChangeEventObservable.onNext(mUiState.transform(STARTED))
         ));
     }
 
     private void stopTrip() {
-        mServiceManager.stopLocationService();
         mSubscriptions.add(mTripManager.finishTrip().subscribe(() -> {
             mUiStateChangeEventObservable.onNext(mUiState.transform(IDLE));
             mMapOptionsObservable.onNext(new MapOptions(true));
