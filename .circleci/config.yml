@@ -73,6 +73,12 @@ references:
       name: Decode keystore.properties
       command: echo $KEYSTORE | base64 -di > keystore.properties
 
+  # Android signing key
+  decode_fabric_key: &decode_fabric_key
+    run:
+      name: Decode fabric.properties
+      command: echo $FABRIC_PROPERTIES | base64 -di > keystore.properties
+
 jobs:
 
   ## Build debug APK and instrumented test APK
@@ -83,6 +89,7 @@ jobs:
       - *restore_cache
       - *decode_keystore_file
       - *decode_gplay_key
+      - *decode_fabric_key
       - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
@@ -103,6 +110,7 @@ jobs:
       - *restore_cache
       - *decode_keystore_file
       - *decode_gplay_key
+      - *decode_fabric_key
       - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
@@ -160,6 +168,7 @@ jobs:
       - *restore_cache
       - *decode_keystore_file
       - *decode_gplay_key
+      - *decode_fabric_key
       - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
@@ -176,6 +185,7 @@ jobs:
     - *restore_cache
     - *decode_keystore_file
     - *decode_gplay_key
+    - *decode_fabric_key
     - run:
         name: Download dependencies
         command: ./gradlew androidDependencies
