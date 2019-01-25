@@ -216,11 +216,11 @@ workflows:
     jobs:
     - lint_check
     - checkstyle
-    - build_debug
+    - build_debug:
         requires:
           - lint_check
           - checkstyle
-    - build_release
+    - build_release:
         requires:
           - lint_check
           - checkstyle
