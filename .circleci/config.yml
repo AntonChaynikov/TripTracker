@@ -257,3 +257,13 @@ workflows:
           - build_release
           - test_unit
           - test_instrumented
+    - deploy_fabric:
+        filters:
+          branches:
+            only:
+            - master
+        requires:
+          - build_release
+          - test_unit
+          - test_instrumented
+
