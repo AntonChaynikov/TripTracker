@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.github.triplet.play'
 apply plugin: 'jacoco-android'
 apply from: '../checkstyle/checkstyle.gradle'
+apply plugin: 'io.fabric'
 
 def versionMajor = 1
 def versionMinor = 0
@@ -115,6 +116,7 @@ ext {
     JUNIT = '4.12'
     ANDROIDX_TEST_RUNNER = '1.1.0'
     ESPRESSO_CORE = '3.1.0'
+    CRASHLYTICS = '2.9.8'
 }
 
 dependencies {
@@ -131,6 +133,7 @@ dependencies {
     implementation "com.google.firebase:firebase-firestore:$FIREBASE_FIRESTORE"
     implementation "joda-time:joda-time:$JODA_TIME"
     implementation "org.joda:joda-convert:$JODA_CONVERT:classic"
+    implementation "com.crashlytics.sdk.android:crashlytics:$CRASHLYTICS"
 
     testImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     testImplementation "junit:junit:$JUNIT"

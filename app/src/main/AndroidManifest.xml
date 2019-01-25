@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-feature android:name="android.hardware.location.gps"/>
     <uses-feature android:name="android.hardware.location.network"/>
@@ -38,5 +39,10 @@
         </activity>
 
         <service android:name=".data.location.PlatformLocationService" />
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="addf454c130e9713afedaadfdba64d014c511f73" />
+
     </application>
 </manifest>
