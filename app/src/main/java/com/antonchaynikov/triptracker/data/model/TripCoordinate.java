@@ -17,9 +17,7 @@ public class TripCoordinate {
     @PropertyName(FIELD_NAME_DATE)
     private double date;
 
-    public TripCoordinate() {
-
-    }
+    public TripCoordinate() {}
 
     public TripCoordinate(long date, double latitude, double longitude) {
         this.latitude = latitude;
