@@ -125,7 +125,7 @@ public class TripManagerTest {
         assertEquals(1, tripCoordinateObserver.valueCount());
         assertEquals(1, tripUpdateObserver.valueCount());
 
-        assertEquals(new TripCoordinate(2,3,4), tripCoordinateObserver.values().get(0));
+        assertEquals(new TripCoordinate(2, 3, 4), tripCoordinateObserver.values().get(0));
     }
 
     @Test

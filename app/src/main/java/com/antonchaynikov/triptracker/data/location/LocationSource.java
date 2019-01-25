@@ -11,7 +11,7 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.PublishSubject;
 
-public class LocationSource implements ServiceConnection {
+public final class LocationSource implements ServiceConnection {
 
     private static volatile LocationSource sInstance;
 
@@ -81,7 +81,7 @@ public class LocationSource implements ServiceConnection {
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        mLocationService = ((LocationService.LocationServiceBinder)service).getLocationService();
+        mLocationService = ((LocationService.LocationServiceBinder) service).getLocationService();
         if (mWaitingForService) {
             mWaitingForService = false;
             startUpdates();

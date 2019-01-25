@@ -3,9 +3,11 @@ package com.antonchaynikov.triptracker.viewmodel;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class ViewModelProviders {
+public final class ViewModelProviders {
 
     private static ViewModelFactory sDefaultFactory;
+
+    private ViewModelProviders() {}
 
     public static ViewModelProvider of(@NonNull ViewModelActivity activity) {
         return new ViewModelProvider(activity.getViewModelRegistry(), null);

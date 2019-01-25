@@ -56,6 +56,7 @@ public class LocationFilterTest {
         when(mockLocation.distanceTo(any(Location.class))).thenReturn(10f);
         assertEquals(expectedSpeed, testSubject.calcSpeed(newLocation), 0.1);
     }
+
     @Test
     public void isRelevant_shouldReturnFalse_ifVelocityIsHigherThanLimit() throws Exception {
         when(mockLocation.distanceTo(any(Location.class))).thenReturn(TEST_DISTANCE_MARGIN); // ~36 km/h
@@ -82,5 +83,4 @@ public class LocationFilterTest {
         when(newLocation.getTime()).thenReturn(10000L);
         assertTrue(testSubject.isRelevant(newLocation));
     }
-
 }

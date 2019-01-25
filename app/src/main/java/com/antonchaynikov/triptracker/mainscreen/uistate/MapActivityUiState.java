@@ -4,7 +4,7 @@ import com.antonchaynikov.triptracker.R;
 
 import androidx.annotation.NonNull;
 
-public class MapActivityUiState {
+public final class MapActivityUiState {
 
     private State mState;
 

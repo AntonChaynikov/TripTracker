@@ -12,6 +12,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 public class StatisticsCalculatorTest {
+
     private StatisticsCalculator mTestSubject;
 
     @Mock
@@ -55,7 +56,6 @@ public class StatisticsCalculatorTest {
         // 30 meters per 4 seconds = 7.5 m/s
         assertEquals(7.5f, mTestSubject.getSpeed(), 0.001);
     }
-
 
     @Test
     public void reset_shouldResetDistance() {

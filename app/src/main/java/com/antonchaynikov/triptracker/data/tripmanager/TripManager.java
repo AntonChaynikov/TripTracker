@@ -1,7 +1,6 @@
 package com.antonchaynikov.triptracker.data.tripmanager;
 
 import android.location.Location;
-import android.util.Log;
 
 import com.antonchaynikov.triptracker.data.location.LocationSource;
 import com.antonchaynikov.triptracker.data.model.Trip;
@@ -17,7 +16,7 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.PublishSubject;
 
-public class TripManager {
+public final class TripManager {
 
     private static volatile TripManager sInstance;
 

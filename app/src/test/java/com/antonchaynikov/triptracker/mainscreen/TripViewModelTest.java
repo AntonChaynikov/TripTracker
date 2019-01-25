@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 public class TripViewModelTest {
 
     @ClassRule
-    public static final RxImmediateSchedulerRule schedulers = new RxImmediateSchedulerRule();
+    public static final RxImmediateSchedulerRule SCHEDULERS = new RxImmediateSchedulerRule();
 
     private TripViewModel mTestSubject;
     @Mock

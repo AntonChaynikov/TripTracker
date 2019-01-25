@@ -35,7 +35,7 @@ public class LocationFilter implements Filter<Location> {
     @Override
     public boolean isRelevant(@NonNull Location location) {
         if (location.getAccuracy() > mAccuracyMargin) {
-            Log.d(TAG, "Accuracy is wrong expected < " + mAccuracyMargin +" received " + location.getAccuracy());
+            Log.d(TAG, "Accuracy is wrong expected < " + mAccuracyMargin + " received " + location.getAccuracy());
             return false;
         }
         if (mLastLocationReceived == null) {
@@ -51,7 +51,7 @@ public class LocationFilter implements Filter<Location> {
             return false;
         }
         if (mLastLocationReceived.distanceTo(location) < mDistanceMargin) {
-            Log.d(TAG, "The distance is wrong expected > " + mDistanceMargin +" received " + mLastLocationReceived.distanceTo(location));
+            Log.d(TAG, "The distance is wrong expected > " + mDistanceMargin + " received " + mLastLocationReceived.distanceTo(location));
             return false;
         }
         mLastLocationReceived = location;

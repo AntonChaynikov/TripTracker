@@ -25,16 +25,10 @@ public abstract class LocationService extends Service {
     private static final String NOTIFICATION_CHANNEL_ID = "channel_id";
     private static final int NOTIFICATION_ID = 1;
 
-    private final IBinder mBinder = new LocationService.LocationServiceBinder();
-
     protected PublishSubject<Location> mLocationsBroadcast;
     protected boolean mIsLocationAvailable;
 
-    class LocationServiceBinder extends Binder {
-        LocationService getLocationService() {
-            return LocationService.this;
-        }
-    }
+    private final IBinder mBinder = new LocationService.LocationServiceBinder();
 
     @Nullable
     @Override
@@ -82,4 +76,9 @@ public abstract class LocationService extends Service {
         return mIsLocationAvailable;
     }
 
+    class LocationServiceBinder extends Binder {
+        LocationService getLocationService() {
+            return LocationService.this;
+        }
+    }
 }

@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.github.triplet.play'
 apply plugin: 'jacoco-android'
+apply from: '../checkstyle/checkstyle.gradle'
 
 def versionMajor = 1
 def versionMinor = 0
@@ -79,6 +80,12 @@ android {
             returnDefaultValues = true
         }
     }
+
+    lintOptions {
+        lintConfig file("../lintConfig.xml")
+        warningsAsErrors true
+    }
+
 }
 
 play {
@@ -94,7 +101,7 @@ ext {
     GOOGLE_MAPS_SDK = '16.0.0'
     GOOGLE_PLAY_SERVICES_BASE = '16.1.0'
     FIREBASE_CORE = '16.0.6'
-    FIREBASE_UI_AUTH = '4.2.1'
+    FIREBASE_UI_AUTH = '4.3.1'
     FIREBASE_FIRESTORE = '17.1.5'
     ROOM = '2.1.0-alpha03'
     GOOGLE_PALY_SERVICES_LOCATION = '16.0.0'

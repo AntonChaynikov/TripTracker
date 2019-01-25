@@ -20,11 +20,11 @@ class MapOptions {
     }
 
     double getCoordinatesLatitude() {
-        return mCoordinates == null? -1 : mCoordinates.getLatitude();
+        return mCoordinates == null ? -1 : mCoordinates.getLatitude();
     }
 
     double getCoordinatesLongitude() {
-        return mCoordinates == null? -1 : mCoordinates.getLongitude();
+        return mCoordinates == null ? -1 : mCoordinates.getLongitude();
     }
 
     float getCameraZoomLevel() {

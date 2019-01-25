@@ -2,9 +2,7 @@
     <string name="app_name">TripTracker</string>
     <string name="button_act">Receive Coordinates</string>
     <string name="button_stop">Stop Receiving Coordinates</string>
-    <string name="map_marker">Here!</string>
     <string name="authentication_button_text">Login</string>
-    <string name="snackbar_location_service_unavailable">Location service is unavailable</string>
     <string name="notification_location_service">Covertly spying on you</string>
     <string name="menu_trip_activity_item_statistics">Statistics</string>
     <string name="statistics_caption">Statistics</string>

@@ -8,7 +8,7 @@ import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
-public class ServiceManager<T extends LocationService> {
+public final class ServiceManager<T extends LocationService> {
 
     @SuppressLint("StaticFieldLeak")
     private static volatile ServiceManager<? extends LocationService> sInstance;
@@ -17,7 +17,17 @@ public class ServiceManager<T extends LocationService> {
     private LocationSource mLocationSource;
     private Class<T> mServiceClass;
 
-    public static <K extends LocationService> ServiceManager getInstance(@NonNull Context context, @NonNull LocationSource locationSource, @NonNull Class<K> serviceClass) {
+    private ServiceManager(@NonNull Context context, @NonNull LocationSource locationSource, @NonNull Class<T> serviceClass ) {
+        mAppContext = context.getApplicationContext();
+        mLocationSource = locationSource;
+        mServiceClass = serviceClass;
+    }
+
+    public static <K extends LocationService> ServiceManager getInstance(
+            @NonNull Context context,
+            @NonNull LocationSource locationSource,
+            @NonNull Class<K> serviceClass) {
+
         if (sInstance == null) {
             synchronized (ServiceManager.class) {
                 if (sInstance == null) {
@@ -26,12 +36,6 @@ public class ServiceManager<T extends LocationService> {
             }
         }
         return sInstance;
-    }
-
-    private ServiceManager(@NonNull Context context, @NonNull LocationSource locationSource, @NonNull Class<T> serviceClass ) {
-        mAppContext = context.getApplicationContext();
-        mLocationSource = locationSource;
-        mServiceClass = serviceClass;
     }
 
     public  void startLocationService() {

@@ -47,10 +47,10 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class TripActivity extends ViewModelActivity implements View.OnClickListener, OnMapReadyCallback {
 
-    private final static int ACCESS_FINE_LOCATION_REQUEST_CODE = 1;
+    private static final int ACCESS_FINE_LOCATION_REQUEST_CODE = 1;
 
-    private final static String EXTRA_USER = "com.antonchaynikov.triptracker.TripActivity.user";
-    private final static String TAG = TripActivity.class.getSimpleName();
+    private static final String EXTRA_USER = "com.antonchaynikov.triptracker.TripActivity.user";
+    private static final String TAG = TripActivity.class.getSimpleName();
 
     private boolean mPermissionGranted;
     private TripViewModel mViewModel;

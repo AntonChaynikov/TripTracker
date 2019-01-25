@@ -182,19 +182,57 @@ jobs:
       - run:
           name: Upload report
           command: bash <(curl -s https://codecov.io/bash)
+      - store_artifacts:
+          path: app/build/reports/
+          destination: /reports/
+
+  checkstyle:
+    <<: *android_config
+    steps:
+      - checkout
+      - *restore_cache
+      - run:
+          name: Checksyle
+          command: ./gradlew checkstyle
+      - store_artifacts:
+          path: app/build/reports/
+          destination: /reports/
+
+  lint_check:
+    <<: *android_config
+    steps:
+      - checkout
+      - *restore_cache
+      - run:
+          name: Linter
+          command: ./gradlew lintPlatformDebug
+      - store_artifacts:
+          path: app/build/reports/
+          destination: /reports/
 
 workflows:
   version: 2
   workflow:
     jobs:
+    - lint_check
+    - checkstyle
     - build_debug
+        requires:
+          - lint_check
+          - checkstyle
     - build_release
+        requires:
+          - lint_check
+          - checkstyle
     - test_unit:
         requires:
           - build_debug
     - test_instrumented:
         requires:
           - build_debug
+    - report_code_cov:
+        requires:
+          - test_instrumented
     - deploy:
         filters:
           branches:
@@ -203,7 +241,4 @@ workflows:
         requires:
           - build_release
           - test_unit
-          - test_instrumented
-    - report_code_cov:
-        requires:
           - test_instrumented

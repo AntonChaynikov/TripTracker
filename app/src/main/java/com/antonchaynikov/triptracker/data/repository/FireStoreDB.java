@@ -1,10 +1,7 @@
 package com.antonchaynikov.triptracker.data.repository;
 
-import android.util.Log;
-
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
@@ -14,9 +11,9 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.CompletableSubject;
 
-public class FireStoreDB implements Repository {
+public final class FireStoreDB implements Repository {
 
-    private final static String TRIPS_COLLECTION_NAME = "trips";
+    private static final String TRIPS_COLLECTION_NAME = "trips";
 
     private static volatile FireStoreDB sInstance;
 

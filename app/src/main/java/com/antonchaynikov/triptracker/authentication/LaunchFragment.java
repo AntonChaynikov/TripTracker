@@ -23,7 +23,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class LaunchFragment extends Fragment {
 
-    private final static int RC_SIGN_IN = 123;
+    private static final int RC_SIGN_IN = 123;
 
     static Fragment getFragment() {
         return new LaunchFragment();
