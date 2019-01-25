@@ -152,7 +152,7 @@ jobs:
           command: ./gradlew androidDependencies
 
   ## Deploy release APK to Google Play Alpha
-  deploy:
+  deploy_google_play:
     <<: *android_config
     steps:
       - checkout
@@ -164,11 +164,24 @@ jobs:
           name: Download dependencies
           command: ./gradlew androidDependencies
       - run:
-          name: Commenting
-          command: echo 'Deploying'
-      - run:
           name: Deploy to Google Play alpha
           command: ./gradlew publishPlatformRelease
+
+  ## Deploy release APK to Google Play Alpha
+  deploy_fabric:
+    <<: *android_config
+    steps:
+    - checkout
+    - *attach_release_workspace
+    - *restore_cache
+    - *decode_keystore_file
+    - *decode_gplay_key
+    - run:
+        name: Download dependencies
+        command: ./gradlew androidDependencies
+    - run:
+        name: Deploy to Fabric
+        command: ./gradlew crashlyticsUploadDistributionPlatformRelease
 
   report_code_cov:
     <<: *android_config
@@ -235,7 +248,7 @@ workflows:
     - report_code_cov:
         requires:
           - test_instrumented
-    - deploy:
+    - deploy_google_play:
         filters:
           branches:
             only:
