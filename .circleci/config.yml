@@ -191,6 +191,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache
+      - *decode_keystore_file
       - run:
           name: Checksyle
           command: ./gradlew checkstyle
@@ -203,6 +204,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache
+      - *decode_keystore_file
       - run:
           name: Linter
           command: ./gradlew lintPlatformDebug
