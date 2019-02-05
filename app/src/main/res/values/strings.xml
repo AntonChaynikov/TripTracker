@@ -10,4 +10,15 @@
     <string name="statistics_speed_descriptions">Speed</string>
     <string name="statistics_distance">%s km</string>
     <string name="statistics_speed">%s km/h</string>
+    <string name="no_trips_trips_list">There are no trips yet</string>
+    <string name="menu_trip_activity_item_logout">logout</string>
+    <string name="statistics_duration_eternity">Eternity</string>
+    <string name="statistics_duration_zero">0s</string>
+    <string name="statistics_speed_kmh">%s km/h</string>
+    <string name="statistics_speed_mps">%s m/s</string>
+    <string name="statistics_distance_km">%s km</string>
+    <string name="statistics_distance_m">%s m</string>
+    <string name="statistics_trip_caption">Trip Info</string>
+    <string name="statistics_start_date">Start date:</string>
+    <string name="statistics_duration">Duration:</string>
 </resources>

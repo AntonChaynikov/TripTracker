@@ -2,4 +2,6 @@
     <issue id="InvalidPackage">
         <ignore path="**/io.grpc/**"/>
     </issue>
+    <issue id="GradleDependency" severity="ignore"/>
+    <issue id="GradleDynamicVersion" severity="ignore"/>
 </lint>

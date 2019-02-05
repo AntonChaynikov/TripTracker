@@ -4,7 +4,9 @@ import com.antonchaynikov.triptracker.RxImmediateSchedulerRule;
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
-import com.antonchaynikov.triptracker.mainscreen.uistate.MapActivityUiState;
+import com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState;
+import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -18,12 +20,13 @@ import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.CompletableSubject;
 import io.reactivex.subjects.PublishSubject;
 
-import static com.antonchaynikov.triptracker.mainscreen.uistate.MapActivityUiState.State.IDLE;
-import static com.antonchaynikov.triptracker.mainscreen.uistate.MapActivityUiState.State.STARTED;
+import static com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState.State.IDLE;
+import static com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState.State.STARTED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -35,6 +38,8 @@ public class TripViewModelTest {
     private TripViewModel mTestSubject;
     @Mock
     private TripManager mockTripManager;
+    @Mock
+    private FirebaseAuth mockFirebaseAuth;
 
     private PublishSubject<Trip> statsStream;
     private PublishSubject<TripCoordinate> coordsStream;
@@ -48,21 +53,22 @@ public class TripViewModelTest {
         doReturn(Completable.complete()).when(mockTripManager).finishTrip();
         doReturn(statsStream).when(mockTripManager).getTripUpdatesStream();
         doReturn(coordsStream).when(mockTripManager).getCoordinatesStream();
-        mTestSubject = new TripViewModel(mockTripManager, true);
+        doReturn(new Trip()).when(mockTripManager).getCurrentTrip();
+        mTestSubject = new TripViewModel(mockTripManager, mockFirebaseAuth, true);
     }
 
     @Test
     public void shouldBroadcastIdleUiState_whenJustCreated() {
-        TestObserver<MapActivityUiState.State> uiStateTestObserver = TestObserver.create();
-        mTestSubject.getUiStateChangeEventObservable().map(MapActivityUiState::getState).subscribe(uiStateTestObserver);
+        TestObserver<TripUiState.State> uiStateTestObserver = TestObserver.create();
+        mTestSubject.getUiStateChangeEventObservable().map(TripUiState::getState).subscribe(uiStateTestObserver);
 
         uiStateTestObserver.assertValue(IDLE);
     }
 
     @Test
     public void shouldBroadcastRunningUIState_whenTripStarts() {
-        TestObserver<MapActivityUiState.State> uiStateTestObserver = TestObserver.create();
-        mTestSubject.getUiStateChangeEventObservable().map(MapActivityUiState::getState).subscribe(uiStateTestObserver);
+        TestObserver<TripUiState.State> uiStateTestObserver = TestObserver.create();
+        mTestSubject.getUiStateChangeEventObservable().map(TripUiState::getState).subscribe(uiStateTestObserver);
 
         mTestSubject.onActionButtonClicked();
 
@@ -72,8 +78,8 @@ public class TripViewModelTest {
 
     @Test
     public void shouldBroadcastIdleUIState_whenTripStops() {
-        TestObserver<MapActivityUiState.State> uiStateTestObserver = TestObserver.create();
-        mTestSubject.getUiStateChangeEventObservable().map(MapActivityUiState::getState).subscribe(uiStateTestObserver);
+        TestObserver<TripUiState.State> uiStateTestObserver = TestObserver.create();
+        mTestSubject.getUiStateChangeEventObservable().map(TripUiState::getState).subscribe(uiStateTestObserver);
 
         // Starts trip
         mTestSubject.onActionButtonClicked();
@@ -103,7 +109,7 @@ public class TripViewModelTest {
         mTestSubject.onLocationPermissionUpdate(false);
 
         TestObserver<Boolean> permissionTestObserver = TestObserver.create();
-        mTestSubject.getAskLocationPermissionEventObserver().subscribe(permissionTestObserver);
+        mTestSubject.getAskLocationPermissionEventObservable().subscribe(permissionTestObserver);
 
         mTestSubject.onActionButtonClicked();
 
@@ -113,7 +119,7 @@ public class TripViewModelTest {
     @Test
     public void onActionButtonClicked_shouldNotAskForLocationPermission_ifAlreadyGranted() {
         TestObserver<Boolean> permissionTestObserver = TestObserver.create();
-        mTestSubject.getAskLocationPermissionEventObserver().subscribe(permissionTestObserver);
+        mTestSubject.getAskLocationPermissionEventObservable().subscribe(permissionTestObserver);
 
         mTestSubject.onActionButtonClicked();
 
@@ -157,8 +163,8 @@ public class TripViewModelTest {
     public void onActionButtonClicked_whenStarting_shouldUpdateState_whenTripManagerRequestCompletes() {
         CompletableSubject tripManagerRequest = CompletableSubject.create();
         doReturn(tripManagerRequest).when(mockTripManager).startTrip();
-        TestObserver<MapActivityUiState.State> uiStateObserver = TestObserver.create();
-        mTestSubject.getUiStateChangeEventObservable().map(MapActivityUiState::getState).subscribe(uiStateObserver);
+        TestObserver<TripUiState.State> uiStateObserver = TestObserver.create();
+        mTestSubject.getUiStateChangeEventObservable().map(TripUiState::getState).subscribe(uiStateObserver);
 
         mTestSubject.onActionButtonClicked();
         uiStateObserver.assertValue(IDLE);
@@ -182,8 +188,8 @@ public class TripViewModelTest {
     public void onActionButtonClicked_whenFinishing_shouldUpdateState_whenTripManagerRequestCompletes() {
         CompletableSubject tripManagerRequest = CompletableSubject.create();
         doReturn(tripManagerRequest).when(mockTripManager).finishTrip();
-        TestObserver<MapActivityUiState.State> uiStateObserver = TestObserver.create();
-        mTestSubject.getUiStateChangeEventObservable().map(MapActivityUiState::getState).subscribe(uiStateObserver);
+        TestObserver<TripUiState.State> uiStateObserver = TestObserver.create();
+        mTestSubject.getUiStateChangeEventObservable().map(TripUiState::getState).subscribe(uiStateObserver);
 
         // Starting
         mTestSubject.onActionButtonClicked();
@@ -250,5 +256,106 @@ public class TripViewModelTest {
         TripStatistics statistics = statisticsObserver.values().get(1);
         assertEquals("0", statistics.getDistance());
         assertEquals("0", statistics.getSpeed());
+    }
+
+    @Test
+    public void onStatisticsButtonClicked_shouldEmitOpenStatisticsEvent() {
+        TestObserver<Boolean> eventObserver = TestObserver.create();
+        mTestSubject.getGotToStatisticsObservable().subscribe(eventObserver);
+        mTestSubject.onStatisticsButtonClicked();
+
+        eventObserver.assertValue(true);
+    }
+
+    @Test
+    public void onLogoutButtonClicked_shouldEmitLogoutEvent() {
+        TestObserver<Boolean> eventObserver = TestObserver.create();
+        mTestSubject.getLogoutObservable().subscribe(eventObserver);
+        mTestSubject.onLogoutButtonClicked();
+
+        eventObserver.assertValue(true);
+    }
+
+    @Test
+    public void onLogoutButtonClicked_shouldFinishTrip_ifStarted() {
+        // Start trip
+        mTestSubject.onActionButtonClicked();
+        // Logout
+        mTestSubject.onLogoutButtonClicked();
+
+        verify(mockTripManager).finishTrip();
+    }
+
+    @Test
+    public void onLogoutButtonClicked_shouldEmitLogoutEvent_afterTripFinishes() {
+        CompletableSubject finishTripCompletable = CompletableSubject.create();
+        doReturn(finishTripCompletable).when(mockTripManager).finishTrip();
+
+        TestObserver<Boolean> logoutEventObserver = TestObserver.create();
+        mTestSubject.getLogoutObservable().subscribe(logoutEventObserver);
+
+        // Start trip
+        mTestSubject.onActionButtonClicked();
+        // Logout
+        mTestSubject.onLogoutButtonClicked();
+
+        logoutEventObserver.assertEmpty();
+
+        // Trip manager finished the trip
+        finishTripCompletable.onComplete();
+
+        logoutEventObserver.assertValue(true);
+    }
+
+    @Test
+    public void onLogoutButtonClicked_shouldSignOut() {
+        CompletableSubject finishTripCompletable = CompletableSubject.create();
+        doReturn(finishTripCompletable).when(mockTripManager).finishTrip();
+
+        // Start trip
+        mTestSubject.onActionButtonClicked();
+        // Logout
+        mTestSubject.onLogoutButtonClicked();
+
+        // Trip manager finished the trip
+        finishTripCompletable.onComplete();
+
+        verify(mockFirebaseAuth).signOut();
+    }
+
+    @Test
+    public void onLogoutButtonClicked_shouldNotSignOutIfTripNotFinished() {
+        CompletableSubject finishTripCompletable = CompletableSubject.create();
+        doReturn(finishTripCompletable).when(mockTripManager).finishTrip();
+
+        // Start trip
+        mTestSubject.onActionButtonClicked();
+        // Logout
+        mTestSubject.onLogoutButtonClicked();
+
+        verify(mockFirebaseAuth, times(0)).signOut();
+    }
+
+    @Test
+    public void onLogoutButtonClicked_shouldNotFinishTrip_ifNotStarted() {
+        // Logout
+        mTestSubject.onLogoutButtonClicked();
+
+        verify(mockTripManager, times(0)).finishTrip();
+    }
+
+    @Test
+    public void shouldDirectToSummary_whenTripFinishes() {
+        TestObserver<Long> testObserver = TestObserver.create();
+
+        doReturn(new Trip(12345L)).when(mockTripManager).getCurrentTrip();
+
+        mTestSubject.getProceedToSummaryObservable().subscribe(testObserver);
+        // Start trip
+        mTestSubject.onActionButtonClicked();
+        // Finish trip
+        mTestSubject.onActionButtonClicked();
+
+        testObserver.assertValue(12345L);
     }
 }

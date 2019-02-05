@@ -15,10 +15,12 @@ public interface Repository {
 
     Observable<List<Trip>> getAllTrips();
 
-    Observable<Trip> getTripById(@NonNull String id);
+    Observable<Trip> getTripByStartDate(long startDate);
+
+    Observable<List<TripCoordinate>> getCoordinatesForTrip(long tripStartDate);
 
     Completable updateTrip(@NonNull Trip trip);
 
-    void addCoordinate(@NonNull TripCoordinate coordinate, @NonNull Trip trip);
+    Completable addCoordinate(@NonNull TripCoordinate coordinate, @NonNull Trip trip);
 
 }

@@ -4,7 +4,7 @@ import com.antonchaynikov.triptracker.R;
 
 import androidx.annotation.NonNull;
 
-public final class MapActivityUiState {
+public final class TripUiState {
 
     private State mState;
 
@@ -14,16 +14,16 @@ public final class MapActivityUiState {
         STARTED, IDLE
     }
 
-    private MapActivityUiState() {
+    private TripUiState() {
         mState = State.IDLE;
         mActionButtomTextId = R.string.button_act;
     }
 
-    public static MapActivityUiState getDefaultState() {
-        return new MapActivityUiState();
+    public static TripUiState getDefaultState() {
+        return new TripUiState();
     }
 
-    public MapActivityUiState transform(@NonNull State state) {
+    public TripUiState transform(@NonNull State state) {
         switch(state) {
             case STARTED: {
                 mActionButtomTextId = R.string.button_stop;

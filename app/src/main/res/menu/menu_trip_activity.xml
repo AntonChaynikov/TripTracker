@@ -7,4 +7,11 @@
         android:icon="@drawable/ic_action_statistics"
         android:title="@string/menu_trip_activity_item_statistics"
         app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/menu_trip_action_logout"
+        android:icon="@drawable/ic_action_logout"
+        android:title="@string/menu_trip_activity_item_logout"
+        app:showAsAction="ifRoom"/>
+
 </menu>

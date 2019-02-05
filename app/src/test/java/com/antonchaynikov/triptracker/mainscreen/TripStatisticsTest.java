@@ -1,5 +1,7 @@
 package com.antonchaynikov.triptracker.mainscreen;
 
+import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;

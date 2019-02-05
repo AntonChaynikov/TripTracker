@@ -2,15 +2,12 @@ package com.antonchaynikov.triptracker.authentication;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.antonchaynikov.triptracker.mainscreen.TripActivity;
 import com.antonchaynikov.triptracker.R;
+import com.antonchaynikov.triptracker.mainscreen.TripActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,6 +15,10 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Arrays;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -53,6 +54,7 @@ public class LaunchFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 startActivity(TripActivity.getStartIntent(getContext(), user));
+                getActivity().finish();
             }
         }
     }

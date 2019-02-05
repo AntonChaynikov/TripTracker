@@ -5,9 +5,11 @@ import android.util.Log;
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
-import com.antonchaynikov.triptracker.mainscreen.uistate.MapActivityUiState;
+import com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState;
 import com.antonchaynikov.triptracker.utils.StringUtils;
 import com.antonchaynikov.triptracker.viewmodel.BasicViewModel;
+import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
+import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Observable;
@@ -15,42 +17,46 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
-import static com.antonchaynikov.triptracker.mainscreen.uistate.MapActivityUiState.State.IDLE;
-import static com.antonchaynikov.triptracker.mainscreen.uistate.MapActivityUiState.State.STARTED;
+import static com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState.State.IDLE;
+import static com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState.State.STARTED;
 
 class TripViewModel extends BasicViewModel {
 
     private static final String TAG = TripViewModel.class.getCanonicalName();
 
-    private BehaviorSubject<MapActivityUiState> mUiStateChangeEventObservable;
+    private BehaviorSubject<TripUiState> mUiStateChangeEventObservable;
     private PublishSubject<Boolean> mAskLocationPermissionEventObservable = PublishSubject.create();
+    private PublishSubject<Boolean> mGoToStatisticsObservable = PublishSubject.create();
+    private PublishSubject<Boolean> mLogoutObservable = PublishSubject.create();
     private BehaviorSubject<TripStatistics> mTripStatisticsStreamObservable;
-
     private PublishSubject<MapOptions> mMapOptionsObservable = PublishSubject.create();
+    private PublishSubject<Long> mProceedToSummaryObservable = PublishSubject.create();
 
     private TripManager mTripManager;
+    private FirebaseAuth mFirebaseAuth;
 
     private CompositeDisposable mSubscriptions = new CompositeDisposable();
 
     private boolean mIsLocationPermissionGranted;
 
-    private MapActivityUiState mUiState;
+    private TripUiState mUiState;
 
-    TripViewModel(@NonNull TripManager tripManager, boolean isLocationPermissionGranted) {
-        mUiState = MapActivityUiState.getDefaultState();
+    TripViewModel(@NonNull TripManager tripManager, @NonNull FirebaseAuth firebaseAuth, boolean isLocationPermissionGranted) {
+        mUiState = TripUiState.getDefaultState();
         mUiStateChangeEventObservable = BehaviorSubject.createDefault(mUiState);
         mTripStatisticsStreamObservable = BehaviorSubject.createDefault(TripStatistics.getDefaultStatistics());
         mIsLocationPermissionGranted = isLocationPermissionGranted;
         mTripManager = tripManager;
+        mFirebaseAuth = firebaseAuth;
         mSubscriptions.add(mTripManager.getTripUpdatesStream().subscribe(this::handleTripUpdate));
         mSubscriptions.add(mTripManager.getCoordinatesStream().subscribe(this::handleLocationUpdate));
     }
 
-    Observable<MapActivityUiState> getUiStateChangeEventObservable() {
+    Observable<TripUiState> getUiStateChangeEventObservable() {
         return mUiStateChangeEventObservable;
     }
 
-    Observable<Boolean> getAskLocationPermissionEventObserver() {
+    Observable<Boolean> getAskLocationPermissionEventObservable() {
         return mAskLocationPermissionEventObservable;
     }
 
@@ -60,6 +66,18 @@ class TripViewModel extends BasicViewModel {
 
     Observable<TripStatistics> getTripStatisticsStreamObservable() {
         return mTripStatisticsStreamObservable;
+    }
+
+    Observable<Boolean> getGotToStatisticsObservable() {
+        return mGoToStatisticsObservable;
+    }
+
+    Observable<Boolean> getLogoutObservable() {
+        return mLogoutObservable;
+    }
+
+    Observable<Long> getProceedToSummaryObservable() {
+        return mProceedToSummaryObservable;
     }
 
     void onLocationPermissionUpdate(boolean isPermissionGranted) {
@@ -78,6 +96,22 @@ class TripViewModel extends BasicViewModel {
         }
     }
 
+    void onStatisticsButtonClicked() {
+        mGoToStatisticsObservable.onNext(true);
+    }
+
+    void onLogoutButtonClicked() {
+        if (mUiState.getState() == TripUiState.State.STARTED) {
+            mSubscriptions.add(mTripManager.finishTrip().subscribe(() -> {
+                mFirebaseAuth.signOut();
+                mLogoutObservable.onNext(true);
+            }));
+        } else {
+            mFirebaseAuth.signOut();
+            mLogoutObservable.onNext(true);
+        }
+    }
+
     boolean isTripStarted() {
         return mUiState.getState() == STARTED;
     }
@@ -89,9 +123,11 @@ class TripViewModel extends BasicViewModel {
     }
 
     private void stopTrip() {
+        long tripStartDate = mTripManager.getCurrentTrip().getStartDate();
         mSubscriptions.add(mTripManager.finishTrip().subscribe(() -> {
             mUiStateChangeEventObservable.onNext(mUiState.transform(IDLE));
             mMapOptionsObservable.onNext(new MapOptions(true));
+            mProceedToSummaryObservable.onNext(tripStartDate);
         }));
         mTripStatisticsStreamObservable.onNext(TripStatistics.getDefaultStatistics());
     }

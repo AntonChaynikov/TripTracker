@@ -10,6 +10,7 @@ class MapOptions {
 
     private TripCoordinate mCoordinates;
     private boolean mShouldDeleteMarkers;
+    private boolean mShouldAddRoute;
 
     MapOptions(@NonNull TripCoordinate coordinates) {
         mCoordinates = coordinates;

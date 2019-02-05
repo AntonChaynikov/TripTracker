@@ -2,6 +2,8 @@ package com.antonchaynikov.triptracker.data.model;
 
 import com.google.firebase.firestore.PropertyName;
 
+import java.util.Objects;
+
 import androidx.annotation.Nullable;
 
 public class TripCoordinate {
@@ -58,5 +60,10 @@ public class TripCoordinate {
                     other.longitude == this.longitude;
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(latitude, longitude, date);
     }
 }
