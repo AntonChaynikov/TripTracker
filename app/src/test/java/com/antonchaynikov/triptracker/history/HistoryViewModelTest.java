@@ -1,5 +1,6 @@
 package com.antonchaynikov.triptracker.history;
 
+import com.antonchaynikov.triptracker.RxImmediateSchedulerRule;
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
 import com.antonchaynikov.triptracker.data.repository.Repository;
@@ -7,12 +8,12 @@ import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
 import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
-import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
@@ -24,6 +25,9 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 
 public class HistoryViewModelTest {
+
+    @ClassRule
+    public static final RxImmediateSchedulerRule SCHEDULERS = new RxImmediateSchedulerRule();
 
     private static final long START_DATE = 0;
 
@@ -60,8 +64,6 @@ public class HistoryViewModelTest {
 
     @Test
     public void onStart_shouldEmitRoute() {
-        PublishSubject<List<TripCoordinate>> coordinatesStream = PublishSubject.create();
-
         doReturn(Observable.just(Collections.singletonList(new TripCoordinate())))
                 .when(mockRepository)
                 .getCoordinatesForTrip(START_DATE);
