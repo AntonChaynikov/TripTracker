@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "api-7194191596450161697-308117",
+  "private_key_id": "f88144cb0f5fd777db5845c65b41c464ee261dc6",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCsz79q+S2JKzFs\nAJo8sSeEX83DaZ8yxehJGyr5pdE9AQ+h/XpqjtgW7rk1kU62XIAVbACvUmgBQKUI\nmjSyGt/YPQ42l2B4jE+GC6tB2IKMBlwBnMU9tSBDVphjDf+VIYbjmRb6aA4xO5DW\nmls1saw0RBd9jXukRc/mDBS8rGBwBM9Ke3z+PUJLXwc8htBhwXfpxi9JOwY/YbgF\n3hOCPsRkJxQmLqNIAQ3myDNBjmdv264GNhvFY9gTU5xE8qsmmfLdbb8QKMzjmPIS\nq8eMHRI7GjlZfiSPlVy0HfyEycKm1xSXK4Az/dRqLTnZMDAtmXJrzeD4ZgMf5zI0\n0Y43svzxAgMBAAECggEABK3K8+bDZUbH27HS0JNcVktwwFp2/r0t2kgzxuwcKO/D\nKwKNrV5o5TVj9YUVvD7EvK++qgCMGS0/+qZliFqiwRGldZ7DdCgaYW77R/kIedQ/\nP/pCZeFmT6Rufk9rTNqfnWsa8eneKSuWHZVdeavx6r1a5HbvnXrtaNVevLKvGWv1\nykwky3kGobzhybrHtD1tWx+Lx3PaFHYWhANFbG596HwjuSyWbGLJQTUsMFOJpe/h\nPzC0VyBNg9Ur8enTmv4YcD2pch2CBcuHmx0HyEcqEpfIlZ+XSsB8DlhTviMcAtr2\nnuJklEk2yxkQJY/kPg7foXMqdIU7pUFXYabKqWlVhQKBgQDq4OKPUEFmSuEE8G8Z\nFjSqThq4S7O4JVDESAh5bwBCXMtKimoZJCkr7MYH995Dkt0HGpPgJ3gyeEQVU+Fw\n6wbZXBUYly8O5IsjF8z4CTHPq76mcuvIxILcmhJm5DmKJrMMKudYQDTZ2reU460h\nz52sM8BCExzgRM4bVvJpcNvjnQKBgQC8WgaDq6ESm3BufFeQ9rkFXLugG7kGwwiT\nWlEh8Felgtx1+BsEXe5SJklh9JINBhKF64ItBYw8+fQD3p8OkXXGLN9EExoD7MWX\nGgmjecoWOBfrnihUjd9rYxmmgyQaWkXYIzbT/uyEvZ+d0tIiP3okW73ynn4k/E6C\nuT/ekhvwZQKBgQCg/wkM5xwM++KFujDM51WuLt9N2EYWQS29fQqiAh4RXv3R2FKl\nbQ3zl9ad+58UfoSWq/cUvLk9DwbL/7UV62PEdcPYGTkeYjWlFlle4x6LlNOX0Eoi\nUeDJSaq3cFSoh6JPAtGUwl33vl375pv0AxW2xbpREDzI1SDZyJ1c/QkcWQKBgFKa\nkNzSOpP0g7yQ37591esaHlc7kUv74RjutUJTK700xQcfxomFwG1ayTgikKMRlLIS\n9UZVdomPfYrs6Yj0FljReSFb1z79ajK4gp2lXhGcjDETbdCXX/KyxZ8XSJAeIx+F\nYhhbZtNYblZDDVFj0Wd8rLNo+x2xYaVHJVGxdntZAoGBAK6waTcER90kTQCre1ns\n9/DDIkQEGKzgeYA+u7W+h/Ag7CUlnOSyCcLj1lKQO/ENzix2fm6h6PW/CShpnfk1\nSqGy031O4MTAyhfMv69LIEpZV53irGM3oSAmT6w+y5HGWwxAnIAxBnvh84Z77CAt\n3D3Cl+iwxwfBkck2aPzwueqe\n-----END PRIVATE KEY-----\n",
+  "client_email": "gps-logger-gplay@api-7194191596450161697-308117.iam.gserviceaccount.com",
+  "client_id": "108789517569210121749",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/gps-logger-gplay%40api-7194191596450161697-308117.iam.gserviceaccount.com"
+}
