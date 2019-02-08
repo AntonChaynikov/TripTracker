@@ -305,7 +305,7 @@ jobs:
       - *decode_keystore_file
       - run:
           name: Linter
-          command: ./gradlew lint
+          command: ./gradlew app:lint
       - store_artifacts:
           path: app/build/reports/
           destination: /reports/
