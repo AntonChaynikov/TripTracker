@@ -19,9 +19,9 @@ import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.authentication.LaunchActivity;
 import com.antonchaynikov.triptracker.data.location.LocationFilter;
 import com.antonchaynikov.triptracker.data.location.LocationSource;
-import com.antonchaynikov.triptracker.data.location.PlatformLocationService;
 
 import com.antonchaynikov.triptracker.data.location.ServiceManager;
+import com.antonchaynikov.triptracker.data.location.ServiceManagerModule;
 import com.antonchaynikov.triptracker.data.repository.firestore.FireStoreDB;
 import com.antonchaynikov.triptracker.data.tripmanager.StatisticsCalculator;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
@@ -110,7 +110,7 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
     }
 
     private void initViewModel() {
-        ServiceManager serviceManager = ServiceManager.getInstance(this, PlatformLocationService.class);
+        ServiceManager<?> serviceManager = ServiceManagerModule.provide(this);
         LocationSource locationSource = LocationSource.getInstance(new LocationFilter(), serviceManager);
         ViewModelFactory factory = new ViewModelFactory() {
             @Override

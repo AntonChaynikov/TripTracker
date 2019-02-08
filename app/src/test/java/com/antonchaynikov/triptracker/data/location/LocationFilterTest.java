@@ -20,6 +20,9 @@ public class LocationFilterTest {
     private static final float TEST_VELOCITY_MARGIN = LocationFilter.DEFAULT_VELOCITY_LIMIT;
     private static final float TEST_DISTANCE_MARGIN = LocationFilter.DEFAULT_DISTANCE_MARGIN;
 
+    private static final long IMMEDIATELY = 0L;
+    private static final long SECOND = 1000L;
+
     private LocationFilter testSubject;
     @Mock
     private Location mockLocation;
@@ -30,8 +33,8 @@ public class LocationFilterTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         when(mockLocation.getAccuracy()).thenReturn(TEST_ACCURACY_MARGIN);
-        when(mockLocation.getTime()).thenReturn(0L);
-        when(newLocation.getTime()).thenReturn(1000L);
+        when(mockLocation.getTime()).thenReturn(IMMEDIATELY);
+        when(newLocation.getTime()).thenReturn(SECOND);
         when(mockLocation.distanceTo(any(Location.class))).thenReturn(TEST_DISTANCE_MARGIN);
         testSubject = new LocationFilter(TEST_ACCURACY_MARGIN, TEST_VELOCITY_MARGIN, TEST_DISTANCE_MARGIN);
         testSubject.isRelevant(mockLocation);
@@ -52,22 +55,26 @@ public class LocationFilterTest {
     @Test
     public void calcDistance_shouldReturnCorrectResult() throws Exception {
         float expectedSpeed = 36;
-        when(newLocation.getTime()).thenReturn(1000L);
-        when(mockLocation.distanceTo(any(Location.class))).thenReturn(10f);
+        float distanceTnMeters = 10f;
+        when(newLocation.getTime()).thenReturn(SECOND);
+        when(mockLocation.distanceTo(any(Location.class))).thenReturn(distanceTnMeters);
+
         assertEquals(expectedSpeed, testSubject.calcSpeed(newLocation), 0.1);
     }
 
     @Test
     public void isRelevant_shouldReturnFalse_ifVelocityIsHigherThanLimit() throws Exception {
         when(mockLocation.distanceTo(any(Location.class))).thenReturn(TEST_DISTANCE_MARGIN); // ~36 km/h
-        when(newLocation.getTime()).thenReturn(550L);
+        long timeHalfSecond = 550L;
+        when(newLocation.getTime()).thenReturn(timeHalfSecond);
         assertFalse(testSubject.isRelevant(newLocation));
     }
 
     @Test
     public void isRelevant_shouldReturnFalse_ifNewLocationUpdateIsOlderThanThePrev() throws Exception {
+
         when(mockLocation.getTime()).thenReturn(1L);
-        when(newLocation.getTime()).thenReturn(0L);
+        when(newLocation.getTime()).thenReturn(IMMEDIATELY);
         assertFalse(testSubject.isRelevant(newLocation));
     }
 

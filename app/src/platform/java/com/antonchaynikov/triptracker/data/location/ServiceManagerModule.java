@@ -4,9 +4,12 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-public class PlatformServiceManagerInjector {
+public final class ServiceManagerModule {
+
+    private ServiceManagerModule() {}
+
     @SuppressWarnings("unchecked")
-    ServiceManager<PlatformLocationService> inject(@NonNull Context context) {
+    public static ServiceManager<?> provide(@NonNull Context context) {
         return ServiceManager.getInstance(context, PlatformLocationService.class);
     }
 }
