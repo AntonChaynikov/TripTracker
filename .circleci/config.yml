@@ -20,26 +20,46 @@ references:
 
   workspace: &workspace
     ~/workspace
-  attach_debug_workspace: &attach_debug_workspace
+
+  attach_platform_debug_workspace: &attach_platform_debug_workspace
     attach_workspace:
       at: *workspace
-  attach_release_workspace: &attach_release_workspace
+
+  attach_api_debug_workspace: &attach_api_debug_workspace
     attach_workspace:
       at: *workspace
-  persist_debug_workspace: &persist_debug_workspace
-    persist_to_workspace:
-      root: *workspace
-      paths:
-        - app/build/intermediates
-        - app/build/outputs/androidTest-results
-        - app/build/outputs/apk
-        - app/build/outputs/code-coverage
-        - app/build/test-results
-  persist_release_workspace: &persist_release_workspace
+
+  attach_platform_release_workspace: &attach_platform_release_workspace
+    attach_workspace:
+      at: *workspace
+
+  attach_api_release_workspace: &attach_api_release_workspace
+    attach_workspace:
+      at: *workspace
+
+  persist_platform_debug_workspace: &persist_platform_debug_workspace
     persist_to_workspace:
       root: *workspace
       paths:
         - app/build
+
+  persist_api_debug_workspace: &persist_api_debug_workspace
+    persist_to_workspace:
+      root: *workspace
+      paths:
+      - app/build
+
+  persist_platform_release_workspace: &persist_platform_release_workspace
+    persist_to_workspace:
+      root: *workspace
+      paths:
+        - app/build
+
+  persist_api_release_workspace: &persist_api_release_workspace
+    persist_to_workspace:
+      root: *workspace
+      paths:
+      - app/build
 
   ## Docker image configurations
 
@@ -97,7 +117,7 @@ jobs:
       - run:
           name: Gradle build (debug)
           command: ./gradlew -PciBuild=true :app:assemblePlatformDebug :app:assemblePlatformDebugAndroidTest
-      - *persist_debug_workspace
+      - *persist_platform_debug_workspace
       - store_artifacts:
           path: app/build/outputs/apk/
           destination: /apk/
@@ -117,7 +137,7 @@ jobs:
     - run:
         name: Gradle build (debug)
         command: ./gradlew -PciBuild=true :app:assembleServicesApiDebug :app:assembleServicesApiDebugAndroidTest
-    - *persist_debug_workspace
+    - *persist_api_debug_workspace
     - store_artifacts:
         path: app/build/outputs/apk/
         destination: /apk/
@@ -138,7 +158,7 @@ jobs:
       - run:
           name: Gradle build (release)
           command: ./gradlew -PciBuild=true :app:assemblePlatformRelease
-      - *persist_release_workspace
+      - *persist_platform_release_workspace
       - store_artifacts:
           path: app/build/outputs/apk/
           destination: /apk/
@@ -161,7 +181,7 @@ jobs:
     - run:
         name: Gradle build (release)
         command: ./gradlew -PciBuild=true :app:assembleServicesApiRelease
-    - *persist_release_workspace
+    - *persist_api_release_workspace
     - store_artifacts:
         path: app/build/outputs/apk/
         destination: /apk/
@@ -183,7 +203,8 @@ jobs:
       - run:
           name: Run platform unit tests
           command: ./gradlew test
-      - *persist_debug_workspace
+      - *persist_platform_debug_workspace
+      - *persist_api_debug_workspace
       - store_artifacts:
           path: app/build/reports/
           destination: /reports/
@@ -207,7 +228,7 @@ jobs:
     <<: *android_config
     steps:
       - checkout
-      - *attach_release_workspace
+      - *attach_platform_release_workspace
       - *restore_cache
       - *decode_keystore_file
       - *decode_gplay_key
@@ -223,7 +244,7 @@ jobs:
     <<: *android_config
     steps:
     - checkout
-    - *attach_release_workspace
+    - *attach_api_release_workspace
     - *restore_cache
     - *decode_keystore_file
     - *decode_gplay_key
@@ -240,7 +261,7 @@ jobs:
     <<: *android_config
     steps:
     - checkout
-    - *attach_release_workspace
+    - *attach_platform_release_workspace
     - *restore_cache
     - *decode_keystore_file
     - *decode_gplay_key
@@ -256,7 +277,7 @@ jobs:
     <<: *android_config
     steps:
     - checkout
-    - *attach_release_workspace
+    - *attach_api_release_workspace
     - *restore_cache
     - *decode_keystore_file
     - *decode_gplay_key

@@ -358,4 +358,11 @@ public class TripViewModelTest {
 
         testObserver.assertValue(12345L);
     }
+
+    @Test
+    public void onActionButtonClicked_whenStarting_shouldStartAlarm() {
+        mTestSubject.onActionButtonClicked();
+
+
+    }
 }
