@@ -18,35 +18,67 @@ references:
 
   ## Workspace
 
-  workspace: &workspace
-    ~/workspace
-  attach_debug_workspace: &attach_debug_workspace
+  workspace_platform: &workspace_platform
+    ~/workspace/platform
+  attach_debug_workspace_platform: &attach_debug_workspace_platform
     attach_workspace:
-      at: *workspace
-  attach_release_workspace: &attach_release_workspace
+      at: *workspace_platform
+  attach_release_workspace_platform: &attach_release_workspace_platform
     attach_workspace:
-      at: *workspace
-  persist_debug_workspace: &persist_debug_workspace
+      at: *workspace_platform
+  persist_debug_workspace_platform: &persist_debug_workspace_platform
     persist_to_workspace:
-      root: *workspace
+      root: *workspace_platform
       paths:
         - app/build/intermediates
         - app/build/outputs/androidTest-results
         - app/build/outputs/apk
         - app/build/outputs/code-coverage
         - app/build/test-results
-  persist_release_workspace: &persist_release_workspace
+  persist_release_workspace_platform: &persist_release_workspace_platform
     persist_to_workspace:
-      root: *workspace
+      root: *workspace_platform
       paths:
         - app/build
 
+  workspace_api: &workspace_api
+    ~/workspace/api
+  attach_debug_workspace_api: &attach_debug_workspace_api
+   attach_workspace:
+     at: *workspace_api
+  attach_release_workspace_api: &attach_release_workspace_api
+   attach_workspace:
+     at: *workspace_api
+  persist_debug_workspace_api: &persist_debug_workspace_api
+   persist_to_workspace:
+     root: *workspace_api
+     paths:
+     - app/build/intermediates
+     - app/build/outputs/androidTest-results
+     - app/build/outputs/apk
+     - app/build/outputs/code-coverage
+     - app/build/test-results
+  persist_release_workspace_api: &persist_release_workspace_api
+   persist_to_workspace:
+     root: *workspace_api
+     paths:
+     - app/build
+
   ## Docker image configurations
 
-  android_config: &android_config
-    working_directory: *workspace
+  image_config_platform: &android_config
+    working_directory: *workspace_platform
     docker:
       - image: circleci/android:api-28
+    environment:
+      TERM: dumb
+      _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
+
+  image_config_api: &android_config
+    working_directory: *workspace_api
+    docker:
+    - image: circleci/android:api-28
     environment:
       TERM: dumb
       _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
@@ -97,7 +129,7 @@ jobs:
       - run:
           name: Gradle build (debug)
           command: ./gradlew -PciBuild=true :app:assemblePlatformDebug :app:assemblePlatformDebugAndroidTest
-      - *persist_debug_workspace
+      - *persist_debug_workspace_platform
       - store_artifacts:
           path: app/build/outputs/apk/
           destination: /apk/
@@ -117,7 +149,7 @@ jobs:
     - run:
         name: Gradle build (debug)
         command: ./gradlew -PciBuild=true :app:assembleServicesApiDebug :app:assembleServicesApiDebugAndroidTest
-    - *persist_debug_workspace
+    - *persist_debug_workspace_api
     - store_artifacts:
         path: app/build/outputs/apk/
         destination: /apk/
@@ -138,7 +170,7 @@ jobs:
       - run:
           name: Gradle build (release)
           command: ./gradlew -PciBuild=true :app:assemblePlatformRelease
-      - *persist_release_workspace
+      - *persist_release_workspace_platform
       - store_artifacts:
           path: app/build/outputs/apk/
           destination: /apk/
@@ -161,7 +193,7 @@ jobs:
     - run:
         name: Gradle build (release)
         command: ./gradlew -PciBuild=true :app:assembleServicesApiRelease
-    - *persist_release_workspace
+    - *persist_release_workspace_api
     - store_artifacts:
         path: app/build/outputs/apk/
         destination: /apk/
@@ -183,7 +215,7 @@ jobs:
       - run:
           name: Run platform unit tests
           command: ./gradlew test
-      - *persist_debug_workspace
+      - *persist_debug_workspace_platform
       - store_artifacts:
           path: app/build/reports/
           destination: /reports/
@@ -211,6 +243,7 @@ jobs:
       - *decode_keystore_file
       - *decode_gplay_key
       - *decode_fabric_key
+      - *attach_release_workspace_platform
       - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
@@ -226,6 +259,7 @@ jobs:
     - *decode_keystore_file
     - *decode_gplay_key
     - *decode_fabric_key
+    - *attach_release_workspace_api
     - run:
         name: Download dependencies
         command: ./gradlew androidDependencies
@@ -242,7 +276,7 @@ jobs:
     - *decode_keystore_file
     - *decode_gplay_key
     - *decode_fabric_key
-    - *attach_release_workspace
+    - *attach_release_workspace_platform
     - run:
         name: Download dependencies
         command: ./gradlew androidDependencies
@@ -258,7 +292,7 @@ jobs:
     - *decode_keystore_file
     - *decode_gplay_key
     - *decode_fabric_key
-    - *attach_release_workspace
+    - *attach_release_workspace_api
     - run:
         name: Download dependencies
         command: ./gradlew androidDependencies
