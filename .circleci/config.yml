@@ -97,19 +97,19 @@ references:
   decode_gplay_key: &decode_gplay_key
     run:
       name: Decode Google Play service acc key
-      command: echo $GOOGLE_PLAY_KEY > /home/circleci/workspace/app/google_play_key.json
+      command: echo $GOOGLE_PLAY_KEY > $PWD/app/google_play_key.json
 
   # Android signing key
   decode_keystore_file: &decode_keystore_file
     run:
       name: Decode keystore.properties
-      command: echo $KEYSTORE | base64 -di > keystore.properties
+      command: echo $KEYSTORE | base64 -di > $PWD/keystore.properties
 
   # Android signing key
   decode_fabric_key: &decode_fabric_key
     run:
       name: Decode fabric.properties
-      command: echo $FABRIC_PROPERTIES > app/fabric.properties
+      command: echo $FABRIC_PROPERTIES > $PWD/app/fabric.properties
 
 jobs:
 
