@@ -242,6 +242,7 @@ jobs:
     - *decode_keystore_file
     - *decode_gplay_key
     - *decode_fabric_key
+    - *attach_release_workspace
     - run:
         name: Download dependencies
         command: ./gradlew androidDependencies
@@ -257,6 +258,7 @@ jobs:
     - *decode_keystore_file
     - *decode_gplay_key
     - *decode_fabric_key
+    - *attach_release_workspace
     - run:
         name: Download dependencies
         command: ./gradlew androidDependencies
