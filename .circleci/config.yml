@@ -18,35 +18,67 @@ references:
 
   ## Workspace
 
-  workspace: &workspace
-    ~/workspace
-  attach_debug_workspace: &attach_debug_workspace
+  workspace_platform: &workspace_platform
+    ~/workspace/platform
+  attach_debug_workspace_platform: &attach_debug_workspace_platform
     attach_workspace:
-      at: *workspace
-  attach_release_workspace: &attach_release_workspace
+      at: *workspace_platform
+  attach_release_workspace_platform: &attach_release_workspace_platform
     attach_workspace:
-      at: *workspace
-  persist_debug_workspace: &persist_debug_workspace
+      at: *workspace_platform
+  persist_debug_workspace_platform: &persist_debug_workspace_platform
     persist_to_workspace:
-      root: *workspace
+      root: *workspace_platform
       paths:
         - app/build/intermediates
         - app/build/outputs/androidTest-results
         - app/build/outputs/apk
         - app/build/outputs/code-coverage
         - app/build/test-results
-  persist_release_workspace: &persist_release_workspace
+  persist_release_workspace_platform: &persist_release_workspace_platform
     persist_to_workspace:
-      root: *workspace
+      root: *workspace_platform
       paths:
         - app/build
 
+  workspace_api: &workspace_api
+    ~/workspace/api
+  attach_debug_workspace_api: &attach_debug_workspace_api
+   attach_workspace:
+     at: *workspace_api
+  attach_release_workspace_api: &attach_release_workspace_api
+   attach_workspace:
+     at: *workspace_api
+  persist_debug_workspace_api: &persist_debug_workspace_api
+   persist_to_workspace:
+     root: *workspace_api
+     paths:
+     - app/build/intermediates
+     - app/build/outputs/androidTest-results
+     - app/build/outputs/apk
+     - app/build/outputs/code-coverage
+     - app/build/test-results
+  persist_release_workspace_api: &persist_release_workspace_api
+   persist_to_workspace:
+     root: *workspace_api
+     paths:
+     - app/build
+
   ## Docker image configurations
 
-  android_config: &android_config
-    working_directory: *workspace
+  image_config_platform: &android_config
+    working_directory: *workspace_platform
     docker:
       - image: circleci/android:api-28
+    environment:
+      TERM: dumb
+      _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
+
+  image_config_api: &android_config
+    working_directory: *workspace_api
+    docker:
+    - image: circleci/android:api-28
     environment:
       TERM: dumb
       _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
@@ -65,24 +97,24 @@ references:
   decode_gplay_key: &decode_gplay_key
     run:
       name: Decode Google Play service acc key
-      command: echo $GOOGLE_PLAY_KEY > /home/circleci/workspace/app/google_play_key.json
+      command: echo $GOOGLE_PLAY_KEY > $PWD/app/google_play_key.json
 
   # Android signing key
   decode_keystore_file: &decode_keystore_file
     run:
       name: Decode keystore.properties
-      command: echo $KEYSTORE | base64 -di > keystore.properties
+      command: echo $KEYSTORE | base64 -di > $PWD/keystore.properties
 
   # Android signing key
   decode_fabric_key: &decode_fabric_key
     run:
       name: Decode fabric.properties
-      command: echo $FABRIC_PROPERTIES > app/fabric.properties
+      command: echo $FABRIC_PROPERTIES > $PWD/app/fabric.properties
 
 jobs:
 
   ## Build debug APK and instrumented test APK
-  build_debug:
+  build_debug_platform:
     <<: *android_config
     steps:
       - checkout
@@ -97,13 +129,33 @@ jobs:
       - run:
           name: Gradle build (debug)
           command: ./gradlew -PciBuild=true :app:assemblePlatformDebug :app:assemblePlatformDebugAndroidTest
-      - *persist_debug_workspace
+      - *persist_debug_workspace_platform
       - store_artifacts:
           path: app/build/outputs/apk/
           destination: /apk/
 
+  build_debug_api:
+    <<: *android_config
+    steps:
+    - checkout
+    - *restore_cache
+    - *decode_keystore_file
+    - *decode_gplay_key
+    - *decode_fabric_key
+    - run:
+        name: Download dependencies
+        command: ./gradlew androidDependencies
+    - *save_cache
+    - run:
+        name: Gradle build (debug)
+        command: ./gradlew -PciBuild=true :app:assembleServicesApiDebug :app:assembleServicesApiDebugAndroidTest
+    - *persist_debug_workspace_api
+    - store_artifacts:
+        path: app/build/outputs/apk/
+        destination: /apk/
+
   ## Build release APK
-  build_release:
+  build_release_platform:
     <<: *android_config
     steps:
       - checkout
@@ -118,13 +170,36 @@ jobs:
       - run:
           name: Gradle build (release)
           command: ./gradlew -PciBuild=true :app:assemblePlatformRelease
-      - *persist_release_workspace
+      - *persist_release_workspace_platform
       - store_artifacts:
           path: app/build/outputs/apk/
           destination: /apk/
       - store_artifacts:
           path: app/build/outputs/mapping/
           destination: /mapping/
+
+  build_release_api:
+    <<: *android_config
+    steps:
+    - checkout
+    - *restore_cache
+    - *decode_keystore_file
+    - *decode_gplay_key
+    - *decode_fabric_key
+    - run:
+        name: Download dependencies
+        command: ./gradlew androidDependencies
+    - *save_cache
+    - run:
+        name: Gradle build (release)
+        command: ./gradlew -PciBuild=true :app:assembleServicesApiRelease
+    - *persist_release_workspace_api
+    - store_artifacts:
+        path: app/build/outputs/apk/
+        destination: /apk/
+    - store_artifacts:
+        path: app/build/outputs/mapping/
+        destination: /mapping/
 
   ## Run unit tests
   test_unit:
@@ -139,8 +214,8 @@ jobs:
       - *save_cache
       - run:
           name: Run platform unit tests
-          command: ./gradlew -PciBuild=true :app:testPlatformDebugUnitTest
-      - *persist_debug_workspace
+          command: ./gradlew test
+      - *persist_debug_workspace_platform
       - store_artifacts:
           path: app/build/reports/
           destination: /reports/
@@ -160,15 +235,15 @@ jobs:
           command: ./gradlew androidDependencies
 
   ## Deploy release APK to Google Play Alpha
-  deploy_google_play:
+  deploy_google_play_platform:
     <<: *android_config
     steps:
       - checkout
-      - *attach_release_workspace
       - *restore_cache
       - *decode_keystore_file
       - *decode_gplay_key
       - *decode_fabric_key
+      - *attach_release_workspace_platform
       - run:
           name: Download dependencies
           command: ./gradlew androidDependencies
@@ -176,22 +251,54 @@ jobs:
           name: Deploy to Google Play alpha
           command: ./gradlew publishPlatformRelease
 
-  ## Deploy release APK to Google Play Alpha
-  deploy_fabric:
+  deploy_google_play_api:
     <<: *android_config
     steps:
     - checkout
-    - *attach_release_workspace
     - *restore_cache
     - *decode_keystore_file
     - *decode_gplay_key
     - *decode_fabric_key
+    - *attach_release_workspace_api
+    - run:
+        name: Download dependencies
+        command: ./gradlew androidDependencies
+    - run:
+        name: Deploy to Google Play alpha
+        command: ./gradlew publishServicesApiRelease
+
+  ## Deploy release APK to Google Play Alpha
+  deploy_fabric_platform:
+    <<: *android_config
+    steps:
+    - checkout
+    - *restore_cache
+    - *decode_keystore_file
+    - *decode_gplay_key
+    - *decode_fabric_key
+    - *attach_release_workspace_platform
     - run:
         name: Download dependencies
         command: ./gradlew androidDependencies
     - run:
         name: Deploy to Fabric
         command: ./gradlew crashlyticsUploadDistributionPlatformRelease
+
+  deploy_fabric_api:
+    <<: *android_config
+    steps:
+    - checkout
+    - *restore_cache
+    - *decode_keystore_file
+    - *decode_gplay_key
+    - *decode_fabric_key
+    - *attach_release_workspace_api
+    - run:
+        name: Download dependencies
+        command: ./gradlew androidDependencies
+    - run:
+        name: Deploy to Fabric
+        command: ./gradlew crashlyticsUploadDistributionServicesApiRelease
 
   report_code_cov:
     <<: *android_config
@@ -201,7 +308,7 @@ jobs:
       - *decode_keystore_file
       - run:
           name: Code coverage report
-          command: ./gradlew jacocoTestPlatformDebugUnitTestReport
+          command: ./gradlew jacocoTestReport
       - run:
           name: Upload report
           command: bash <(curl -s https://codecov.io/bash)
@@ -230,7 +337,7 @@ jobs:
       - *decode_keystore_file
       - run:
           name: Linter
-          command: ./gradlew lintPlatformDebug
+          command: ./gradlew app:lint
       - store_artifacts:
           path: app/build/reports/
           destination: /reports/
@@ -239,41 +346,82 @@ workflows:
   version: 2
   workflow:
     jobs:
+
     - lint_check
+
     - checkstyle
-    - build_debug:
+
+    - build_debug_platform:
         requires:
           - lint_check
           - checkstyle
-    - build_release:
+
+    - build_debug_api:
         requires:
           - lint_check
           - checkstyle
+
+    - build_release_platform:
+        requires:
+          - lint_check
+          - checkstyle
+
+    - build_release_api:
+        requires:
+          - lint_check
+          - checkstyle
+
     - test_unit:
         requires:
-          - build_debug
+          - build_debug_platform
+          - build_debug_api
+
     - test_instrumented:
         requires:
-          - build_debug
+          - build_debug_platform
+          - build_debug_api
+
     - report_code_cov:
         requires:
           - test_instrumented
-    - deploy_google_play:
+
+    - deploy_google_play_platform:
         filters:
           branches:
             only:
               - master
         requires:
-          - build_release
+          - build_release_platform
           - test_unit
           - test_instrumented
-    - deploy_fabric:
+
+    - deploy_google_play_api:
         filters:
           branches:
             only:
-            - master
+              - master
         requires:
-          - build_release
+          - build_release_api
+          - test_unit
+          - test_instrumented
+
+    - deploy_fabric_platform:
+        filters:
+          branches:
+            only:
+              - master
+        requires:
+          - build_release_platform
+          - test_unit
+          - test_instrumented
+
+    - deploy_fabric_api:
+        filters:
+          branches:
+            only:
+              - master
+        requires:
+          - build_release_api
           - test_unit
           - test_instrumented
 
