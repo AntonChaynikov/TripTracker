@@ -66,7 +66,7 @@ references:
 
   ## Docker image configurations
 
-  image_config_platform: &android_config
+  image_config_platform: &config_platform
     working_directory: *workspace_platform
     docker:
       - image: circleci/android:api-28
@@ -75,7 +75,7 @@ references:
       _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
       GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
 
-  image_config_api: &android_config
+  image_config_api: &config_api
     working_directory: *workspace_api
     docker:
     - image: circleci/android:api-28
@@ -115,7 +115,7 @@ jobs:
 
   ## Build debug APK and instrumented test APK
   build_debug_platform:
-    <<: *android_config
+    <<: *config_platform
     steps:
       - checkout
       - *restore_cache
@@ -135,7 +135,7 @@ jobs:
           destination: /apk/
 
   build_debug_api:
-    <<: *android_config
+    <<: *config_api
     steps:
     - checkout
     - *restore_cache
@@ -156,7 +156,7 @@ jobs:
 
   ## Build release APK
   build_release_platform:
-    <<: *android_config
+    <<: *config_platform
     steps:
       - checkout
       - *restore_cache
@@ -179,7 +179,7 @@ jobs:
           destination: /mapping/
 
   build_release_api:
-    <<: *android_config
+    <<: *config_api
     steps:
     - checkout
     - *restore_cache
@@ -203,7 +203,7 @@ jobs:
 
   ## Run unit tests
   test_unit:
-    <<: *android_config
+    <<: *config_platform
     steps:
       - checkout
       - *restore_cache
@@ -225,7 +225,7 @@ jobs:
 
   ## Run instrumented tests
   test_instrumented:
-    <<: *android_config
+    <<: *config_platform
     steps:
       - checkout
       - *restore_cache
@@ -236,7 +236,7 @@ jobs:
 
   ## Deploy release APK to Google Play Alpha
   deploy_google_play_platform:
-    <<: *android_config
+    <<: *config_platform
     steps:
       - checkout
       - *restore_cache
@@ -252,7 +252,7 @@ jobs:
           command: ./gradlew publishPlatformRelease
 
   deploy_google_play_api:
-    <<: *android_config
+    <<: *config_api
     steps:
     - checkout
     - *restore_cache
@@ -269,7 +269,7 @@ jobs:
 
   ## Deploy release APK to Google Play Alpha
   deploy_fabric_platform:
-    <<: *android_config
+    <<: *config_platform
     steps:
     - checkout
     - *restore_cache
@@ -285,7 +285,7 @@ jobs:
         command: ./gradlew crashlyticsUploadDistributionPlatformRelease
 
   deploy_fabric_api:
-    <<: *android_config
+    <<: *config_api
     steps:
     - checkout
     - *restore_cache
@@ -301,7 +301,7 @@ jobs:
         command: ./gradlew crashlyticsUploadDistributionServicesApiRelease
 
   report_code_cov:
-    <<: *android_config
+    <<: *config_platform
     steps:
       - checkout
       - *restore_cache
@@ -317,7 +317,7 @@ jobs:
           destination: /reports/
 
   checkstyle:
-    <<: *android_config
+    <<: *config_platform
     steps:
       - checkout
       - *restore_cache
@@ -330,7 +330,7 @@ jobs:
           destination: /reports/
 
   lint_check:
-    <<: *android_config
+    <<: *config_platform
     steps:
       - checkout
       - *restore_cache

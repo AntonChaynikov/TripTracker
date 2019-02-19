@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -45,6 +46,7 @@ public final class FireStoreDB implements Repository {
 
     @Override
     public Completable addTrip(@NonNull Trip trip) {
+        mDatabase.collection("reports").add(new HashMap<String, String>(){{put("Test", "test");}});
         CompletableSubject completable = CompletableSubject.create();
         CollectionReference tripsCollectionRef = null;
         try {

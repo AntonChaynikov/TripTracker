@@ -37,7 +37,7 @@ public class StatisticsCalculator {
     }
 
     double getSpeed() {
-        double tripDurationSeconds = (mPrevLocation.getTime() - mFirstLocationReceivedTime) / 1000;
+        double tripDurationSeconds = (mPrevLocation.getTime() - mFirstLocationReceivedTime) / 1000d;
         return mDistance / tripDurationSeconds;
     }
 
