@@ -46,7 +46,7 @@ public final class FireStoreDB implements Repository {
 
     @Override
     public Completable addTrip(@NonNull Trip trip) {
-        mDatabase.collection("reports").add(new HashMap<String, String>(){{put("Test", "test");}});
+        mDatabase.collection("reports").add(new HashMap<String, String>() { { put("Test", "test"); } } );
         CompletableSubject completable = CompletableSubject.create();
         CollectionReference tripsCollectionRef = null;
         try {
