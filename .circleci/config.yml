@@ -13,13 +13,13 @@ references:
     save_cache:
       <<: *cache_key
       paths:
-        - ~/.gradle
-        - ~/.m2
+      - ~/.gradle
+      - ~/.m2
 
   ## Workspace
 
   workspace_platform: &workspace_platform
-    ~/workspace/platform
+                        ~/workspace/platform
   attach_debug_workspace_platform: &attach_debug_workspace_platform
     attach_workspace:
       at: *workspace_platform
@@ -30,52 +30,52 @@ references:
     persist_to_workspace:
       root: *workspace_platform
       paths:
-        - app/build/intermediates
-        - app/build/outputs/androidTest-results
-        - app/build/outputs/apk
-        - app/build/outputs/code-coverage
-        - app/build/test-results
+      - app/build/intermediates
+      - app/build/outputs/androidTest-results
+      - app/build/outputs/apk
+      - app/build/outputs/code-coverage
+      - app/build/test-results
   persist_release_workspace_platform: &persist_release_workspace_platform
     persist_to_workspace:
       root: *workspace_platform
       paths:
-        - app/build
+      - app/build
 
   workspace_api: &workspace_api
-    ~/workspace/api
+                   ~/workspace/api
   attach_debug_workspace_api: &attach_debug_workspace_api
-   attach_workspace:
-     at: *workspace_api
+    attach_workspace:
+      at: *workspace_api
   attach_release_workspace_api: &attach_release_workspace_api
-   attach_workspace:
-     at: *workspace_api
+    attach_workspace:
+      at: *workspace_api
   persist_debug_workspace_api: &persist_debug_workspace_api
-   persist_to_workspace:
-     root: *workspace_api
-     paths:
-     - app/build/intermediates
-     - app/build/outputs/androidTest-results
-     - app/build/outputs/apk
-     - app/build/outputs/code-coverage
-     - app/build/test-results
+    persist_to_workspace:
+      root: *workspace_api
+      paths:
+      - app/build/intermediates
+      - app/build/outputs/androidTest-results
+      - app/build/outputs/apk
+      - app/build/outputs/code-coverage
+      - app/build/test-results
   persist_release_workspace_api: &persist_release_workspace_api
-   persist_to_workspace:
-     root: *workspace_api
-     paths:
-     - app/build
+    persist_to_workspace:
+      root: *workspace_api
+      paths:
+      - app/build
 
   ## Docker image configurations
 
-  image_config_platform: &android_config
+  image_config_platform: &config_platform
     working_directory: *workspace_platform
     docker:
-      - image: circleci/android:api-28
+    - image: circleci/android:api-28
     environment:
       TERM: dumb
       _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
       GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
 
-  image_config_api: &android_config
+  image_config_api: &config_api
     working_directory: *workspace_api
     docker:
     - image: circleci/android:api-28
@@ -84,7 +84,7 @@ references:
       _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
       GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
 
-## Keys
+  ## Keys
 
   # google-services.json
   decode_google_services_key: &decode_google_services_key
@@ -115,27 +115,27 @@ jobs:
 
   ## Build debug APK and instrumented test APK
   build_debug_platform:
-    <<: *android_config
+    <<: *config_platform
     steps:
-      - checkout
-      - *restore_cache
-      - *decode_keystore_file
-      - *decode_gplay_key
-      - *decode_fabric_key
-      - run:
-          name: Download dependencies
-          command: ./gradlew androidDependencies
-      - *save_cache
-      - run:
-          name: Gradle build (debug)
-          command: ./gradlew -PciBuild=true :app:assemblePlatformDebug :app:assemblePlatformDebugAndroidTest
-      - *persist_debug_workspace_platform
-      - store_artifacts:
-          path: app/build/outputs/apk/
-          destination: /apk/
+    - checkout
+    - *restore_cache
+    - *decode_keystore_file
+    - *decode_gplay_key
+    - *decode_fabric_key
+    - run:
+        name: Download dependencies
+        command: ./gradlew androidDependencies
+    - *save_cache
+    - run:
+        name: Gradle build (debug)
+        command: ./gradlew -PciBuild=true :app:assemblePlatformDebug :app:assemblePlatformDebugAndroidTest
+    - *persist_debug_workspace_platform
+    - store_artifacts:
+        path: app/build/outputs/apk/
+        destination: /apk/
 
   build_debug_api:
-    <<: *android_config
+    <<: *config_api
     steps:
     - checkout
     - *restore_cache
@@ -156,30 +156,30 @@ jobs:
 
   ## Build release APK
   build_release_platform:
-    <<: *android_config
+    <<: *config_platform
     steps:
-      - checkout
-      - *restore_cache
-      - *decode_keystore_file
-      - *decode_gplay_key
-      - *decode_fabric_key
-      - run:
-          name: Download dependencies
-          command: ./gradlew androidDependencies
-      - *save_cache
-      - run:
-          name: Gradle build (release)
-          command: ./gradlew -PciBuild=true :app:assemblePlatformRelease
-      - *persist_release_workspace_platform
-      - store_artifacts:
-          path: app/build/outputs/apk/
-          destination: /apk/
-      - store_artifacts:
-          path: app/build/outputs/mapping/
-          destination: /mapping/
+    - checkout
+    - *restore_cache
+    - *decode_keystore_file
+    - *decode_gplay_key
+    - *decode_fabric_key
+    - run:
+        name: Download dependencies
+        command: ./gradlew androidDependencies
+    - *save_cache
+    - run:
+        name: Gradle build (release)
+        command: ./gradlew -PciBuild=true :app:assemblePlatformRelease
+    - *persist_release_workspace_platform
+    - store_artifacts:
+        path: app/build/outputs/apk/
+        destination: /apk/
+    - store_artifacts:
+        path: app/build/outputs/mapping/
+        destination: /mapping/
 
   build_release_api:
-    <<: *android_config
+    <<: *config_api
     steps:
     - checkout
     - *restore_cache
@@ -203,56 +203,56 @@ jobs:
 
   ## Run unit tests
   test_unit:
-    <<: *android_config
+    <<: *config_platform
     steps:
-      - checkout
-      - *restore_cache
-      - *decode_keystore_file
-      - run:
-          name: Download dependencies
-          command: ./gradlew androidDependencies
-      - *save_cache
-      - run:
-          name: Run platform unit tests
-          command: ./gradlew test
-      - *persist_debug_workspace_platform
-      - store_artifacts:
-          path: app/build/reports/
-          destination: /reports/
-      - store_test_results:
-          path: app/build/test-results/
-          destination: /test-results/
+    - checkout
+    - *restore_cache
+    - *decode_keystore_file
+    - run:
+        name: Download dependencies
+        command: ./gradlew androidDependencies
+    - *save_cache
+    - run:
+        name: Run platform unit tests
+        command: ./gradlew test
+    - *persist_debug_workspace_platform
+    - store_artifacts:
+        path: app/build/reports/
+        destination: /reports/
+    - store_test_results:
+        path: app/build/test-results/
+        destination: /test-results/
 
   ## Run instrumented tests
   test_instrumented:
-    <<: *android_config
+    <<: *config_platform
     steps:
-      - checkout
-      - *restore_cache
-      - *decode_keystore_file
-      - run:
-          name: Download dependencies
-          command: ./gradlew androidDependencies
+    - checkout
+    - *restore_cache
+    - *decode_keystore_file
+    - run:
+        name: Download dependencies
+        command: ./gradlew androidDependencies
 
   ## Deploy release APK to Google Play Alpha
   deploy_google_play_platform:
-    <<: *android_config
+    <<: *config_platform
     steps:
-      - checkout
-      - *restore_cache
-      - *decode_keystore_file
-      - *decode_gplay_key
-      - *decode_fabric_key
-      - *attach_release_workspace_platform
-      - run:
-          name: Download dependencies
-          command: ./gradlew androidDependencies
-      - run:
-          name: Deploy to Google Play alpha
-          command: ./gradlew publishPlatformRelease
+    - checkout
+    - *restore_cache
+    - *decode_keystore_file
+    - *decode_gplay_key
+    - *decode_fabric_key
+    - *attach_release_workspace_platform
+    - run:
+        name: Download dependencies
+        command: ./gradlew androidDependencies
+    - run:
+        name: Deploy to Google Play alpha
+        command: ./gradlew publishPlatformRelease
 
   deploy_google_play_api:
-    <<: *android_config
+    <<: *config_api
     steps:
     - checkout
     - *restore_cache
@@ -269,7 +269,7 @@ jobs:
 
   ## Deploy release APK to Google Play Alpha
   deploy_fabric_platform:
-    <<: *android_config
+    <<: *config_platform
     steps:
     - checkout
     - *restore_cache
@@ -285,7 +285,7 @@ jobs:
         command: ./gradlew crashlyticsUploadDistributionPlatformRelease
 
   deploy_fabric_api:
-    <<: *android_config
+    <<: *config_api
     steps:
     - checkout
     - *restore_cache
@@ -301,46 +301,46 @@ jobs:
         command: ./gradlew crashlyticsUploadDistributionServicesApiRelease
 
   report_code_cov:
-    <<: *android_config
+    <<: *config_platform
     steps:
-      - checkout
-      - *restore_cache
-      - *decode_keystore_file
-      - run:
-          name: Code coverage report
-          command: ./gradlew jacocoTestReport
-      - run:
-          name: Upload report
-          command: bash <(curl -s https://codecov.io/bash)
-      - store_artifacts:
-          path: app/build/reports/
-          destination: /reports/
+    - checkout
+    - *restore_cache
+    - *decode_keystore_file
+    - run:
+        name: Code coverage report
+        command: ./gradlew jacocoTestReport
+    - run:
+        name: Upload report
+        command: bash <(curl -s https://codecov.io/bash)
+    - store_artifacts:
+        path: app/build/reports/
+        destination: /reports/
 
   checkstyle:
-    <<: *android_config
+    <<: *config_platform
     steps:
-      - checkout
-      - *restore_cache
-      - *decode_keystore_file
-      - run:
-          name: Checksyle
-          command: ./gradlew checkstyle
-      - store_artifacts:
-          path: app/build/reports/
-          destination: /reports/
+    - checkout
+    - *restore_cache
+    - *decode_keystore_file
+    - run:
+        name: Checksyle
+        command: ./gradlew checkstyle
+    - store_artifacts:
+        path: app/build/reports/
+        destination: /reports/
 
   lint_check:
-    <<: *android_config
+    <<: *config_platform
     steps:
-      - checkout
-      - *restore_cache
-      - *decode_keystore_file
-      - run:
-          name: Linter
-          command: ./gradlew app:lint
-      - store_artifacts:
-          path: app/build/reports/
-          destination: /reports/
+    - checkout
+    - *restore_cache
+    - *decode_keystore_file
+    - run:
+        name: Linter
+        command: ./gradlew app:lint
+    - store_artifacts:
+        path: app/build/reports/
+        destination: /reports/
 
 workflows:
   version: 2
@@ -353,75 +353,83 @@ workflows:
 
     - build_debug_platform:
         requires:
-          - lint_check
-          - checkstyle
+        - lint_check
+        - checkstyle
 
     - build_debug_api:
         requires:
-          - lint_check
-          - checkstyle
+        - lint_check
+        - checkstyle
 
     - build_release_platform:
+        filters:
+          branches:
+            only:
+            - master
         requires:
-          - lint_check
-          - checkstyle
+        - lint_check
+        - checkstyle
 
     - build_release_api:
+        filters:
+          branches:
+            only:
+            - master
         requires:
-          - lint_check
-          - checkstyle
+        - lint_check
+        - checkstyle
 
     - test_unit:
         requires:
-          - build_debug_platform
-          - build_debug_api
+        - build_debug_platform
+        - build_debug_api
 
     - test_instrumented:
         requires:
-          - build_debug_platform
-          - build_debug_api
+        - build_debug_platform
+        - build_debug_api
 
     - report_code_cov:
         requires:
-          - test_instrumented
+        - test_instrumented
 
     - deploy_google_play_platform:
         filters:
           branches:
             only:
-              - master
+            - master
         requires:
-          - build_release_platform
-          - test_unit
-          - test_instrumented
+        - build_release_platform
+        - test_unit
+        - test_instrumented
 
     - deploy_google_play_api:
         filters:
           branches:
             only:
-              - master
+            - master
         requires:
-          - build_release_api
-          - test_unit
-          - test_instrumented
+        - build_release_api
+        - test_unit
+        - test_instrumented
 
     - deploy_fabric_platform:
         filters:
           branches:
             only:
-              - master
+            - master
         requires:
-          - build_release_platform
-          - test_unit
-          - test_instrumented
+        - build_release_platform
+        - test_unit
+        - test_instrumented
 
     - deploy_fabric_api:
         filters:
           branches:
             only:
-              - master
+            - master
         requires:
-          - build_release_api
-          - test_unit
-          - test_instrumented
+        - build_release_api
+        - test_unit
+        - test_instrumented
 
