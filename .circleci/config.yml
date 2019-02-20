@@ -20,12 +20,15 @@ references:
 
   workspace_platform: &workspace_platform
                         ~/workspace/platform
+
   attach_debug_workspace_platform: &attach_debug_workspace_platform
     attach_workspace:
       at: *workspace_platform
+
   attach_release_workspace_platform: &attach_release_workspace_platform
     attach_workspace:
       at: *workspace_platform
+
   persist_debug_workspace_platform: &persist_debug_workspace_platform
     persist_to_workspace:
       root: *workspace_platform
@@ -35,20 +38,25 @@ references:
       - app/build/outputs/apk
       - app/build/outputs/code-coverage
       - app/build/test-results
+
   persist_release_workspace_platform: &persist_release_workspace_platform
     persist_to_workspace:
       root: *workspace_platform
       paths:
-      - app/build
+      - app/build/outputs/apk/platform
+      - app/build/outputs/mapping/platform
 
   workspace_api: &workspace_api
                    ~/workspace/api
+
   attach_debug_workspace_api: &attach_debug_workspace_api
     attach_workspace:
       at: *workspace_api
+
   attach_release_workspace_api: &attach_release_workspace_api
     attach_workspace:
       at: *workspace_api
+
   persist_debug_workspace_api: &persist_debug_workspace_api
     persist_to_workspace:
       root: *workspace_api
@@ -62,7 +70,8 @@ references:
     persist_to_workspace:
       root: *workspace_api
       paths:
-      - app/build
+      - app/build/outputs/apk/servicesApi
+      - app/build/outputs/mapping/servicesApi
 
   ## Docker image configurations
 
