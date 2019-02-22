@@ -70,6 +70,7 @@ android {
         }
         release {
             minifyEnabled true
+            multiDexEnabled true
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -118,10 +119,15 @@ ext {
     JODA_CONVERT = '2.1.2'
     MOCKITO_CORE = '2.23.4'
     MOCKITO_INLINE = '2.13.0';
+    MOCKITO_ANDROID = '2.24.5'
     JUNIT = '4.12'
     ANDROIDX_TEST_RUNNER = '1.1.0'
     ESPRESSO_CORE = '3.1.0'
     CRASHLYTICS = '2.9.8'
+    ANDROID_TEST_CORE = '1.0.0'
+    ANDROID_TEST_RULES = '1.1.0'
+    IDLING_RESOURCES = '3.1.0'
+    DAGGER = '2.21'
 }
 
 dependencies {
@@ -140,13 +146,23 @@ dependencies {
     implementation "joda-time:joda-time:$JODA_TIME"
     implementation "org.joda:joda-convert:$JODA_CONVERT:classic"
     implementation "com.crashlytics.sdk.android:crashlytics:$CRASHLYTICS"
+    implementation "com.google.dagger:dagger:$DAGGER"
+    annotationProcessor "com.google.dagger:dagger-compiler:$DAGGER"
+
+    implementation 'com.android.support:multidex:1.0.3'
 
     testImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     testImplementation "junit:junit:$JUNIT"
     testImplementation "org.mockito:mockito-inline:$MOCKITO_INLINE"
 
+    // AndroidJUnitRunner and JUnit Rules
+    androidTestImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
+    androidTestImplementation "org.mockito:mockito-android:$MOCKITO_ANDROID"
+    androidTestImplementation 'androidx.test:core:1.1.0'
+    androidTestImplementation 'androidx.test:rules:1.1.1'
     androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"
+    androidTestImplementation "androidx.test.espresso:espresso-idling-resource:$IDLING_RESOURCES"
 }
 
 apply plugin: 'com.google.gms.google-services'

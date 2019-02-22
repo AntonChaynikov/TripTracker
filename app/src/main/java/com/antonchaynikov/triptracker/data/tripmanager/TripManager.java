@@ -36,7 +36,7 @@ public final class TripManager {
         mRepository = repository;
         mLocationSource = locationSource;
         mStatisticsCalculator = statisticsCalculator;
-        Disposable d = mLocationSource.getLocationUpdates().subscribe(this::handleCoordinatesUpdate);
+        Disposable d = mLocationSource.getLocationsObservable().subscribe(this::handleCoordinatesUpdate);
     }
 
     public static TripManager getInstance(

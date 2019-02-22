@@ -1,13 +1,11 @@
 package com.antonchaynikov.triptracker.mainscreen;
 
 import android.Manifest;
-
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,11 +15,8 @@ import android.widget.TextView;
 
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.authentication.LaunchActivity;
-import com.antonchaynikov.triptracker.data.location.LocationFilter;
+import com.antonchaynikov.triptracker.data.location.LocationProviderModule;
 import com.antonchaynikov.triptracker.data.location.LocationSource;
-
-import com.antonchaynikov.triptracker.data.location.ServiceManager;
-import com.antonchaynikov.triptracker.data.location.ServiceManagerModule;
 import com.antonchaynikov.triptracker.data.repository.firestore.FireStoreDB;
 import com.antonchaynikov.triptracker.data.tripmanager.StatisticsCalculator;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
@@ -110,8 +105,8 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
     }
 
     private void initViewModel() {
-        ServiceManager<?> serviceManager = ServiceManagerModule.provide(this);
-        LocationSource locationSource = LocationSource.getInstance(new LocationFilter(), serviceManager);
+        LocationSource locationSource = LocationSource.getInstance(this);
+        locationSource.setLocationProvider(LocationProviderModule.provide(this));
         ViewModelFactory factory = new ViewModelFactory() {
             @Override
             public <T extends BasicViewModel> T create(@NonNull Class<T> clazz) {

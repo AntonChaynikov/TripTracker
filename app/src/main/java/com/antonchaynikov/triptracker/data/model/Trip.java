@@ -4,10 +4,10 @@ import com.google.firebase.firestore.PropertyName;
 
 public class Trip {
 
-    public static final String FIELD_NAME_START_DATE = "startDate";
-    public static final String FIELD_NAME_END_DATE = "endDate";
-    public static final String FIELD_NAME_DISTANCE = "distance";
-    public static final String FIELD_NAME_SPEED = "speed";
+    private static final String FIELD_NAME_START_DATE = "startDate";
+    private static final String FIELD_NAME_END_DATE = "endDate";
+    private static final String FIELD_NAME_DISTANCE = "distance";
+    private static final String FIELD_NAME_SPEED = "speed";
 
     @PropertyName(FIELD_NAME_START_DATE)
     private long startDate;

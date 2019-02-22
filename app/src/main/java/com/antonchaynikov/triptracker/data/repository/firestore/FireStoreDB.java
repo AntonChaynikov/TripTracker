@@ -20,6 +20,8 @@ import io.reactivex.subjects.PublishSubject;
 
 public final class FireStoreDB implements Repository {
 
+    private final static String TAG = FireStoreDB.class.getCanonicalName();
+
     private static final String TRIPS_COLLECTION_NAME = "trips";
     private static final String ROOT_USER_COLLECTION = "users";
     private static final String COORDINATES_COLLECTION_NAME = "coordinates";
@@ -58,7 +60,7 @@ public final class FireStoreDB implements Repository {
                     .document(Long.toString(trip.getStartDate()))
                     .set(trip)
                     .addOnCompleteListener(task -> completable.onComplete())
-                    .addOnFailureListener(task -> Log.d("Repo", "Error addidng/updating trip"));
+                    .addOnFailureListener(task -> Log.d(TAG, "Error adding/updating trip"));
         }
         return completable;
     }
@@ -159,7 +161,7 @@ public final class FireStoreDB implements Repository {
     private CollectionReference getTripsCollectionReference() throws FirebaseAuthException {
         String uId = FirebaseAuth.getInstance().getUid();
         if (uId == null) {
-            throw new FirebaseAuthException("", "");
+            throw new FirebaseAuthException("", "Couldn't find user id");
         }
         return mDatabase
                 .collection(ROOT_USER_COLLECTION)

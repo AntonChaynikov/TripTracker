@@ -52,7 +52,7 @@ public class TripManagerTest {
 
         doReturn(CompletableSubject.complete()).when(mockRepository).addTrip(any(Trip.class));
         doReturn(CompletableSubject.complete()).when(mockRepository).updateTrip(any(Trip.class));
-        doReturn(coordinateObservable).when(mockLocationSource).getLocationUpdates();
+        doReturn(coordinateObservable).when(mockLocationSource).getLocationsObservable();
         doNothing().when(mockStatisticsCalculator).addCoordinate(any(Location.class));
 
         mTestSubject = TripManager.getInstance(mockRepository, mockLocationSource, mockStatisticsCalculator);
@@ -78,7 +78,6 @@ public class TripManagerTest {
     public void finishTrip_shouldCallRepository_withCurrentTime_withCorrectTrip() {
         ArgumentCaptor<Trip> argumentCaptor = ArgumentCaptor.forClass(Trip.class);
         Disposable sd = mTestSubject.startTrip().subscribe();
-        Trip trip = mTestSubject.getCurrentTrip();
 
         long timeBeforeFinish = System.currentTimeMillis();
         Disposable fd = mTestSubject.finishTrip().subscribe();
