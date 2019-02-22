@@ -2,6 +2,8 @@ package com.antonchaynikov.triptracker.data.model;
 
 import com.google.firebase.firestore.PropertyName;
 
+import java.util.Objects;
+
 public class Trip {
 
     private static final String FIELD_NAME_START_DATE = "startDate";
@@ -55,5 +57,21 @@ public class Trip {
 
     public double getSpeed() {
         return speed;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Trip)) return false;
+        Trip trip = (Trip) o;
+        return startDate == trip.startDate &&
+                endDate == trip.endDate &&
+                Double.compare(trip.distance, distance) == 0 &&
+                Double.compare(trip.speed, speed) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startDate, endDate, distance, speed);
     }
 }

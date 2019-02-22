@@ -1,16 +1,21 @@
 package com.antonchaynikov.triptracker.data.repository.firestore;
 
+import android.os.OperationCanceledException;
 import android.util.Log;
 
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
 import com.antonchaynikov.triptracker.data.repository.Repository;
+import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.List;
+import java.util.MissingResourceException;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Completable;
@@ -59,8 +64,17 @@ public final class FireStoreDB implements Repository {
             tripsCollectionRef
                     .document(Long.toString(trip.getStartDate()))
                     .set(trip)
-                    .addOnCompleteListener(task -> completable.onComplete())
-                    .addOnFailureListener(task -> Log.d(TAG, "Error adding/updating trip"));
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            completable.onComplete();
+                        } else {
+                            if (task.isCanceled()) {
+                                completable.onError(new OperationCanceledException());
+                            } else {
+                                completable.onError(task.getException());
+                            }
+                        }
+                    });
         }
         return completable;
     }
@@ -81,6 +95,12 @@ public final class FireStoreDB implements Repository {
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             observable.onNext(task.getResult().toObjects(Trip.class));
+                        } else {
+                            if (task.isCanceled()) {
+                                observable.onError(new OperationCanceledException());
+                            } else {
+                                observable.onError(task.getException());
+                            }
                         }
                     });
         }
@@ -104,6 +124,12 @@ public final class FireStoreDB implements Repository {
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             observable.onNext(task.getResult().toObject(Trip.class));
+                        } else {
+                            if (task.isCanceled()) {
+                                observable.onError(new OperationCanceledException());
+                            } else {
+                                observable.onError(task.getException());
+                            }
                         }
                     });
         }
@@ -128,6 +154,12 @@ public final class FireStoreDB implements Repository {
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             observable.onNext(task.getResult().toObjects(TripCoordinate.class));
+                        } else {
+                            if (task.isCanceled()) {
+                                observable.onError(new OperationCanceledException());
+                            } else {
+                                observable.onError(task.getException());
+                            }
                         }
                     });
         }
@@ -153,19 +185,61 @@ public final class FireStoreDB implements Repository {
             tripsCollectionRef
                     .document(Long.toString(trip.getStartDate()))
                     .collection(COORDINATES_COLLECTION_NAME)
-                    .add(coordinate);
+                    .add(coordinate)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            completable.onComplete();
+                        } else {
+                            if (task.isCanceled()) {
+                                completable.onError(new OperationCanceledException());
+                            } else {
+                                completable.onError(task.getException());
+                            }
+                        }
+                    });
+        }
+        return completable;
+    }
+
+    @Override
+    public Completable deleteUserData() {
+        CompletableSubject completable = CompletableSubject.create();
+        DocumentReference userDocument = null;
+        try {
+            userDocument = getUserDocumentReference();
+        } catch (FirebaseAuthException e) {
+            completable.onError(e);
+            e.printStackTrace();
+        }
+        if (userDocument != null) {
+            userDocument.delete()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            completable.onComplete();
+                        } else {
+                            if (task.isCanceled()) {
+                                completable.onError(new OperationCanceledException());
+                            } else {
+                                completable.onError(task.getException());
+                            }
+                        }
+                    });
         }
         return completable;
     }
 
     private CollectionReference getTripsCollectionReference() throws FirebaseAuthException {
+        return getUserDocumentReference()
+                .collection(TRIPS_COLLECTION_NAME);
+    }
+
+    private DocumentReference getUserDocumentReference() throws FirebaseAuthException {
         String uId = FirebaseAuth.getInstance().getUid();
         if (uId == null) {
             throw new FirebaseAuthException("", "Couldn't find user id");
         }
         return mDatabase
                 .collection(ROOT_USER_COLLECTION)
-                .document(uId)
-                .collection(TRIPS_COLLECTION_NAME);
+                .document(uId);
     }
 }

@@ -21,7 +21,9 @@ import androidx.annotation.NonNull;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 import androidx.test.rule.GrantPermissionRule;
+import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
+import io.reactivex.subjects.PublishSubject;
 
 import static org.junit.Assert.assertEquals;
 
@@ -33,13 +35,13 @@ public class LocationSource_LocationService_IntegrationTest {
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION);
 
-    private TestableLocationProvider locationProvider;
+    private MockLocationProvider locationProvider;
 
     private LocationSource mLocationSource;
 
     private TestObserver<Location> mLocationsObserver;
     private TestObserver<Boolean> mGeolocationAvailabilityObserver;
-    private List<Location> mLocationsList = createLocationsList();
+    private PublishSubject<Location> mLocationsObservable = PublishSubject.create();
 
     @Before
     public void setUp() throws Exception {
@@ -47,10 +49,7 @@ public class LocationSource_LocationService_IntegrationTest {
         mGeolocationAvailabilityObserver = TestObserver.create();
 
         Context context = ApplicationProvider.getApplicationContext();
-        locationProvider = LocationProviderModule.provideTestable(context);
-
-        locationProvider.setTestMode();
-        locationProvider.setFilter(null);
+        locationProvider = new MockLocationProvider(mLocationsObservable);
 
         mLocationSource = LocationSource.getInstance(context);
         mLocationSource.setLocationProvider(locationProvider);
@@ -67,10 +66,10 @@ public class LocationSource_LocationService_IntegrationTest {
         mLocationSource.getGeolocationAvailabilityObservable().subscribe(mGeolocationAvailabilityObserver::onNext);
         mLocationSource.startUpdates();
 
-        locationProvider.setGeolocationAvailability(false);
+        locationProvider.onGeolocationAvailabilityChanged(false);
         mGeolocationAvailabilityObserver.assertValue(false);
 
-        locationProvider.setGeolocationAvailability(true);
+        locationProvider.onGeolocationAvailabilityChanged(true);
         mGeolocationAvailabilityObserver.assertValues(false, true);
     }
 
@@ -79,7 +78,9 @@ public class LocationSource_LocationService_IntegrationTest {
         mLocationSource.getLocationsObservable().subscribe(mLocationsObserver);
         mLocationSource.startUpdates();
 
-        locationProvider.emitLocations(mLocationsList);
+        for(Location location: createLocationsList()) {
+            mLocationsObservable.onNext(location);
+        }
 
         assertEquals(LOCATIONS_COUNT, mLocationsObserver.valueCount());
     }

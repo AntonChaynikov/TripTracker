@@ -7,59 +7,34 @@ import android.location.LocationManager;
 import android.os.Bundle;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-class LocationProviderImpl implements TestableLocationProvider, LocationListener {
+class LocationProviderImpl implements LocationProvider, LocationListener {
+
+    private static final int PROVIDERS_COUNT = 2;
 
     private LocationManager mLocationManager;
     private LocationConsumer mConsumer;
     private Filter<Location> mFilter;
     private Set<String> mDisabledProviders;
-    private int mProvidersCount;
 
     LocationProviderImpl(@NonNull Context context) {
         mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
     }
 
     @Override
-    public void setTestMode() throws SecurityException {
-        mLocationManager.setTestProviderEnabled(LocationManager.GPS_PROVIDER, true);
-        mLocationManager.setTestProviderEnabled(LocationManager.NETWORK_PROVIDER, true);
-    }
-
-    @Override
-    public void emitLocations(List<Location> locations) {
-        for (Location location: locations) {
-            location.setProvider(LocationManager.NETWORK_PROVIDER);
-            mLocationManager.setTestProviderLocation(LocationManager.NETWORK_PROVIDER, location);
-        }
-    }
-
-    @Override
-    public void setGeolocationAvailability(boolean isAvailable) {
-        if (isAvailable) {
-            onProviderEnabled(LocationManager.NETWORK_PROVIDER);
-            onProviderEnabled(LocationManager.GPS_PROVIDER);
-        } else {
-            onProviderDisabled(LocationManager.NETWORK_PROVIDER);
-            onProviderDisabled(LocationManager.GPS_PROVIDER);
-        }
-    }
-
-    @Override
     public void startUpdates(@NonNull LocationConsumer consumer) throws SecurityException {
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        mProvidersCount = 2;
-        mDisabledProviders = new HashSet<>(mProvidersCount);
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 0, this);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, this);
+        mDisabledProviders = new HashSet<>(PROVIDERS_COUNT);
         mConsumer = consumer;
     }
 
     @Override
-    public void setFilter(@NonNull Filter<Location> filter) {
+    public void setFilter(@Nullable Filter<Location> filter) {
         mFilter = filter;
     }
 
@@ -71,7 +46,7 @@ class LocationProviderImpl implements TestableLocationProvider, LocationListener
 
     @Override
     public void onLocationChanged(Location location) {
-        if (mFilter.isRelevant(location)) {
+        if (mFilter == null || mFilter.isRelevant(location)) {
             mConsumer.onNewLocationUpdate(location);
         }
     }
@@ -84,7 +59,7 @@ class LocationProviderImpl implements TestableLocationProvider, LocationListener
     @Override
     public void onProviderEnabled(String provider) {
         mDisabledProviders.remove(provider);
-        if (mDisabledProviders.size() < mProvidersCount) {
+        if (mDisabledProviders.size() < PROVIDERS_COUNT) {
             mConsumer.onLocationUpdatesAvailabilityChange(true);
         }
     }
@@ -92,7 +67,7 @@ class LocationProviderImpl implements TestableLocationProvider, LocationListener
     @Override
     public void onProviderDisabled(String provider) {
         mDisabledProviders.add(provider);
-        if (mDisabledProviders.size() == mProvidersCount) {
+        if (mDisabledProviders.size() == PROVIDERS_COUNT) {
             mConsumer.onLocationUpdatesAvailabilityChange(false);
         }
     }

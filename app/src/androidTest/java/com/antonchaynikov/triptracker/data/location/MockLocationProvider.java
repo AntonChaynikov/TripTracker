@@ -5,6 +5,7 @@ import android.location.Location;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 
@@ -43,7 +44,7 @@ class MockLocationProvider implements LocationProvider {
     }
 
     @Override
-    public void setFilter(@NonNull Filter<Location> filter) {
+    public void setFilter(@Nullable Filter<Location> filter) {
 
     }
 }
