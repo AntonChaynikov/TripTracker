@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.authentication.LaunchActivity;
+import com.antonchaynikov.triptracker.data.location.LocationFilter;
 import com.antonchaynikov.triptracker.data.location.LocationProviderModule;
 import com.antonchaynikov.triptracker.data.location.LocationSource;
 import com.antonchaynikov.triptracker.data.repository.firestore.FireStoreDB;
@@ -24,6 +26,7 @@ import com.antonchaynikov.triptracker.history.HistoryActivity;
 import com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState;
 import com.antonchaynikov.triptracker.trips.AbcActivity;
 import com.antonchaynikov.triptracker.viewmodel.BasicViewModel;
+import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
 import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
 import com.antonchaynikov.triptracker.viewmodel.ViewModelActivity;
 import com.antonchaynikov.triptracker.viewmodel.ViewModelFactory;
@@ -106,7 +109,7 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
 
     private void initViewModel() {
         LocationSource locationSource = LocationSource.getInstance(this);
-        locationSource.setLocationProvider(LocationProviderModule.provide(this));
+        locationSource.setLocationProvider(LocationProviderModule.provide(this, new LocationFilter()));
         ViewModelFactory factory = new ViewModelFactory() {
             @Override
             public <T extends BasicViewModel> T create(@NonNull Class<T> clazz) {
@@ -116,6 +119,7 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
                                 locationSource,
                                 new StatisticsCalculator()),
                         FirebaseAuth.getInstance(),
+                        new StatisticsFormatter(TripActivity.this),
                         mPermissionGranted);
             }
         };

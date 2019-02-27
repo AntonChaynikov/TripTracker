@@ -91,6 +91,7 @@ public class LocationService extends Service implements LocationConsumer {
     }
 
     public void startUpdates() {
+        Log.d(TAG, "LocationService start updates");
         if (!mIsReceivingLocations && mLocationProvider != null) {
             if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) ==
                     PackageManager.PERMISSION_GRANTED) {

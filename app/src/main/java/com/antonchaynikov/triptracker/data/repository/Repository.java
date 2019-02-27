@@ -24,5 +24,4 @@ public interface Repository {
     Completable addCoordinate(@NonNull TripCoordinate coordinate, @NonNull Trip trip);
 
     Completable deleteUserData();
-
 }

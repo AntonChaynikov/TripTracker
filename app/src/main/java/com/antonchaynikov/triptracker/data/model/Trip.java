@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class Trip {
 
-    private static final String FIELD_NAME_START_DATE = "startDate";
+    public static final String FIELD_NAME_START_DATE = "startDate";
     private static final String FIELD_NAME_END_DATE = "endDate";
     private static final String FIELD_NAME_DISTANCE = "distance";
     private static final String FIELD_NAME_SPEED = "speed";

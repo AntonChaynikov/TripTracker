@@ -25,7 +25,7 @@ public class StatisticsFormatter {
         mAppContext = context.getApplicationContext();
     }
 
-    public TripStatistics formatTrip(@NonNull Trip trip, @NonNull FormatOptions options) {
+    TripStatistics formatTrip(@NonNull Trip trip, @NonNull FormatOptions options) {
         mTrip = trip;
         TripStatistics statistics = new TripStatistics();
         statistics.setStartDate(formatStartDate(options.getStartDatePattern()));

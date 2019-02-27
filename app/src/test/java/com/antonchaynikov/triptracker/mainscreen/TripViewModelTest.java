@@ -5,6 +5,7 @@ import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
 import com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState;
+import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
 import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -24,10 +25,12 @@ import static com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState.Stat
 import static com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState.State.STARTED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TripViewModelTest {
@@ -40,6 +43,8 @@ public class TripViewModelTest {
     private TripManager mockTripManager;
     @Mock
     private FirebaseAuth mockFirebaseAuth;
+    @Mock
+    private StatisticsFormatter mockFormatter;
 
     private PublishSubject<Trip> statsStream;
     private PublishSubject<TripCoordinate> coordsStream;
@@ -54,7 +59,7 @@ public class TripViewModelTest {
         doReturn(statsStream).when(mockTripManager).getTripUpdatesStream();
         doReturn(coordsStream).when(mockTripManager).getCoordinatesStream();
         doReturn(new Trip()).when(mockTripManager).getCurrentTrip();
-        mTestSubject = new TripViewModel(mockTripManager, mockFirebaseAuth, true);
+        mTestSubject = new TripViewModel(mockTripManager, mockFirebaseAuth, mockFormatter, true);
     }
 
     @Test
@@ -208,17 +213,18 @@ public class TripViewModelTest {
         TestObserver<TripStatistics> statisticsObserver = TestObserver.create();
         mTestSubject.getTripStatisticsStreamObservable().subscribe(statisticsObserver);
 
-        Trip trip = new Trip().updateStatistics(12.01341235, 1.0045);
+        Trip trip = new Trip().updateStatistics(123, 321);
+        TripStatistics statistics = new TripStatistics("12", "21");
+        doReturn(statistics).when(mockFormatter).formatTrip(trip);
         statsStream.onNext(trip);
 
         // 2 broadcasts happening - default during vm creation and expected one
         assertEquals(2, statisticsObserver.valueCount());
 
         // We are interested int the last value
-        TripStatistics statistics = statisticsObserver.values().get(1);
+        TripStatistics receivedStatistics = statisticsObserver.values().get(1);
 
-        assertEquals("12.01", statistics.getDistance());
-        assertEquals("1", statistics.getSpeed());
+        assertSame(statistics, receivedStatistics);
     }
 
     @Test

@@ -62,7 +62,7 @@ public final class LocationSource implements ServiceConnection {
     }
 
     @VisibleForTesting
-    void setServiceConnectedSyncMode() throws InterruptedException {
+    public void setServiceConnectedSyncMode() throws InterruptedException {
         mIsTestMode = true;
         mCountDownLatch = new CountDownLatch(1);
     }
@@ -75,6 +75,8 @@ public final class LocationSource implements ServiceConnection {
     }
 
     public void startUpdates() {
+        Log.d(TAG, "startUpdates");
+        Log.d(TAG, "Thread " + Thread.currentThread().getId());
         if (mLocationProvider != null) {
             startService();
 

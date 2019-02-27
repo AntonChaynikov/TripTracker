@@ -1,25 +1,30 @@
 package com.antonchaynikov.triptracker.data.location;
 
 import android.location.Location;
+import android.util.Log;
 
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 
-class MockLocationProvider implements LocationProvider {
+@VisibleForTesting
+public class MockLocationProvider implements LocationProvider {
 
     private Observable<Location> mLocationObservable;
     private Disposable mDisposable;
     private volatile LocationConsumer mConsumer;
 
-    MockLocationProvider(Observable<Location> locations) {
+    @VisibleForTesting
+    public MockLocationProvider(Observable<Location> locations) {
         mLocationObservable = locations;
     }
 
-    void onGeolocationAvailabilityChanged(boolean isAvailable) {
+    @VisibleForTesting
+    public void onGeolocationAvailabilityChanged(boolean isAvailable) {
         if (mConsumer != null) {
             mConsumer.onLocationUpdatesAvailabilityChange(isAvailable);
         }
@@ -27,14 +32,8 @@ class MockLocationProvider implements LocationProvider {
 
     @Override
     public void startUpdates(@NonNull LocationConsumer consumer) {
+        Log.d("MockLocaProvider", "startUpdates");
         mConsumer = consumer;
-        new Thread(() -> {
-            try {
-                TimeUnit.MILLISECONDS.sleep(5);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
         mDisposable = mLocationObservable.subscribe(consumer::onNewLocationUpdate);
     }
 

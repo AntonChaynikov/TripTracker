@@ -11,11 +11,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.List;
 import java.util.MissingResourceException;
+import java.util.NoSuchElementException;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Completable;
@@ -123,7 +125,12 @@ public final class FireStoreDB implements Repository {
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            observable.onNext(task.getResult().toObject(Trip.class));
+                            if (task.getResult().exists()) {
+                                observable.onNext(task.getResult().toObject(Trip.class));
+                            } else {
+                                observable.onError(new NoSuchElementException("Failed to fetch an element/element doesn't exist"));
+                            }
+
                         } else {
                             if (task.isCanceled()) {
                                 observable.onError(new OperationCanceledException());
@@ -204,26 +211,30 @@ public final class FireStoreDB implements Repository {
     @Override
     public Completable deleteUserData() {
         CompletableSubject completable = CompletableSubject.create();
-        DocumentReference userDocument = null;
+        CollectionReference tripsCollectionRef = null;
         try {
-            userDocument = getUserDocumentReference();
+            tripsCollectionRef = getTripsCollectionReference();
         } catch (FirebaseAuthException e) {
             completable.onError(e);
             e.printStackTrace();
         }
-        if (userDocument != null) {
-            userDocument.delete()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            completable.onComplete();
-                        } else {
-                            if (task.isCanceled()) {
-                                completable.onError(new OperationCanceledException());
-                            } else {
-                                completable.onError(task.getException());
-                            }
-                        }
-                    });
+        if (tripsCollectionRef != null) {
+            tripsCollectionRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                    for (DocumentSnapshot documentSnapshot: documents) {
+                        documentSnapshot.getReference().delete();
+                    }
+                    completable.onComplete();
+                } else {
+                    if (task.isCanceled()) {
+                        completable.onError(new OperationCanceledException());
+                    } else {
+                        task.getException().printStackTrace();
+                        completable.onError(task.getException());
+                    }
+                }
+            });
         }
         return completable;
     }
