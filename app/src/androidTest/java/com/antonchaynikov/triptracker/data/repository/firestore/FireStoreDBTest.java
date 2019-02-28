@@ -6,11 +6,12 @@ import com.antonchaynikov.triptracker.data.repository.Repository;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -23,25 +24,28 @@ import static org.junit.Assert.assertTrue;
 
 public class FireStoreDBTest {
 
-    private FirebaseAuth mFirebaseAuth;
+    private static FirebaseAuth sFirebaseAuth;
     private Repository mTestSubject;
 
-    @Before
-    public void setUp() throws Exception {
-
+    @BeforeClass
+    public static void initTestEnv() throws Exception {
         // Authenticate as a test user
-        mFirebaseAuth = FirebaseAuth.getInstance();
+        sFirebaseAuth = FirebaseAuth.getInstance();
         CountDownLatch authInProcessLatch = new CountDownLatch(1);
-        mFirebaseAuth.signInWithEmailAndPassword("test@test.test", "123456").addOnCompleteListener(t -> authInProcessLatch.countDown());
+        sFirebaseAuth.signInWithEmailAndPassword("test@test.test", "123456").addOnCompleteListener(t -> authInProcessLatch.countDown());
         while(authInProcessLatch.getCount() > 0) {
             authInProcessLatch.await();
         }
+        FireStoreDB.getInstance().deleteUserData().blockingAwait();
+    }
 
+    @Before
+    public void setUp() throws Exception {
         mTestSubject = FireStoreDB.getInstance();
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
         mTestSubject.deleteUserData().blockingAwait();
     }
 

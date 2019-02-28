@@ -20,7 +20,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
-public final class LocationSource implements ServiceConnection {
+public class LocationSource implements ServiceConnection {
 
     private static final String TAG  = LocationSource.class.getCanonicalName();
 
@@ -43,7 +43,7 @@ public final class LocationSource implements ServiceConnection {
     // Used for testing purposes to notify when the location service has been connected
     private CountDownLatch mCountDownLatch;
 
-    private LocationSource(@NonNull Context context) {
+    LocationSource(@NonNull Context context) {
         mAppContext = context.getApplicationContext();
         mLocationObservable = PublishSubject.create();
         mServiceConnectionObservable = PublishSubject.create();
@@ -75,8 +75,6 @@ public final class LocationSource implements ServiceConnection {
     }
 
     public void startUpdates() {
-        Log.d(TAG, "startUpdates");
-        Log.d(TAG, "Thread " + Thread.currentThread().getId());
         if (mLocationProvider != null) {
             startService();
 
@@ -124,7 +122,6 @@ public final class LocationSource implements ServiceConnection {
     }
 
     public void finishUpdates() {
-        Log.d(TAG, "finishUpdates");
         mLocationService.stopUpdates();
         mAppContext.unbindService(this);
         mAppContext.stopService(new Intent(mAppContext, LocationService.class));

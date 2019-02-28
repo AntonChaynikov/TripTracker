@@ -60,7 +60,7 @@ public class TripManagerTest {
 
     @After
     public void tearDown() {
-        mTestSubject.resetInstance();
+        TripManager.resetInstance();
     }
 
     @Test

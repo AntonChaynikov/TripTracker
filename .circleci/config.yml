@@ -46,8 +46,18 @@ references:
       - app/build/outputs/apk/platform
       - app/build/outputs/mapping/platform
 
+  attach_firebase_workspace: &attach_firebase_workspace
+    attach_workspace:
+      at: ~workspace
+
+  persist_firebase_workspace: &persist_firebase_workspace
+    persist_to_workspace:
+      root: ~workspace
+      paths:
+      - firebase
+
   workspace_api: &workspace_api
-                   ~/workspace/api
+     ~/workspace/api
 
   attach_debug_workspace_api: &attach_debug_workspace_api
     attach_workspace:
@@ -66,6 +76,7 @@ references:
       - app/build/outputs/apk
       - app/build/outputs/code-coverage
       - app/build/test-results
+
   persist_release_workspace_api: &persist_release_workspace_api
     persist_to_workspace:
       root: *workspace_api
@@ -93,6 +104,13 @@ references:
       _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
       GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
 
+  gcloud_config: &gcloud_config
+    working_directory: ~workspace
+    docker:
+    - image: google/cloud-sdk:latest
+    environment:
+      TERM: dumb
+
   ## Keys
 
   # google-services.json
@@ -119,6 +137,12 @@ references:
     run:
       name: Decode fabric.properties
       command: echo $FABRIC_PROPERTIES > $PWD/app/fabric.properties
+
+  # Gloud key
+  decode_gcloud_key: &decode_gcloud_key
+    run:
+      name: Decode secret.json
+      command: echo $GCLOUD_KEY > ./client-secret.json
 
 jobs:
 
@@ -234,14 +258,30 @@ jobs:
 
   ## Run instrumented tests
   test_instrumented:
-    <<: *config_platform
+    <<: *gcloud_config
     steps:
-    - checkout
-    - *restore_cache
-    - *decode_keystore_file
+    - *attach_debug_workspace_api
+    - *attach_debug_workspace_platform
+    - *decode_gcloud_key
     - run:
-        name: Download dependencies
-        command: ./gradlew androidDependencies
+        name: Authenticate with Google Cloud
+        command: gcloud auth activate-service-account firebase-adminsdk-3zsqi@gps-trip-logger.iam.gserviceaccount.com --key-file ./client-secret.json
+    - run:
+        name: Set Google Cloud target project
+        command: gcloud config set project  gps-trip-logger
+    - run:
+        name: Run instrumented test on Firebase Test Lab
+        command: gcloud firebase test android run --app */app/build/outputs/apk/debug/*debug.apk --test */app/build/outputs/apk/androidTest/debug/*androidTest.apk --no-record-video --environment-variables coverage=true,coverageFile=/sdcard/coverage.ec --directories-to-pull=/sdcard --timeout 20m
+    - run:
+        name: Create directory to store test results
+        command: mkdir firebase
+    - run:
+        name: Download instrumented test results from Firebase Test Lab
+        command: gsutil -m cp -r -U "`gsutil ls gs://test-lab-5370x54d253i6-hik4hxw61q2vq | tail -1`*" /root/workspace/firebase/
+    - *persist_firebase_workspace
+    - store_artifacts:
+        path: firebase/
+        destination: /firebase/
 
   ## Deploy release APK to Google Play Alpha
   deploy_google_play_platform:

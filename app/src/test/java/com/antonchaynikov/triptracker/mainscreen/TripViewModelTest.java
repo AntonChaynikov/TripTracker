@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.CompletableSubject;
 import io.reactivex.subjects.PublishSubject;
@@ -37,7 +38,6 @@ public class TripViewModelTest {
 
     @ClassRule
     public static final RxImmediateSchedulerRule SCHEDULERS = new RxImmediateSchedulerRule();
-
     private TripViewModel mTestSubject;
     @Mock
     private TripManager mockTripManager;
@@ -58,6 +58,7 @@ public class TripViewModelTest {
         doReturn(Completable.complete()).when(mockTripManager).finishTrip();
         doReturn(statsStream).when(mockTripManager).getTripUpdatesStream();
         doReturn(coordsStream).when(mockTripManager).getCoordinatesStream();
+        doReturn(Observable.empty()).when(mockTripManager).getGeoloactionAvailabilityChangeObservable();
         doReturn(new Trip()).when(mockTripManager).getCurrentTrip();
         mTestSubject = new TripViewModel(mockTripManager, mockFirebaseAuth, mockFormatter, true);
     }
@@ -233,8 +234,32 @@ public class TripViewModelTest {
         mTestSubject.getMapOptionsObservable().subscribe(mapOptionsObserver);
 
         mapOptionsObserver.assertEmpty();
-        coordsStream.onNext(new TripCoordinate());
+        double expectedLat = 123;
+        double expectedLng = 321;
+        coordsStream.onNext(new TripCoordinate(System.currentTimeMillis(), 123, 321));
         assertEquals(1, mapOptionsObserver.valueCount());
+
+        MapOptions mapOptions = mapOptionsObserver.values().get(0);
+        assertEquals(expectedLat, mapOptions.getCoordinatesLatitude(), 0.001);
+        assertEquals(expectedLng, mapOptions.getCoordinatesLongitude(), 0.001);
+        assertFalse(mapOptions.shouldDeleteMarkers());
+    }
+
+    @Test
+    public void shouldBroadcastMapOptionsDeleteMarkers_whenTripEnds() {
+        TestObserver<MapOptions> mapOptionsObserver = TestObserver.create();
+        mTestSubject.getMapOptionsObservable().subscribe(mapOptionsObserver);
+
+        // Start trip
+        mTestSubject.onActionButtonClicked();
+        // Finish trip
+        mTestSubject.onActionButtonClicked();
+
+        assertEquals(1, mapOptionsObserver.valueCount());
+
+        MapOptions mapOptions = mapOptionsObserver.values().get(0);
+
+        assertTrue(mapOptions.shouldDeleteMarkers());
     }
 
     @Test
@@ -365,6 +390,7 @@ public class TripViewModelTest {
         testObserver.assertValue(12345L);
     }
 
+    // TODO implement feature
     @Test
     public void onActionButtonClicked_whenStarting_shouldStartAlarm() {
         mTestSubject.onActionButtonClicked();

@@ -2,6 +2,7 @@ package com.antonchaynikov.triptracker.mainscreen;
 
 import android.util.Log;
 
+import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
@@ -61,6 +62,7 @@ class TripViewModel extends BasicViewModel {
         mFirebaseAuth = firebaseAuth;
         mSubscriptions.add(mTripManager.getTripUpdatesStream().subscribe(this::handleTripUpdate));
         mSubscriptions.add(mTripManager.getCoordinatesStream().subscribe(this::handleLocationUpdate));
+        mSubscriptions.add(mTripManager.getGeoloactionAvailabilityChangeObservable().subscribe(this::handleGeolocationAvailabilityChange));
     }
 
     Observable<TripUiState> getUiStateChangeEventObservable() {
@@ -127,6 +129,14 @@ class TripViewModel extends BasicViewModel {
         return mUiState.getState() == STARTED;
     }
 
+    private void handleGeolocationAvailabilityChange(boolean isAvailable) {
+        if (isAvailable) {
+            showSnackbarMessage(R.string.message_geolocation_available);
+        } else {
+            showSnackbarMessage(R.string.message_geolocation_unavailable);
+        }
+    }
+
     private void startTrip() {
         mSubscriptions.add(mTripManager.startTrip()
                 .subscribeOn(Schedulers.computation())
@@ -161,5 +171,3 @@ class TripViewModel extends BasicViewModel {
         mSubscriptions.dispose();
     }
 }
-
-

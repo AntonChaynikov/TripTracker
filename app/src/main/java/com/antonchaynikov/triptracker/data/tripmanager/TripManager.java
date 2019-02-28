@@ -56,7 +56,7 @@ public final class TripManager {
     }
 
     @VisibleForTesting
-    void resetInstance() {
+    public static void resetInstance() {
         sInstance = null;
     }
 
@@ -66,6 +66,10 @@ public final class TripManager {
 
     public Observable<TripCoordinate> getCoordinatesStream() {
         return mCoordinatesStream;
+    }
+
+    public Observable<Boolean> getGeoloactionAvailabilityChangeObservable() {
+        return mLocationSource.getGeolocationAvailabilityObservable();
     }
 
     public Completable startTrip() {
