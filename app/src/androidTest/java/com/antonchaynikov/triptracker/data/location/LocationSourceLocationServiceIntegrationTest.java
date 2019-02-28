@@ -25,7 +25,7 @@ import io.reactivex.subjects.PublishSubject;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(AndroidJUnit4ClassRunner.class)
-public class LocationSource_LocationService_IntegrationTest {
+public class LocationSourceLocationServiceIntegrationTest {
 
     private static final int LOCATIONS_COUNT = 5;
 
@@ -75,7 +75,7 @@ public class LocationSource_LocationService_IntegrationTest {
         mLocationSource.getLocationsObservable().subscribe(mLocationsObserver);
         mLocationSource.startUpdates();
 
-        for(Location location: createLocationsList()) {
+        for (Location location : createLocationsList()) {
             mLocationsObservable.onNext(location);
         }
 

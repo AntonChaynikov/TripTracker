@@ -3,8 +3,6 @@ package com.antonchaynikov.triptracker.data.location;
 import android.location.Location;
 import android.util.Log;
 
-import java.util.concurrent.TimeUnit;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;

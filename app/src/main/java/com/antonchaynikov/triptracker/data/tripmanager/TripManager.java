@@ -1,7 +1,6 @@
 package com.antonchaynikov.triptracker.data.tripmanager;
 
 import android.location.Location;
-import android.util.Log;
 
 import com.antonchaynikov.triptracker.data.location.LocationSource;
 import com.antonchaynikov.triptracker.data.model.Trip;

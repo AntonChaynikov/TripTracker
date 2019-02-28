@@ -37,7 +37,8 @@ public class LocationServiceTest {
     @Test
     public void shouldCallToStopUpdates_whenOnDestroy() throws Exception {
 
-        IBinder binder = mServiceRule.bindService(new Intent(InstrumentationRegistry.getInstrumentation().getTargetContext(), LocationService.class));
+        IBinder binder = mServiceRule.bindService(
+                new Intent(InstrumentationRegistry.getInstrumentation().getTargetContext(), LocationService.class));
         LocationService service = ((LocationService.LocationServiceBinder) binder).getLocationService();
         service.setLocationProvider(mockLocationProvider);
 
@@ -51,7 +52,8 @@ public class LocationServiceTest {
     public void shouldEmitGeolocationError_whenNoLocationProvider() throws Exception {
 
         TestObserver<Boolean> geoErrorObserver = TestObserver.create();
-        IBinder binder = mServiceRule.bindService(new Intent(InstrumentationRegistry.getInstrumentation().getTargetContext(), LocationService.class));
+        IBinder binder = mServiceRule.bindService(
+                new Intent(InstrumentationRegistry.getInstrumentation().getTargetContext(), LocationService.class));
         LocationService service = ((LocationService.LocationServiceBinder) binder).getLocationService();
         service.getGeolocationAvailabilityUpdatesObservable().subscribe(geoErrorObserver);
 
@@ -64,7 +66,8 @@ public class LocationServiceTest {
     public void shouldEmitLocation_whenOneReceived() throws Exception {
 
         TestObserver<Location> locationsObserver = TestObserver.create();
-        IBinder binder = mServiceRule.bindService(new Intent(InstrumentationRegistry.getInstrumentation().getTargetContext(), LocationService.class));
+        IBinder binder = mServiceRule.bindService(
+                new Intent(InstrumentationRegistry.getInstrumentation().getTargetContext(), LocationService.class));
         LocationService service = ((LocationService.LocationServiceBinder) binder).getLocationService();
         service.setLocationProvider(mockLocationProvider);
         service.getLocationsStream().subscribe(locationsObserver);
@@ -82,7 +85,8 @@ public class LocationServiceTest {
     public void shouldEmitGeolocationError_whenOneReceived() throws Exception {
 
         TestObserver<Boolean> geoErrorObserver = TestObserver.create();
-        IBinder binder = mServiceRule.bindService(new Intent(InstrumentationRegistry.getInstrumentation().getTargetContext(), LocationService.class));
+        IBinder binder = mServiceRule.bindService(
+                new Intent(InstrumentationRegistry.getInstrumentation().getTargetContext(), LocationService.class));
         LocationService service = ((LocationService.LocationServiceBinder) binder).getLocationService();
         service.setLocationProvider(mockLocationProvider);
         service.getGeolocationAvailabilityUpdatesObservable().subscribe(geoErrorObserver);

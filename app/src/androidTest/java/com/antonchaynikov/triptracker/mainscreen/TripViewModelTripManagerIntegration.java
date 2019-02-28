@@ -38,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-public class TripViewModel_TripManager_Integration {
+public class TripViewModelTripManagerIntegration {
 
     @ClassRule
     public static final RxImmediateSchedulerRule IMMEDIATE_SCHEDULER_RULE = new RxImmediateSchedulerRule();
@@ -60,7 +60,7 @@ public class TripViewModel_TripManager_Integration {
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         CountDownLatch authInProcessLatch = new CountDownLatch(1);
         firebaseAuth.signInWithEmailAndPassword("test@test.test", "123456").addOnCompleteListener(t -> authInProcessLatch.countDown());
-        while(authInProcessLatch.getCount() > 0) {
+        while (authInProcessLatch.getCount() > 0) {
             authInProcessLatch.await();
         }
 
@@ -93,7 +93,7 @@ public class TripViewModel_TripManager_Integration {
         mViewModel.onActionButtonClicked();
 
         int locationsCount = 5;
-        for (Location location: createLocationsList(locationsCount)) {
+        for (Location location : createLocationsList(locationsCount)) {
             mLocationObservable.onNext(location);
         }
 
@@ -109,7 +109,7 @@ public class TripViewModel_TripManager_Integration {
         mViewModel.onActionButtonClicked();
 
         int itemsCount = 5;
-        for (Location location: createLocationsList(itemsCount)) {
+        for (Location location : createLocationsList(itemsCount)) {
             mLocationObservable.onNext(location);
         }
 

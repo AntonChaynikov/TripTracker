@@ -78,13 +78,13 @@ public class LocationSource implements ServiceConnection {
         if (mLocationProvider != null) {
             startService();
 
-            Observable.just(true).zipWith(mServiceConnectionObservable, (event, service) -> service)
+            mSubscriptions.add(Observable.just(true).zipWith(mServiceConnectionObservable, (event, service) -> service)
                     .subscribe(service -> {
                         Log.d(TAG, "Service connected");
                         mLocationService = service;
                         mLocationService.setLocationProvider(mLocationProvider);
                         mLocationService.startUpdates();
-                    });
+                    }));
 
             testModeWaitForServiceConnection(mIsTestMode);
 

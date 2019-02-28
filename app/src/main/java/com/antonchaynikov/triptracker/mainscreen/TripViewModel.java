@@ -7,18 +7,13 @@ import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
 import com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState;
-import com.antonchaynikov.triptracker.utils.StringUtils;
 import com.antonchaynikov.triptracker.viewmodel.BasicViewModel;
 import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
 import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.util.concurrent.CountDownLatch;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;

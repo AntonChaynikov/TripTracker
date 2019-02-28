@@ -1,22 +1,18 @@
 package com.antonchaynikov.triptracker.data.repository.firestore;
 
 import android.os.OperationCanceledException;
-import android.util.Log;
 
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
 import com.antonchaynikov.triptracker.data.repository.Repository;
-import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.List;
-import java.util.MissingResourceException;
 import java.util.NoSuchElementException;
 
 import androidx.annotation.NonNull;
@@ -27,7 +23,7 @@ import io.reactivex.subjects.PublishSubject;
 
 public final class FireStoreDB implements Repository {
 
-    private final static String TAG = FireStoreDB.class.getCanonicalName();
+    private static final String TAG = FireStoreDB.class.getCanonicalName();
 
     private static final String TRIPS_COLLECTION_NAME = "trips";
     private static final String ROOT_USER_COLLECTION = "users";

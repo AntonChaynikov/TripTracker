@@ -14,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnitRunner;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -27,7 +26,8 @@ public class ViewModelProvidersTest {
 
     @Before
     public void setUp() {
-        mActivity = viewModelActivityActivityTestRule.launchActivity(new Intent(InstrumentationRegistry.getInstrumentation().getTargetContext(), TripActivity.class));
+        mActivity = viewModelActivityActivityTestRule.launchActivity(
+                new Intent(InstrumentationRegistry.getInstrumentation().getTargetContext(), TripActivity.class));
 
     }
 

@@ -6,7 +6,6 @@ import com.antonchaynikov.triptracker.data.repository.Repository;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,7 +32,7 @@ public class FireStoreDBTest {
         sFirebaseAuth = FirebaseAuth.getInstance();
         CountDownLatch authInProcessLatch = new CountDownLatch(1);
         sFirebaseAuth.signInWithEmailAndPassword("test@test.test", "123456").addOnCompleteListener(t -> authInProcessLatch.countDown());
-        while(authInProcessLatch.getCount() > 0) {
+        while (authInProcessLatch.getCount() > 0) {
             authInProcessLatch.await();
         }
         FireStoreDB.getInstance().deleteUserData().blockingAwait();
@@ -101,7 +100,7 @@ public class FireStoreDBTest {
         mTestSubject.addTrip(trip).blockingAwait();
         long endDate = System.currentTimeMillis() + 123456;
         trip.setEndDate(endDate);
-        trip.updateStatistics(123,321);
+        trip.updateStatistics(123, 321);
         mTestSubject.updateTrip(trip);
 
         assertEquals(trip, mTestSubject.getTripByStartDate(startDate).blockingFirst());
@@ -121,7 +120,7 @@ public class FireStoreDBTest {
 
             @Override
             public void onError(Throwable e) {
-                assert(e instanceof NoSuchElementException);
+                assertTrue(e instanceof NoSuchElementException);
             }
 
             @Override

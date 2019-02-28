@@ -6,7 +6,10 @@ import android.location.Location;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class LocationProviderModule {
+public final class LocationProviderModule {
+
+    private LocationProviderModule() {}
+
     public static LocationProvider provide(@NonNull Context context, @Nullable Filter<Location> locationFilter) {
         LocationProvider locationProvider = new LocationProviderImpl(context);
         locationProvider.setFilter(locationFilter);
