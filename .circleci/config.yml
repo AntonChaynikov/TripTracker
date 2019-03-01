@@ -3,7 +3,6 @@ version: 2
 references:
 
   ## Cache
-
   cache_key: &cache_key
     key: cache-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
   restore_cache: &restore_cache
@@ -17,7 +16,6 @@ references:
       - ~/.m2
 
   ## Workspace
-
   workspace_platform: &workspace_platform
                         ~/workspace/platform
 
@@ -85,7 +83,6 @@ references:
       - app/build/outputs/mapping/servicesApi
 
   ## Docker image configurations
-
   image_config_platform: &config_platform
     working_directory: *workspace_platform
     docker:
@@ -277,10 +274,10 @@ jobs:
         command: gcloud config set project  gps-trip-logger
     - run:
         name: Run instrumented test on Firebase Test Lab
-        command: gcloud firebase test android run --app app/build/outputs/apk/platform/debug/*debug.apk --test app/build/outputs/apk/androidTest/platform/debug/*androidTest.apk --no-record-video --environment-variables coverage=true,coverageFile=/sdcard/coverage.ec --directories-to-pull=/sdcard --timeout 20m
+        command: gcloud firebase test android run --app app/build/outputs/apk/servicesApi/debug/*debug.apk --test app/build/outputs/apk/androidTest/servicesApi/debug/*androidTest.apk --no-record-video --environment-variables coverage=true,coverageFile=/sdcard/coverage.ec --directories-to-pull=/sdcard --timeout 20m
     - run:
         name: Create directory to store test results
-        command: mkdir -p firebase/api
+        command: mkdir -p /root/workspace/firebase/api
     - run:
         name: Download instrumented test results from Firebase Test Lab
         command: gsutil -m cp -r -U "`gsutil ls gs://test-lab-9td3tnt7fd09a-kqr91929f8ba0 | tail -1`*" /root/workspace/firebase/api
@@ -314,7 +311,6 @@ jobs:
     - store_artifacts:
         path: firebase/
         destination: /firebase/
-
 
   ## Deploy release APK to Google Play Alpha
   deploy_google_play_platform:
@@ -533,4 +529,3 @@ workflows:
         - build_release_api
         - test_unit
         - test_instrumented_api
-
