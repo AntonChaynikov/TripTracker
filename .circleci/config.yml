@@ -48,11 +48,11 @@ references:
 
   attach_firebase_workspace: &attach_firebase_workspace
     attach_workspace:
-      at: ~workspace
+      at: *workspace_platform
 
   persist_firebase_workspace: &persist_firebase_workspace
     persist_to_workspace:
-      root: ~workspace
+      root: *workspace_platform
       paths:
       - firebase
 
@@ -276,7 +276,7 @@ jobs:
         command: mkdir firebase
     - run:
         name: Download instrumented test results from Firebase Test Lab
-        command: gsutil -m cp -r -U "`gsutil ls gs://test-lab-9td3tnt7fd09a-kqr91929f8ba0 | tail -1`*" /root/workspace/firebase/
+        command: gsutil -m cp -r -U "`gsutil ls gs://test-lab-9td3tnt7fd09a-kqr91929f8ba0 | tail -1`*" /root/workspace/platform/firebase/
     - *persist_firebase_workspace
     - store_artifacts:
         path: firebase/
