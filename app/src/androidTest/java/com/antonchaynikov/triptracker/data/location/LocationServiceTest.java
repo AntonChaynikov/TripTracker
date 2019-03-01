@@ -1,5 +1,6 @@
 package com.antonchaynikov.triptracker.data.location;
 
+import android.Manifest;
 import android.content.Intent;
 import android.location.Location;
 import android.os.IBinder;
@@ -14,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.GrantPermissionRule;
 import androidx.test.rule.ServiceTestRule;
 import io.reactivex.observers.TestObserver;
 
@@ -24,6 +26,8 @@ import static org.mockito.Mockito.verify;
 @RunWith(AndroidJUnit4ClassRunner.class)
 public class LocationServiceTest {
 
+    @Rule
+    public final GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION);
     @Rule
     public final ServiceTestRule mServiceRule = new ServiceTestRule();
     @Mock
