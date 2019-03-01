@@ -36,7 +36,7 @@ public final class TripManager {
         mRepository = repository;
         mLocationSource = locationSource;
         mStatisticsCalculator = statisticsCalculator;
-        Disposable d = mLocationSource.getLocationUpdates().subscribe(this::handleCoordinatesUpdate);
+        Disposable d = mLocationSource.getLocationsObservable().subscribe(this::handleCoordinatesUpdate);
     }
 
     public static TripManager getInstance(
@@ -55,7 +55,7 @@ public final class TripManager {
     }
 
     @VisibleForTesting
-    void resetInstance() {
+    public static void resetInstance() {
         sInstance = null;
     }
 
@@ -65,6 +65,10 @@ public final class TripManager {
 
     public Observable<TripCoordinate> getCoordinatesStream() {
         return mCoordinatesStream;
+    }
+
+    public Observable<Boolean> getGeoloactionAvailabilityChangeObservable() {
+        return mLocationSource.getGeolocationAvailabilityObservable();
     }
 
     public Completable startTrip() {

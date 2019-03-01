@@ -46,8 +46,18 @@ references:
       - app/build/outputs/apk/platform
       - app/build/outputs/mapping/platform
 
+  attach_firebase_workspace: &attach_firebase_workspace
+    attach_workspace:
+      at: *workspace_platform
+
+  persist_firebase_workspace: &persist_firebase_workspace
+    persist_to_workspace:
+      root: *workspace_platform
+      paths:
+      - firebase
+
   workspace_api: &workspace_api
-                   ~/workspace/api
+     ~/workspace/api
 
   attach_debug_workspace_api: &attach_debug_workspace_api
     attach_workspace:
@@ -66,6 +76,7 @@ references:
       - app/build/outputs/apk
       - app/build/outputs/code-coverage
       - app/build/test-results
+
   persist_release_workspace_api: &persist_release_workspace_api
     persist_to_workspace:
       root: *workspace_api
@@ -93,6 +104,20 @@ references:
       _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
       GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
 
+  gcloud_config_platform: &gcloud_config_platform
+    working_directory: *workspace_platform
+    docker:
+    - image: google/cloud-sdk:latest
+    environment:
+      TERM: dumb
+
+  gcloud_config_api: &gcloud_config_api
+    working_directory: *workspace_api
+    docker:
+    - image: google/cloud-sdk:latest
+    environment:
+      TERM: dumb
+
   ## Keys
 
   # google-services.json
@@ -119,6 +144,12 @@ references:
     run:
       name: Decode fabric.properties
       command: echo $FABRIC_PROPERTIES > $PWD/app/fabric.properties
+
+  # Gloud key
+  decode_gcloud_key: &decode_gcloud_key
+    run:
+      name: Decode secret.json
+      command: echo $GCLOUD_KEY > ./client-secret.json
 
 jobs:
 
@@ -233,15 +264,57 @@ jobs:
         destination: /test-results/
 
   ## Run instrumented tests
-  test_instrumented:
-    <<: *config_platform
+  test_instrumented_api:
+    <<: *gcloud_config_api
     steps:
-    - checkout
-    - *restore_cache
-    - *decode_keystore_file
+    - *attach_debug_workspace_api
+    - *decode_gcloud_key
     - run:
-        name: Download dependencies
-        command: ./gradlew androidDependencies
+        name: Authenticate with Google Cloud
+        command: gcloud auth activate-service-account firebase-adminsdk-3zsqi@gps-trip-logger.iam.gserviceaccount.com --key-file ./client-secret.json
+    - run:
+        name: Set Google Cloud target project
+        command: gcloud config set project  gps-trip-logger
+    - run:
+        name: Run instrumented test on Firebase Test Lab
+        command: gcloud firebase test android run --app app/build/outputs/apk/platform/debug/*debug.apk --test app/build/outputs/apk/androidTest/platform/debug/*androidTest.apk --no-record-video --environment-variables coverage=true,coverageFile=/sdcard/coverage.ec --directories-to-pull=/sdcard --timeout 20m
+    - run:
+        name: Create directory to store test results
+        command: mkdir -p firebase/api
+    - run:
+        name: Download instrumented test results from Firebase Test Lab
+        command: gsutil -m cp -r -U "`gsutil ls gs://test-lab-9td3tnt7fd09a-kqr91929f8ba0 | tail -1`*" /root/workspace/firebase/api
+    - *persist_firebase_workspace
+    - store_artifacts:
+        path: firebase/
+        destination: /firebase/
+
+  ## Run instrumented tests
+  test_instrumented_platform:
+    <<: *gcloud_config_platform
+    steps:
+    - *attach_debug_workspace_platform
+    - *decode_gcloud_key
+    - run:
+        name: Authenticate with Google Cloud
+        command: gcloud auth activate-service-account firebase-adminsdk-3zsqi@gps-trip-logger.iam.gserviceaccount.com --key-file ./client-secret.json
+    - run:
+        name: Set Google Cloud target project
+        command: gcloud config set project  gps-trip-logger
+    - run:
+        name: Run instrumented test on Firebase Test Lab
+        command: gcloud firebase test android run --app app/build/outputs/apk/platform/debug/*debug.apk --test app/build/outputs/apk/androidTest/platform/debug/*androidTest.apk --no-record-video --environment-variables coverage=true,coverageFile=/sdcard/coverage.ec --directories-to-pull=/sdcard --timeout 20m
+    - run:
+        name: Create directory to store test results
+        command: mkdir /root/workspace/firebase/platform
+    - run:
+        name: Download instrumented test results from Firebase Test Lab
+        command: gsutil -m cp -r -U "`gsutil ls gs://test-lab-9td3tnt7fd09a-kqr91929f8ba0 | tail -1`*" /root/workspace/firebase/platform
+    - *persist_firebase_workspace
+    - store_artifacts:
+        path: firebase/
+        destination: /firebase/
+
 
   ## Deploy release APK to Google Play Alpha
   deploy_google_play_platform:
@@ -315,6 +388,13 @@ jobs:
     - checkout
     - *restore_cache
     - *decode_keystore_file
+    - *attach_firebase_workspace
+    - run:
+        name: Move Firebase coverage report platfomm
+        command: mkdir -p app/build/outputs/code-coverage/platformDebugAndroidTest/connected && cp /root/workspace/firebase/platform/sailfish-26-en_US-portrait/artifacts/coverage.ec app/build/outputs/code-coverage/platformDebugAndroidTest/connected/coverage.ec
+    - run:
+        name: Move Firebase coverage report api
+        command: mkdir -p app/build/outputs/code-coverage/servicesApiDebugAndroidTest/connected && cp /root/workspace/firebase/api/sailfish-26-en_US-portrait/artifacts/coverage.ec app/build/outputs/code-coverage/servicesApiDebugAndroidTest/connected/coverage.ec
     - run:
         name: Code coverage report
         command: ./gradlew jacocoTestReport
@@ -393,14 +473,26 @@ workflows:
         - build_debug_platform
         - build_debug_api
 
-    - test_instrumented:
+    - test_instrumented_platform:
+        filters:
+          branches:
+            only:
+            - master
         requires:
         - build_debug_platform
+
+    - test_instrumented_api:
+        filters:
+          branches:
+            only:
+            - master
+        requires:
         - build_debug_api
 
     - report_code_cov:
         requires:
-        - test_instrumented
+        - test_instrumented_api
+        - test_instrumented_platform
 
     - deploy_google_play_platform:
         filters:
@@ -410,7 +502,7 @@ workflows:
         requires:
         - build_release_platform
         - test_unit
-        - test_instrumented
+        - test_instrumented_platform
 
     - deploy_google_play_api:
         filters:
@@ -420,7 +512,7 @@ workflows:
         requires:
         - build_release_api
         - test_unit
-        - test_instrumented
+        - test_instrumented_api
 
     - deploy_fabric_platform:
         filters:
@@ -430,7 +522,7 @@ workflows:
         requires:
         - build_release_platform
         - test_unit
-        - test_instrumented
+        - test_instrumented_platform
 
     - deploy_fabric_api:
         filters:
@@ -440,5 +532,5 @@ workflows:
         requires:
         - build_release_api
         - test_unit
-        - test_instrumented
+        - test_instrumented_api
 
