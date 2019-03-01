@@ -271,7 +271,7 @@ jobs:
         command: gcloud config set project  gps-trip-logger
     - run:
         name: Run instrumented test on Firebase Test Lab
-        command: gcloud firebase test android run --app */app/build/outputs/apk/debug/*debug.apk --test */app/build/outputs/apk/androidTest/debug/*androidTest.apk --no-record-video --environment-variables coverage=true,coverageFile=/sdcard/coverage.ec --directories-to-pull=/sdcard --timeout 20m
+        command: gcloud firebase test android run --app {api, platform}/app/build/outputs/apk/debug/*debug.apk --test {api, platform}/app/build/outputs/apk/androidTest/debug/*androidTest.apk --no-record-video --environment-variables coverage=true,coverageFile=/sdcard/coverage.ec --directories-to-pull=/sdcard --timeout 20m
     - run:
         name: Create directory to store test results
         command: mkdir firebase
