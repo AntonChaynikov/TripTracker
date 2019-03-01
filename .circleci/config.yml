@@ -502,7 +502,7 @@ workflows:
         requires:
         - build_release_platform
         - test_unit
-        - test_instrumented
+        - test_instrumented_platform
 
     - deploy_google_play_api:
         filters:
@@ -512,7 +512,7 @@ workflows:
         requires:
         - build_release_api
         - test_unit
-        - test_instrumented
+        - test_instrumented_api
 
     - deploy_fabric_platform:
         filters:
@@ -522,7 +522,7 @@ workflows:
         requires:
         - build_release_platform
         - test_unit
-        - test_instrumented
+        - test_instrumented_platform
 
     - deploy_fabric_api:
         filters:
@@ -532,5 +532,5 @@ workflows:
         requires:
         - build_release_api
         - test_unit
-        - test_instrumented
+        - test_instrumented_api
 
