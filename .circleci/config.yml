@@ -123,7 +123,6 @@ references:
       name: Decode google services key
       command: echo GOOGLE_SERVICES_KEY > google-services.json
 
-
   # Google Play Service acc key
   decode_gplay_key: &decode_gplay_key
     run:
