@@ -52,7 +52,7 @@ references:
     persist_to_workspace:
       root: *workspace_platform
       paths:
-      - firebase
+      - ~/workspace/firebase
 
   workspace_api: &workspace_api
      ~/workspace/api
