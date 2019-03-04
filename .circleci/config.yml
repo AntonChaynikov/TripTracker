@@ -264,6 +264,7 @@ jobs:
     <<: *gcloud_config_api
     steps:
     - *attach_debug_workspace_api
+    - *attach_firebase_workspace
     - *decode_gcloud_key
     - run:
         name: Authenticate with Google Cloud
@@ -290,6 +291,7 @@ jobs:
     <<: *gcloud_config_platform
     steps:
     - *attach_debug_workspace_platform
+    - *attach_firebase_workspace
     - *decode_gcloud_key
     - run:
         name: Authenticate with Google Cloud
