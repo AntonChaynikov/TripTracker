@@ -50,9 +50,9 @@ references:
 
   persist_firebase_workspace: &persist_firebase_workspace
     persist_to_workspace:
-      root: *workspace_platform
+      root: ~workspace
       paths:
-      - ~/workspace/firebase
+      - /firebase
   workspace_api: &workspace_api
      ~/workspace/api
 
