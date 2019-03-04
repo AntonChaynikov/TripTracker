@@ -46,14 +46,13 @@ references:
 
   attach_firebase_workspace: &attach_firebase_workspace
     attach_workspace:
-      at: *workspace_platform
+      at: ~/workspace/firebase
 
   persist_firebase_workspace: &persist_firebase_workspace
     persist_to_workspace:
       root: *workspace_platform
       paths:
       - ~/workspace/firebase
-
   workspace_api: &workspace_api
      ~/workspace/api
 
