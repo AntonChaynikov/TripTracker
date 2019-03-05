@@ -68,9 +68,6 @@ public class LocationSource implements ServiceConnection {
     }
 
     public void setLocationProvider(@Nullable LocationProvider locationProvider) {
-        if (mIsServiceRunning) {
-            throw new IllegalStateException("Should've stopped current LocationProvider first");
-        }
         mLocationProvider = locationProvider;
     }
 
