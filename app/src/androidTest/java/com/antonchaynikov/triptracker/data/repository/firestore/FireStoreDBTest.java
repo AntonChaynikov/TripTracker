@@ -64,7 +64,10 @@ public class FireStoreDBTest {
     public void getAllTrips_shouldReturnAllTrips() throws Exception {
         int tripsCount = 5;
         for (int i = 0; i < tripsCount; i++) {
-            mTestSubject.addTrip(new Trip(System.currentTimeMillis())).blockingAwait();
+            Trip trip = new Trip(System.currentTimeMillis());
+            trip.updateStatistics(i, i);
+            trip.setEndDate(System.currentTimeMillis());
+            mTestSubject.addTrip(trip).blockingAwait();
         }
 
         Set<Trip> tripsDistinct = new HashSet<>(mTestSubject.getAllTrips().blockingFirst());
