@@ -26,11 +26,15 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import javax.annotation.Nullable;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+import androidx.test.espresso.IdlingResource;
+import androidx.test.espresso.idling.CountingIdlingResource;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class HistoryActivity extends ViewModelActivity implements OnMapReadyCallback {
 
     private static final String EXTRA_TRIP_START_DATE = "com.antonchaynikov.triptracker.history.EXTRA_TRIP_START_DATE";
+    private static final String IDLING_RES_NAME = "com.antonchaynikov.triptracker.history.HistoryActivity";
 
     private HistoryViewModel mViewModel;
 
@@ -44,6 +48,8 @@ public class HistoryActivity extends ViewModelActivity implements OnMapReadyCall
     private TextView tvDistance;
 
     private GoogleMap mGoogleMap;
+
+    private CountingIdlingResource mIdlingResource = new CountingIdlingResource(IDLING_RES_NAME);
 
     private CompositeDisposable mSubscriptions = new CompositeDisposable();
 
@@ -108,6 +114,8 @@ public class HistoryActivity extends ViewModelActivity implements OnMapReadyCall
     @Override
     public void onStart() {
         super.onStart();
+        mIdlingResource.increment();
+        mIdlingResource.increment();
         mViewModel.onStart();
     }
 
@@ -121,6 +129,11 @@ public class HistoryActivity extends ViewModelActivity implements OnMapReadyCall
     public void onDestroy() {
         super.onDestroy();
         mViewModel.onCleared();
+    }
+
+    @VisibleForTesting
+    public IdlingResource getIdlingResource() {
+        return mIdlingResource;
     }
 
     private void onMapOptionsLoaded(@NonNull MapOptions mapOptions) {
@@ -138,6 +151,7 @@ public class HistoryActivity extends ViewModelActivity implements OnMapReadyCall
 
             mGoogleMap.addPolyline(mapOptions.getPolylineOptions());
         }
+        mIdlingResource.decrement();
     }
 
     private void onTripStatisticsLoaded(@NonNull TripStatistics statistics) {
@@ -145,6 +159,7 @@ public class HistoryActivity extends ViewModelActivity implements OnMapReadyCall
         tvDuration.setText(statistics.getDuration());
         tvSpeed.setText(statistics.getSpeed());
         tvDistance.setText(statistics.getDistance());
+        mIdlingResource.decrement();
     }
 
     private void setProgressBarVisible(boolean isVisible) {

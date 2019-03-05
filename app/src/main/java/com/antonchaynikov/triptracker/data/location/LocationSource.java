@@ -144,6 +144,7 @@ public class LocationSource implements ServiceConnection {
                 .getGeolocationAvailabilityUpdatesObservable()
                 .subscribe(mGeolocationAvailabilityObservable::onNext));
 
+        Log.d(TAG, "onService connected");
         if (mIsTestMode) {
             mCountDownLatch.countDown();
         }

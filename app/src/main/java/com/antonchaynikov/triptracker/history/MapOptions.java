@@ -18,7 +18,11 @@ public class MapOptions {
 
     public MapOptions(@NonNull List<TripCoordinate> tripCoordinates) {
         this();
-        mMarkerOptions = new MarkerOptions(tripCoordinates.get(tripCoordinates.size() - 1));
+        if (tripCoordinates.isEmpty()) {
+            mMarkerOptions = new MarkerOptions(null);
+        } else {
+            mMarkerOptions = new MarkerOptions(tripCoordinates.get(tripCoordinates.size() - 1));
+        }
         mPolylineOptions.addAll(CollectionUtils.map(tripCoordinates, mConverter));
     }
 

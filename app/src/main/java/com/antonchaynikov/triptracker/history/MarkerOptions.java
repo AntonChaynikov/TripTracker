@@ -4,7 +4,7 @@ import com.antonchaynikov.triptracker.data.model.TripCoordinate;
 
 import java.util.Objects;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class MarkerOptions {
 
@@ -12,7 +12,7 @@ public class MarkerOptions {
 
     private TripCoordinate mCoordinates;
 
-    public MarkerOptions(@NonNull TripCoordinate lastCoordinate) {
+    public MarkerOptions(@Nullable TripCoordinate lastCoordinate) {
         mCoordinates = lastCoordinate;
     }
 

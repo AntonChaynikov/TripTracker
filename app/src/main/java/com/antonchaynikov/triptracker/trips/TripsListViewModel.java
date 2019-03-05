@@ -25,7 +25,9 @@ class TripsListViewModel extends BasicViewModel {
 
     void onStart() {
         mShowProgressBarEventBroadcast.onNext(true);
-        mSubscriptions.add(mRepository.getAllTrips().subscribe(this::onTripsLoaded));
+        mSubscriptions.add(mRepository
+                .getAllTrips()
+                .subscribe(this::onTripsLoaded));
     }
 
     Observable<Boolean> getEmptyListEventObservable() {
