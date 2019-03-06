@@ -125,6 +125,7 @@ class TripViewModel extends BasicViewModel {
     }
 
     private void handleGeolocationAvailabilityChange(boolean isAvailable) {
+        Log.d(TAG, "GeolocationAvailable " + isAvailable);
         if (isAvailable) {
             showSnackbarMessage(R.string.message_geolocation_available);
         } else {

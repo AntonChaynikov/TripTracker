@@ -31,7 +31,6 @@ public class HistoryActivityTest {
     private ActivityTestRule<HistoryActivity> activityTestRule = new ActivityTestRule<>(HistoryActivity.class, true, false);
 
     private FireStoreDB mFirestore;
-    private long mTripStartDate;
     private Trip mTrip;
 
     @BeforeClass
