@@ -48,17 +48,11 @@ references:
     attach_workspace:
       at: ~/workspace
 
-  persist_firebase_workspace_api: &persist_firebase_workspace_api
+  persist_firebase_workspace: &persist_firebase_workspace
     persist_to_workspace:
       root: ~/workspace
       paths:
-      - firebase/api
-
-  persist_firebase_workspace_platform: &persist_firebase_workspace_platform
-    persist_to_workspace:
-      root: ~/workspace
-      paths:
-      - firebase/platform
+      - firebase
 
   workspace_api: &workspace_api
      ~/workspace/api
@@ -287,7 +281,7 @@ jobs:
     - run:
         name: Download instrumented test results from Firebase Test Lab
         command: gsutil -m cp -r -U "`gsutil ls gs://test-lab-9td3tnt7fd09a-kqr91929f8ba0 | tail -1`*" ~/workspace/firebase/api
-    - *persist_firebase_workspace_api
+    - *persist_firebase_workspace
     - store_artifacts:
         path: firebase/
         destination: /firebase/
@@ -314,7 +308,7 @@ jobs:
     - run:
         name: Download instrumented test results from Firebase Test Lab
         command: gsutil -m cp -r -U "`gsutil ls gs://test-lab-9td3tnt7fd09a-kqr91929f8ba0 | tail -1`*" ~/workspace/firebase/platform
-    - *persist_firebase_workspace_platform
+    - *persist_firebase_workspace
     - store_artifacts:
         path: firebase/
         destination: /firebase/
@@ -394,10 +388,18 @@ jobs:
     - *attach_firebase_workspace
     - run:
         name: Move Firebase coverage report platfomm
-        command: mkdir -p app/build/outputs/code-coverage/platformDebugAndroidTest/connected && cp workspace/firebase/platform/*/artifacts/coverage.ec app/build/outputs/code-coverage/platformDebugAndroidTest/connected/coverage.ec 2>/dev/null || :
+        command: mkdir -p app/build/outputs/code-coverage/platformDebugAndroidTest/connected &&
+          if [ -e workspace/firebase/platform/*/artifacts/coverage.ec]
+            then
+            cp workspace/firebase/platform/*/artifacts/coverage.ec app/build/outputs/code-coverage/platformDebugAndroidTest/connected/coverage.ec
+          fi
     - run:
         name: Move Firebase coverage report api
-        command: mkdir -p app/build/outputs/code-coverage/servicesApiDebugAndroidTest/connected && cp workspace/firebase/api/*/artifacts/coverage.ec app/build/outputs/code-coverage/servicesApiDebugAndroidTest/connected/coverage.ec 2>/dev/null || :
+        command: mkdir -p app/build/outputs/code-coverage/servicesApiDebugAndroidTest/connected &&
+          if [ -e workspace/firebase/api/*/artifacts/coverage.ec]
+            then
+            cp workspace/firebase/api/*/artifacts/coverage.ec app/build/outputs/code-coverage/servicesApiDebugAndroidTest/connected/coverage.ec
+          fi
     - run:
         name: Code coverage report
         command: ./gradlew jacocoTestReport

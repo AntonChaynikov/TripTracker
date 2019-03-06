@@ -18,9 +18,12 @@ import java.util.Random;
 
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.GrantPermissionRule;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(AndroidJUnit4ClassRunner.class)
 public class LocationSourceLocationServiceIntegrationTest {
@@ -53,9 +56,9 @@ public class LocationSourceLocationServiceIntegrationTest {
 
     @After
     public void tearDown() {
-        //mLocationSource.finishUpdates();
+        mLocationSource.finishUpdates();
     }
-/*
+
     @Test
     public void startUpdates_shouldEmitGeolocationAvailabilityEvents() throws Exception {
         mLocationSource.getGeolocationAvailabilityObservable().subscribe(mGeolocationAvailabilityObserver::onNext);
@@ -69,22 +72,19 @@ public class LocationSourceLocationServiceIntegrationTest {
     }
 
     @Test
-    @UiThreadTest
     public void startUpdates_shouldEmitGeolocationData() throws Exception {
         mLocationSource.getLocationsObservable().subscribe(mLocationsObserver);
         mLocationSource.startUpdates();
+
+        InstrumentationRegistry.getInstrumentation().waitForIdle(() -> {
+            System.out.println("Idle now");
+        });
 
         for (Location location : createLocationsList()) {
             mLocationsObservable.onNext(location);
         }
 
         assertEquals(LOCATIONS_COUNT, mLocationsObserver.valueCount());
-    }
-    */
-
-    @Test
-    public void testStub() {
-
     }
 
     private List<Location> createLocationsList() {
