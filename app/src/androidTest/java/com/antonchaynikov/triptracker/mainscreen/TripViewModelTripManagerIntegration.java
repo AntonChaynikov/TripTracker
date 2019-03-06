@@ -5,6 +5,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.SystemClock;
 
+import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.RxImmediateSchedulerRule;
 import com.antonchaynikov.triptracker.data.location.LocationSource;
 import com.antonchaynikov.triptracker.data.model.Trip;
@@ -91,7 +92,7 @@ public class TripViewModelTripManagerIntegration {
 
         mViewModel.onActionButtonClicked();
 
-        int locationsCount = 5;
+        int locationsCount = 2;
         for (Location location : createLocationsList(locationsCount)) {
             mLocationObservable.onNext(location);
         }
@@ -107,7 +108,7 @@ public class TripViewModelTripManagerIntegration {
 
         mViewModel.onActionButtonClicked();
 
-        int itemsCount = 5;
+        int itemsCount = 2;
         for (Location location : createLocationsList(itemsCount)) {
             mLocationObservable.onNext(location);
         }
@@ -115,8 +116,6 @@ public class TripViewModelTripManagerIntegration {
         assertEquals(itemsCount, mapOptionsObserver.valueCount());
     }
 
-    //TODO uncomment and fix
-    /*
     @Test
     public void shouldEmitGeolocationError_whenGeolocationUnavailable() throws Exception {
         TestObserver<Integer> snackbarMessageObserver = TestObserver.create();
@@ -128,7 +127,6 @@ public class TripViewModelTripManagerIntegration {
 
         snackbarMessageObserver.assertValue(R.string.message_geolocation_unavailable);
     }
-    */
 
     private List<Location> createLocationsList(int locationCount) {
         List<Location> locations = new ArrayList<>(locationCount);
