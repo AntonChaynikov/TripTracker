@@ -75,16 +75,7 @@ public class LocationSource implements ServiceConnection {
         if (mLocationProvider != null) {
             startService();
 
-            mSubscriptions.add(Observable.just(true).zipWith(mServiceConnectionObservable, (event, service) -> service)
-                    .subscribe(service -> {
-                        Log.d(TAG, "Service connected");
-                        mLocationService = service;
-                        mLocationService.setLocationProvider(mLocationProvider);
-                        mLocationService.startUpdates();
-                    }));
-
             testModeWaitForServiceConnection(mIsTestMode);
-
         } else {
             Log.e(TAG, "LocationProvider is null");
             mGeolocationAvailabilityObservable.onNext(false);
@@ -143,6 +134,10 @@ public class LocationSource implements ServiceConnection {
         mSubscriptions.add(service
                 .getGeolocationAvailabilityUpdatesObservable()
                 .subscribe(mGeolocationAvailabilityObservable::onNext));
+
+        mLocationService = service;
+        mLocationService.setLocationProvider(mLocationProvider);
+        mLocationService.startUpdates();
 
         Log.d(TAG, "onService connected");
         if (mIsTestMode) {

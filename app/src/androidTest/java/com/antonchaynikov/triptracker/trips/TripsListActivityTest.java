@@ -21,7 +21,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
 public class TripsListActivityTest {
 
-    private static final int DB_TRIPS_COUNT = 5;
+    private static final int DB_TRIPS_COUNT = 2;
     private static FirebaseAuth sFirebaseAuth;
 
     private ActivityTestRule<TripsListActivity>
