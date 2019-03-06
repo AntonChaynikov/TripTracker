@@ -388,10 +388,10 @@ jobs:
     - *attach_firebase_workspace
     - run:
         name: Move Firebase coverage report platfomm
-        command: mkdir -p app/build/outputs/code-coverage/platformDebugAndroidTest/connected && cp workspace/firebase/platform/*/artifacts/coverage.ec app/build/outputs/code-coverage/platformDebugAndroidTest/connected/coverage.ec
+        command: mkdir -p app/build/outputs/code-coverage/platformDebugAndroidTest/connected && cp workspace/firebase/platform/*/artifacts/coverage.ec app/build/outputs/code-coverage/platformDebugAndroidTest/connected/coverage.ec 2>/dev/null || :
     - run:
         name: Move Firebase coverage report api
-        command: mkdir -p app/build/outputs/code-coverage/servicesApiDebugAndroidTest/connected && cp workspace/firebase/api/*/artifacts/coverage.ec app/build/outputs/code-coverage/servicesApiDebugAndroidTest/connected/coverage.ec
+        command: mkdir -p app/build/outputs/code-coverage/servicesApiDebugAndroidTest/connected && cp workspace/firebase/api/*/artifacts/coverage.ec app/build/outputs/code-coverage/servicesApiDebugAndroidTest/connected/coverage.ec 2>/dev/null || :
     - run:
         name: Code coverage report
         command: ./gradlew jacocoTestReport
