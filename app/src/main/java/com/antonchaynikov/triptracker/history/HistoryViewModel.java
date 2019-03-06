@@ -59,5 +59,4 @@ class HistoryViewModel extends BasicViewModel {
         super.onCleared();
         mSubscriptions.dispose();
     }
-
 }

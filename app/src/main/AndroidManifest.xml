@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.antonchaynikov.triptracker">
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -18,6 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
+        <uses-library android:name="android.test.runner"
+            android:required="false" />
 
         <uses-library
             android:name="org.apache.http.legacy"
@@ -44,7 +48,7 @@
         <activity android:name=".history.HistoryActivity" />
 
         <service android:name=".data.location.PlatformLocationService" />
-        <service android:name=".data.location.FusedLocationService" />
+        <service android:name=".data.location.LocationService" />
 
         <meta-data
             android:name="io.fabric.ApiKey"

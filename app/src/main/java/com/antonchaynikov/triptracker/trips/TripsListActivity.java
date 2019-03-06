@@ -18,15 +18,22 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.IdlingResource;
+import androidx.test.espresso.idling.CountingIdlingResource;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class TripsListActivity extends ViewModelActivity {
+
+    private static final String IDLING_RES_NAME = "com.antonchaynikov.triptracker.trips.TripsListActivity";
 
     private RecyclerView mRecyclerView;
     private View vProgressBar;
     private TextView tvNoTrips;
     private TripsListViewModel mViewModel;
+
+    private CountingIdlingResource mIdlingResource = new CountingIdlingResource(IDLING_RES_NAME);
 
     private CompositeDisposable mSubscriptions = new CompositeDisposable();
 
@@ -47,6 +54,9 @@ public class TripsListActivity extends ViewModelActivity {
     public void onStart() {
         super.onStart();
         mViewModel.onStart();
+        if (mIdlingResource.isIdleNow()) {
+            mIdlingResource.increment();
+        }
     }
 
     @Override
@@ -59,6 +69,11 @@ public class TripsListActivity extends ViewModelActivity {
     public void onDestroy() {
         super.onDestroy();
         mViewModel.onCleared();
+    }
+
+    @VisibleForTesting
+    public IdlingResource getIdlingResource() {
+        return mIdlingResource;
     }
 
     private void initViewModel() {
@@ -90,5 +105,6 @@ public class TripsListActivity extends ViewModelActivity {
             tvNoTrips.setVisibility(View.GONE);
         }
         mRecyclerView.setAdapter(new TripsAdapter(trips));
+        mIdlingResource.decrement();
     }
 }

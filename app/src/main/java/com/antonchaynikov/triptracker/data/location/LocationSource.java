@@ -1,42 +1,60 @@
 package com.antonchaynikov.triptracker.data.location;
 
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
 import android.content.ServiceConnection;
 import android.location.Location;
 import android.os.IBinder;
+import android.util.Log;
+
+import java.util.concurrent.CountDownLatch;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import androidx.core.app.ActivityCompat;
 import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
-public final class LocationSource implements ServiceConnection {
+public class LocationSource implements ServiceConnection {
 
+    private static final String TAG  = LocationSource.class.getCanonicalName();
+
+    @SuppressLint("StaticFieldLeak")
     private static volatile LocationSource sInstance;
 
-    private PublishSubject<Location> mLocationsBroadcast;
-    private PublishSubject<Boolean> mGeolocationAvailabilityBroadcast;
-    private PublishSubject<IBinder> mServiceConnectionEvent;
-    private ServiceManager<?> mServiceManager;
+    private Context mAppContext;
     private LocationService mLocationService;
-    private Filter<Location> mLocationFilter;
 
-    private Disposable mUpdateRequestDisposable;
+    private PublishSubject<Location> mLocationObservable;
+    private BehaviorSubject<Boolean> mGeolocationAvailabilityObservable;
+    private CompositeDisposable mSubscriptions = new CompositeDisposable();
+    private LocationProvider mLocationProvider;
 
-    private LocationSource(@NonNull Filter<Location> filter, @NonNull ServiceManager<?> serviceManager) {
-        mLocationsBroadcast = PublishSubject.create();
-        mServiceConnectionEvent = PublishSubject.create();
-        mGeolocationAvailabilityBroadcast = PublishSubject.create();
-        mLocationFilter = filter;
-        mServiceManager = serviceManager;
+    private PublishSubject<LocationService> mServiceConnectionObservable;
+
+    private boolean mIsServiceRunning;
+    private boolean mIsTestMode;
+
+    // Used for testing purposes to notify when the location service has been connected
+    private CountDownLatch mCountDownLatch;
+
+    LocationSource(@NonNull Context context) {
+        mAppContext = context.getApplicationContext();
+        mLocationObservable = PublishSubject.create();
+        mServiceConnectionObservable = PublishSubject.create();
+        mGeolocationAvailabilityObservable = BehaviorSubject.create();
     }
 
-    public static LocationSource getInstance(@NonNull Filter<Location> filter, @NonNull ServiceManager<?> serviceManager) {
+    public static LocationSource getInstance(@NonNull Context context) {
         if (sInstance == null) {
             synchronized (LocationSource.class) {
                 if (sInstance == null) {
-                    sInstance = new LocationSource(filter, serviceManager);
+                    sInstance = new LocationSource(context);
                 }
             }
         }
@@ -44,51 +62,97 @@ public final class LocationSource implements ServiceConnection {
     }
 
     @VisibleForTesting
-    static void resetInstance() {
-        sInstance = null;
+    public void setServiceConnectedSyncMode() throws InterruptedException {
+        mIsTestMode = true;
+        mCountDownLatch = new CountDownLatch(1);
     }
 
-    public void startUpdates() throws SecurityException {
-        mServiceManager.startLocationService(this);
-        mUpdateRequestDisposable = Observable.just(true)
-                .zipWith(mServiceConnectionEvent, (areUpdatesRequested, iBinder) -> iBinder)
-                .subscribe(this::requestUpdates);
+    public void setLocationProvider(@Nullable LocationProvider locationProvider) {
+        mLocationProvider = locationProvider;
     }
 
-    private void requestUpdates(@NonNull IBinder iBinder) {
-        mLocationService = ((LocationService.LocationServiceBinder) iBinder).getLocationService();
-        Disposable d = mLocationService.getLocationsStream().subscribe(mLocationsBroadcast::onNext);
-        d = mLocationService.getGeolocationAvailabilityUpdatesBroadcast().subscribe(mGeolocationAvailabilityBroadcast::onNext);
-        mLocationService.startUpdates(mLocationFilter);
+    public void startUpdates() {
+        if (mLocationProvider != null) {
+            startService();
+
+            mSubscriptions.add(Observable.just(true).zipWith(mServiceConnectionObservable, (event, service) -> service)
+                    .subscribe(service -> {
+                        Log.d(TAG, "Service connected");
+                        mLocationService = service;
+                        mLocationService.setLocationProvider(mLocationProvider);
+                        mLocationService.startUpdates();
+                    }));
+
+            testModeWaitForServiceConnection(mIsTestMode);
+
+        } else {
+            Log.e(TAG, "LocationProvider is null");
+            mGeolocationAvailabilityObservable.onNext(false);
+        }
+    }
+
+    private void testModeWaitForServiceConnection(boolean isTestMode) {
+        if (isTestMode) {
+            while (mCountDownLatch.getCount() > 0) {
+                try {
+                    mCountDownLatch.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void startService() {
+        Intent serviceIntent = new Intent(mAppContext, LocationService.class);
+        if (!mIsServiceRunning) {
+            ActivityCompat.startForegroundService(mAppContext, serviceIntent);
+        }
+        mIsServiceRunning = mAppContext.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
+        if (!mIsServiceRunning) {
+            mGeolocationAvailabilityObservable.onNext(false);
+
+            if (mIsTestMode) {
+                mCountDownLatch.countDown();
+            }
+        }
     }
 
     public void finishUpdates() {
-        if (mLocationService != null) {
-            mLocationService.stopUpdates();
-        }
-        mServiceManager.stopLocationService(this);
-        if (mUpdateRequestDisposable != null) {
-            mUpdateRequestDisposable.dispose();
-        }
+        mLocationService.stopUpdates();
+        mAppContext.unbindService(this);
+        mAppContext.stopService(new Intent(mAppContext, LocationService.class));
+        mIsServiceRunning = false;
     }
 
-    @NonNull
-    public Observable<Location> getLocationUpdates() {
-        return mLocationsBroadcast;
+    public Observable<Location> getLocationsObservable() {
+        return mLocationObservable;
     }
 
-    @NonNull
-    public Observable<Boolean> getGeolocationAvailabilityUpdates() {
-        return mGeolocationAvailabilityBroadcast;
+    public Observable<Boolean> getGeolocationAvailabilityObservable() {
+        return mGeolocationAvailabilityObservable;
     }
 
     @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        mServiceConnectionEvent.onNext(service);
+    public void onServiceConnected(ComponentName name, IBinder iBinder) {
+        LocationService service = ((LocationService.LocationServiceBinder) iBinder).getLocationService();
+        mServiceConnectionObservable.onNext(service);
+        mSubscriptions.add(service
+                .getLocationsStream()
+                .subscribe(mLocationObservable::onNext));
+        mSubscriptions.add(service
+                .getGeolocationAvailabilityUpdatesObservable()
+                .subscribe(mGeolocationAvailabilityObservable::onNext));
+
+        Log.d(TAG, "onService connected");
+        if (mIsTestMode) {
+            mCountDownLatch.countDown();
+        }
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
-        mLocationService = null;
+        mSubscriptions.dispose();
+        mIsServiceRunning = false;
     }
 }

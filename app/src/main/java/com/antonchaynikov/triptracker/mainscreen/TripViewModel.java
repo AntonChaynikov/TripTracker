@@ -2,18 +2,20 @@ package com.antonchaynikov.triptracker.mainscreen;
 
 import android.util.Log;
 
+import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
 import com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState;
-import com.antonchaynikov.triptracker.utils.StringUtils;
 import com.antonchaynikov.triptracker.viewmodel.BasicViewModel;
+import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
 import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
 import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 
@@ -34,6 +36,7 @@ class TripViewModel extends BasicViewModel {
 
     private TripManager mTripManager;
     private FirebaseAuth mFirebaseAuth;
+    private StatisticsFormatter mStatisticsFormatter;
 
     private CompositeDisposable mSubscriptions = new CompositeDisposable();
 
@@ -41,15 +44,20 @@ class TripViewModel extends BasicViewModel {
 
     private TripUiState mUiState;
 
-    TripViewModel(@NonNull TripManager tripManager, @NonNull FirebaseAuth firebaseAuth, boolean isLocationPermissionGranted) {
+    TripViewModel(@NonNull TripManager tripManager,
+                  @NonNull FirebaseAuth firebaseAuth,
+                  @NonNull StatisticsFormatter statisticsFormatter,
+                  boolean isLocationPermissionGranted) {
         mUiState = TripUiState.getDefaultState();
         mUiStateChangeEventObservable = BehaviorSubject.createDefault(mUiState);
         mTripStatisticsStreamObservable = BehaviorSubject.createDefault(TripStatistics.getDefaultStatistics());
         mIsLocationPermissionGranted = isLocationPermissionGranted;
+        mStatisticsFormatter = statisticsFormatter;
         mTripManager = tripManager;
         mFirebaseAuth = firebaseAuth;
         mSubscriptions.add(mTripManager.getTripUpdatesStream().subscribe(this::handleTripUpdate));
         mSubscriptions.add(mTripManager.getCoordinatesStream().subscribe(this::handleLocationUpdate));
+        mSubscriptions.add(mTripManager.getGeoloactionAvailabilityChangeObservable().subscribe(this::handleGeolocationAvailabilityChange));
     }
 
     Observable<TripUiState> getUiStateChangeEventObservable() {
@@ -116,8 +124,19 @@ class TripViewModel extends BasicViewModel {
         return mUiState.getState() == STARTED;
     }
 
+    private void handleGeolocationAvailabilityChange(boolean isAvailable) {
+        if (isAvailable) {
+            showSnackbarMessage(R.string.message_geolocation_available);
+        } else {
+            showSnackbarMessage(R.string.message_geolocation_unavailable);
+        }
+    }
+
     private void startTrip() {
-        mSubscriptions.add(mTripManager.startTrip().subscribe(() ->
+        mSubscriptions.add(mTripManager.startTrip()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(Schedulers.computation())
+                .subscribe(() ->
                 mUiStateChangeEventObservable.onNext(mUiState.transform(STARTED))
         ));
     }
@@ -133,11 +152,7 @@ class TripViewModel extends BasicViewModel {
     }
 
     private void handleTripUpdate(@NonNull Trip trip) {
-        double distance = trip.getDistance();
-        double speed = trip.getSpeed();
-        mTripStatisticsStreamObservable.onNext(new TripStatistics(
-                StringUtils.numToFormattedString(speed, true),
-                StringUtils.numToFormattedString(distance, true)));
+        mTripStatisticsStreamObservable.onNext(mStatisticsFormatter.formatTrip(trip));
     }
 
     private void handleLocationUpdate(@NonNull TripCoordinate tripCoordinate) {
@@ -151,5 +166,3 @@ class TripViewModel extends BasicViewModel {
         mSubscriptions.dispose();
     }
 }
-
-

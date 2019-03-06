@@ -5,6 +5,7 @@ import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
 import com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState;
+import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
 import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.CompletableSubject;
 import io.reactivex.subjects.PublishSubject;
@@ -24,6 +26,7 @@ import static com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState.Stat
 import static com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState.State.STARTED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -34,12 +37,13 @@ public class TripViewModelTest {
 
     @ClassRule
     public static final RxImmediateSchedulerRule SCHEDULERS = new RxImmediateSchedulerRule();
-
     private TripViewModel mTestSubject;
     @Mock
     private TripManager mockTripManager;
     @Mock
     private FirebaseAuth mockFirebaseAuth;
+    @Mock
+    private StatisticsFormatter mockFormatter;
 
     private PublishSubject<Trip> statsStream;
     private PublishSubject<TripCoordinate> coordsStream;
@@ -53,8 +57,9 @@ public class TripViewModelTest {
         doReturn(Completable.complete()).when(mockTripManager).finishTrip();
         doReturn(statsStream).when(mockTripManager).getTripUpdatesStream();
         doReturn(coordsStream).when(mockTripManager).getCoordinatesStream();
+        doReturn(Observable.empty()).when(mockTripManager).getGeoloactionAvailabilityChangeObservable();
         doReturn(new Trip()).when(mockTripManager).getCurrentTrip();
-        mTestSubject = new TripViewModel(mockTripManager, mockFirebaseAuth, true);
+        mTestSubject = new TripViewModel(mockTripManager, mockFirebaseAuth, mockFormatter, true);
     }
 
     @Test
@@ -208,17 +213,18 @@ public class TripViewModelTest {
         TestObserver<TripStatistics> statisticsObserver = TestObserver.create();
         mTestSubject.getTripStatisticsStreamObservable().subscribe(statisticsObserver);
 
-        Trip trip = new Trip().updateStatistics(12.01341235, 1.0045);
+        Trip trip = new Trip().updateStatistics(123, 321);
+        TripStatistics statistics = new TripStatistics("12", "21");
+        doReturn(statistics).when(mockFormatter).formatTrip(trip);
         statsStream.onNext(trip);
 
         // 2 broadcasts happening - default during vm creation and expected one
         assertEquals(2, statisticsObserver.valueCount());
 
         // We are interested int the last value
-        TripStatistics statistics = statisticsObserver.values().get(1);
+        TripStatistics receivedStatistics = statisticsObserver.values().get(1);
 
-        assertEquals("12.01", statistics.getDistance());
-        assertEquals("1", statistics.getSpeed());
+        assertSame(statistics, receivedStatistics);
     }
 
     @Test
@@ -227,8 +233,32 @@ public class TripViewModelTest {
         mTestSubject.getMapOptionsObservable().subscribe(mapOptionsObserver);
 
         mapOptionsObserver.assertEmpty();
-        coordsStream.onNext(new TripCoordinate());
+        double expectedLat = 123;
+        double expectedLng = 321;
+        coordsStream.onNext(new TripCoordinate(System.currentTimeMillis(), 123, 321));
         assertEquals(1, mapOptionsObserver.valueCount());
+
+        MapOptions mapOptions = mapOptionsObserver.values().get(0);
+        assertEquals(expectedLat, mapOptions.getCoordinatesLatitude(), 0.001);
+        assertEquals(expectedLng, mapOptions.getCoordinatesLongitude(), 0.001);
+        assertFalse(mapOptions.shouldDeleteMarkers());
+    }
+
+    @Test
+    public void shouldBroadcastMapOptionsDeleteMarkers_whenTripEnds() {
+        TestObserver<MapOptions> mapOptionsObserver = TestObserver.create();
+        mTestSubject.getMapOptionsObservable().subscribe(mapOptionsObserver);
+
+        // Start trip
+        mTestSubject.onActionButtonClicked();
+        // Finish trip
+        mTestSubject.onActionButtonClicked();
+
+        assertEquals(1, mapOptionsObserver.valueCount());
+
+        MapOptions mapOptions = mapOptionsObserver.values().get(0);
+
+        assertTrue(mapOptions.shouldDeleteMarkers());
     }
 
     @Test
@@ -359,6 +389,7 @@ public class TripViewModelTest {
         testObserver.assertValue(12345L);
     }
 
+    // TODO implement feature
     @Test
     public void onActionButtonClicked_whenStarting_shouldStartAlarm() {
         mTestSubject.onActionButtonClicked();

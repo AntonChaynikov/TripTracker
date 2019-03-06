@@ -2,30 +2,30 @@ package com.antonchaynikov.triptracker.viewmodel;
 
 import androidx.annotation.Nullable;
 
-public class FormatOptions {
+class FormatOptions {
 
-    public static final String DATE_FORMAT_DEFAULT = "dd.MM.yy HH:mm";
-    public static final UnitSpeed UNIT_SPEED_DEFAULT = UnitSpeed.KMH;
-    public static final UnitDistance UNIT_DISTANCE_DEFAULT = UnitDistance.KM;
+    static final String DATE_FORMAT_DEFAULT = "dd.MM.yy HH:mm";
+    static final UnitSpeed UNIT_SPEED_DEFAULT = UnitSpeed.KMH;
+    static final UnitDistance UNIT_DISTANCE_DEFAULT = UnitDistance.KM;
 
     private String mStartDatePattern;
     private String mEndDatePattern;
     private UnitSpeed mUnitSpeed;
     private UnitDistance mUnitDistance;
 
-    public String getStartDatePattern() {
+    String getStartDatePattern() {
         return mStartDatePattern == null ? DATE_FORMAT_DEFAULT : mStartDatePattern;
     }
 
-    public String getEndDatePattern() {
+    String getEndDatePattern() {
         return mEndDatePattern == null ? getStartDatePattern() : mEndDatePattern;
     }
 
-    public UnitSpeed getUnitSpeed() {
+    UnitSpeed getUnitSpeed() {
         return mUnitSpeed == null ? UNIT_SPEED_DEFAULT : mUnitSpeed;
     }
 
-    public UnitDistance getUnitDistance() {
+    UnitDistance getUnitDistance() {
         return mUnitDistance == null ? UNIT_DISTANCE_DEFAULT : mUnitDistance;
     }
 
@@ -37,22 +37,22 @@ public class FormatOptions {
         KM, M
     }
 
-    public FormatOptions setStartDatePattern(@Nullable String pattern) {
+    FormatOptions setStartDatePattern(@Nullable String pattern) {
         mStartDatePattern = pattern;
         return this;
     }
 
-    public FormatOptions setEndDatePattern(String endDatePattern) {
+    FormatOptions setEndDatePattern(String endDatePattern) {
         mEndDatePattern = endDatePattern;
         return this;
     }
 
-    public FormatOptions setUnitSpeed(UnitSpeed unitSpeed) {
+    FormatOptions setUnitSpeed(UnitSpeed unitSpeed) {
         mUnitSpeed = unitSpeed;
         return this;
     }
 
-    public FormatOptions setUnitDistance(UnitDistance unitDistance) {
+    FormatOptions setUnitDistance(UnitDistance unitDistance) {
         mUnitDistance = unitDistance;
         return this;
     }
