@@ -58,6 +58,7 @@ public class LocationSourceLocationServiceIntegrationTest {
     public void tearDown() {
         mLocationSource.finishUpdates();
     }
+
     @Test
     public void startUpdates_shouldEmitGeolocationAvailabilityEvents() throws Exception {
         mLocationSource.getGeolocationAvailabilityObservable().subscribe(mGeolocationAvailabilityObserver::onNext);
