@@ -5,7 +5,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.SystemClock;
 
-import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.RxImmediateSchedulerRule;
 import com.antonchaynikov.triptracker.data.location.LocationSource;
 import com.antonchaynikov.triptracker.data.model.Trip;

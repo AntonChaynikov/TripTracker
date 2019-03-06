@@ -1,7 +1,6 @@
 package com.antonchaynikov.triptracker.mainscreen;
 
 import com.antonchaynikov.triptracker.data.repository.firestore.FireStoreDB;
-import com.antonchaynikov.triptracker.history.HistoryActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.junit.After;
@@ -11,8 +10,6 @@ import org.junit.BeforeClass;
 import java.util.concurrent.CountDownLatch;
 
 import androidx.test.rule.ActivityTestRule;
-
-import static org.junit.Assert.*;
 
 public class TripActivityTest {
 
