@@ -105,7 +105,6 @@ public class TripsListActivity extends ViewModelActivity {
             tvNoTrips.setVisibility(View.GONE);
         }
         mRecyclerView.setAdapter(new TripsAdapter(trips));
-
         mIdlingResource.decrement();
     }
 }
