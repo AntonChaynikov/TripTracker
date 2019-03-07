@@ -50,6 +50,7 @@ public class TripActivityTest {
 
         onView(withId(R.id.btn_layout_statistics)).perform(click());
 
+
     }
 
     @After

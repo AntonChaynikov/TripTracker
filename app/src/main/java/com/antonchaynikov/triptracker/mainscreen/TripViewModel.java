@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
@@ -61,31 +62,31 @@ class TripViewModel extends BasicViewModel {
     }
 
     Observable<TripUiState> getUiStateChangeEventObservable() {
-        return mUiStateChangeEventObservable;
+        return mUiStateChangeEventObservable.observeOn(AndroidSchedulers.mainThread());
     }
 
     Observable<Boolean> getAskLocationPermissionEventObservable() {
-        return mAskLocationPermissionEventObservable;
+        return mAskLocationPermissionEventObservable.observeOn(AndroidSchedulers.mainThread());
     }
 
     Observable<MapOptions> getMapOptionsObservable() {
-        return mMapOptionsObservable;
+        return mMapOptionsObservable.observeOn(AndroidSchedulers.mainThread());
     }
 
     Observable<TripStatistics> getTripStatisticsStreamObservable() {
-        return mTripStatisticsStreamObservable;
+        return mTripStatisticsStreamObservable.observeOn(AndroidSchedulers.mainThread());
     }
 
     Observable<Boolean> getGotToStatisticsObservable() {
-        return mGoToStatisticsObservable;
+        return mGoToStatisticsObservable.observeOn(AndroidSchedulers.mainThread());
     }
 
     Observable<Boolean> getLogoutObservable() {
-        return mLogoutObservable;
+        return mLogoutObservable.observeOn(AndroidSchedulers.mainThread());
     }
 
     Observable<Long> getProceedToSummaryObservable() {
-        return mProceedToSummaryObservable;
+        return mProceedToSummaryObservable.observeOn(AndroidSchedulers.mainThread());
     }
 
     void onLocationPermissionUpdate(boolean isPermissionGranted) {

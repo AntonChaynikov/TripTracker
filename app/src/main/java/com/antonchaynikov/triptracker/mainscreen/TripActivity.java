@@ -106,6 +106,10 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
         return true;
     }
 
+    void injectViewModel(@NonNull TripViewModel tripViewModel) {
+
+    }
+
     private void initViewModel() {
         LocationSource locationSource = LocationSource.getInstance(this);
         locationSource.setLocationProvider(LocationProviderModule.provide(this, new LocationFilter()));
@@ -123,6 +127,10 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
             }
         };
         mViewModel = ViewModelProviders.of(this, factory).get(TripViewModel.class);
+        subscribeToViewModelEvents();
+    }
+
+    private void subscribeToViewModelEvents() {
         mSubscriptions.add(mViewModel.getAskLocationPermissionEventObservable().subscribe(event -> onLocationPermissionRequested()));
         mSubscriptions.add(mViewModel.getUiStateChangeEventObservable().subscribe(this::onUiStateUpdate));
         mSubscriptions.add(mViewModel.getShowSnackbarMessageBroadcast().subscribe(this::showSnackbarMessage));
@@ -132,6 +140,7 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
         mSubscriptions.add(mViewModel.getLogoutObservable().subscribe(event -> logout()));
         mSubscriptions.add(mViewModel.getProceedToSummaryObservable().subscribe(this::goToSummaryScreen));
     }
+
 
     @Override
     public void onDestroy() {
