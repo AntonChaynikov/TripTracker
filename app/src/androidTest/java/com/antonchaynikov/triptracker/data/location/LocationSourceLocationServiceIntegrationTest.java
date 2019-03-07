@@ -35,7 +35,7 @@ public class LocationSourceLocationServiceIntegrationTest {
 
     private MockLocationProvider locationProvider;
 
-    private LocationSource mLocationSource;
+    private LocationSourceImpl mLocationSource;
 
     private TestObserver<Location> mLocationsObserver;
     private TestObserver<Boolean> mGeolocationAvailabilityObserver;
@@ -49,7 +49,7 @@ public class LocationSourceLocationServiceIntegrationTest {
         Context context = ApplicationProvider.getApplicationContext();
         locationProvider = new MockLocationProvider(mLocationsObservable);
 
-        mLocationSource = new LocationSource(context);
+        mLocationSource = new LocationSourceImpl(context);
         mLocationSource.setLocationProvider(locationProvider);
         mLocationSource.setServiceConnectedSyncMode();
     }

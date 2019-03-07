@@ -17,7 +17,7 @@ import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.authentication.LaunchActivity;
 import com.antonchaynikov.triptracker.data.location.LocationFilter;
 import com.antonchaynikov.triptracker.data.location.LocationProviderModule;
-import com.antonchaynikov.triptracker.data.location.LocationSource;
+import com.antonchaynikov.triptracker.data.location.LocationSourceImpl;
 import com.antonchaynikov.triptracker.data.repository.firestore.FireStoreDB;
 import com.antonchaynikov.triptracker.data.tripmanager.StatisticsCalculator;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
@@ -43,6 +43,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -106,12 +107,14 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
         return true;
     }
 
+    @VisibleForTesting
     void injectViewModel(@NonNull TripViewModel tripViewModel) {
-
+        mViewModel = tripViewModel;
+        subscribeToViewModelEvents();
     }
 
     private void initViewModel() {
-        LocationSource locationSource = LocationSource.getInstance(this);
+        LocationSourceImpl locationSource = LocationSourceImpl.getInstance(this);
         locationSource.setLocationProvider(LocationProviderModule.provide(this, new LocationFilter()));
         ViewModelFactory factory = new ViewModelFactory() {
             @Override
@@ -140,7 +143,6 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
         mSubscriptions.add(mViewModel.getLogoutObservable().subscribe(event -> logout()));
         mSubscriptions.add(mViewModel.getProceedToSummaryObservable().subscribe(this::goToSummaryScreen));
     }
-
 
     @Override
     public void onDestroy() {
