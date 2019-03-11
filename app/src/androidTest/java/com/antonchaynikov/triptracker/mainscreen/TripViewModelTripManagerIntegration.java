@@ -5,6 +5,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.SystemClock;
 
+import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.RxImmediateSchedulerRule;
 import com.antonchaynikov.triptracker.data.location.LocationSource;
 import com.antonchaynikov.triptracker.data.model.Trip;
@@ -74,6 +75,7 @@ public class TripViewModelTripManagerIntegration {
 
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
+        TripManager.resetInstance();
         TripManager tripManager = TripManager.getInstance(mockRepository, mockLocationSource, new StatisticsCalculator());
 
         mViewModel = new TripViewModel(tripManager, firebaseAuth, new StatisticsFormatter(context), true);
@@ -115,8 +117,6 @@ public class TripViewModelTripManagerIntegration {
         assertEquals(itemsCount, mapOptionsObserver.valueCount());
     }
 
-    //TODO fix failing test
-    /*
     @Test
     public void shouldEmitGeolocationError_whenGeolocationUnavailable() throws Exception {
         TestObserver<Integer> snackbarMessageObserver = TestObserver.create();
@@ -128,7 +128,6 @@ public class TripViewModelTripManagerIntegration {
 
         snackbarMessageObserver.assertValue(R.string.message_geolocation_unavailable);
     }
-    */
 
     private List<Location> createLocationsList(int locationCount) {
         List<Location> locations = new ArrayList<>(locationCount);
