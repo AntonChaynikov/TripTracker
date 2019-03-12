@@ -17,7 +17,7 @@ import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.authentication.LaunchActivity;
 import com.antonchaynikov.triptracker.data.location.LocationFilter;
 import com.antonchaynikov.triptracker.data.location.LocationProviderModule;
-import com.antonchaynikov.triptracker.data.location.LocationSource;
+import com.antonchaynikov.triptracker.data.location.LocationSourceImpl;
 import com.antonchaynikov.triptracker.data.repository.firestore.FireStoreDB;
 import com.antonchaynikov.triptracker.data.tripmanager.StatisticsCalculator;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
@@ -43,9 +43,11 @@ import com.google.firebase.auth.FirebaseUser;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.test.espresso.IdlingResource;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class TripActivity extends ViewModelActivity implements View.OnClickListener, OnMapReadyCallback {
@@ -53,6 +55,7 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
     private static final int ACCESS_FINE_LOCATION_REQUEST_CODE = 1;
 
     private static final String EXTRA_USER = "com.antonchaynikov.triptracker.TripActivity.user";
+    private static final String IDLING_RES_NAME = "com.antonchaynikov.triptracker.mainscreen.TripActivity";
     private static final String TAG = TripActivity.class.getSimpleName();
 
     private boolean mPermissionGranted;
@@ -65,6 +68,8 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
     private TextView tvSpeed;
 
     private CompositeDisposable mSubscriptions;
+
+    private MainScreenIdlingResource mStatisticsIdlingResource;
 
     public static Intent getStartIntent(Context context, FirebaseUser user) {
         return new Intent(context, TripActivity.class)
@@ -106,8 +111,20 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
         return true;
     }
 
+    @VisibleForTesting
+    void injectViewModel(@NonNull TripViewModel tripViewModel) {
+        mViewModel = tripViewModel;
+        subscribeToViewModelEvents();
+    }
+
+    @VisibleForTesting
+    IdlingResource initStatisticsIdlingResource(int itemsToWait) {
+        mStatisticsIdlingResource = new MainScreenIdlingResource(IDLING_RES_NAME, itemsToWait);
+        return mStatisticsIdlingResource;
+    }
+
     private void initViewModel() {
-        LocationSource locationSource = LocationSource.getInstance(this);
+        LocationSourceImpl locationSource = LocationSourceImpl.getInstance(this);
         locationSource.setLocationProvider(LocationProviderModule.provide(this, new LocationFilter()));
         ViewModelFactory factory = new ViewModelFactory() {
             @Override
@@ -123,6 +140,10 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
             }
         };
         mViewModel = ViewModelProviders.of(this, factory).get(TripViewModel.class);
+        subscribeToViewModelEvents();
+    }
+
+    private void subscribeToViewModelEvents() {
         mSubscriptions.add(mViewModel.getAskLocationPermissionEventObservable().subscribe(event -> onLocationPermissionRequested()));
         mSubscriptions.add(mViewModel.getUiStateChangeEventObservable().subscribe(this::onUiStateUpdate));
         mSubscriptions.add(mViewModel.getShowSnackbarMessageBroadcast().subscribe(this::showSnackbarMessage));
@@ -155,6 +176,9 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
+        if (mStatisticsIdlingResource != null) {
+            mStatisticsIdlingResource.set();
+        }
         mViewModel.onActionButtonClicked();
     }
 
@@ -211,8 +235,11 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
     }
 
     private void handleStatisticsUpdate(@NonNull TripStatistics statistics) {
-        tvDistance.setText(getString(R.string.statistics_distance, statistics.getDistance()));
-        tvSpeed.setText(getString(R.string.statistics_speed, statistics.getSpeed()));
+        tvDistance.setText(statistics.getDistance());
+        tvSpeed.setText(statistics.getSpeed());
+        if (mStatisticsIdlingResource != null) {
+            mStatisticsIdlingResource.onItemEmitted();
+        }
     }
 
     private void goToStatisticsScreen() {

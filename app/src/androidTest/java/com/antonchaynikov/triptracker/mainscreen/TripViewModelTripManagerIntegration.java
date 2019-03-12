@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -28,9 +29,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import io.reactivex.Completable;
+import io.reactivex.observers.BaseTestConsumer;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
 
@@ -43,6 +46,8 @@ public class TripViewModelTripManagerIntegration {
     @ClassRule
     public static final RxImmediateSchedulerRule IMMEDIATE_SCHEDULER_RULE = new RxImmediateSchedulerRule();
 
+    private static FirebaseAuth sFirebaseAuth;
+
     private TripViewModel mViewModel;
 
     @Mock
@@ -53,17 +58,19 @@ public class TripViewModelTripManagerIntegration {
     private PublishSubject<Location> mLocationObservable = PublishSubject.create();
     private PublishSubject<Boolean> mGeolocationAvailabilityObservable = PublishSubject.create();
 
-    @Before
-    public void setUp() throws Exception {
-
+    @BeforeClass
+    public static void setTestEnv() throws Exception {
         // Authenticate as a test user
-        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        sFirebaseAuth = FirebaseAuth.getInstance();
         CountDownLatch authInProcessLatch = new CountDownLatch(1);
-        firebaseAuth.signInWithEmailAndPassword("test@test.test", "123456").addOnCompleteListener(t -> authInProcessLatch.countDown());
+        sFirebaseAuth.signInWithEmailAndPassword("test@test.test", "123456").addOnCompleteListener(t -> authInProcessLatch.countDown());
         while (authInProcessLatch.getCount() > 0) {
             authInProcessLatch.await();
         }
+    }
 
+    @Before
+    public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
         doReturn(Completable.complete()).when(mockRepository).addTrip(any(Trip.class));
@@ -77,7 +84,7 @@ public class TripViewModelTripManagerIntegration {
 
         TripManager tripManager = TripManager.getInstance(mockRepository, mockLocationSource, new StatisticsCalculator());
 
-        mViewModel = new TripViewModel(tripManager, firebaseAuth, new StatisticsFormatter(context), true);
+        mViewModel = new TripViewModel(tripManager, sFirebaseAuth, new StatisticsFormatter(context), true);
     }
 
     @After
@@ -97,6 +104,8 @@ public class TripViewModelTripManagerIntegration {
             mLocationObservable.onNext(location);
         }
 
+        statisticsObserver.awaitCount(locationsCount + 1, BaseTestConsumer.TestWaitStrategy.YIELD, TimeUnit.SECONDS.toMillis(1));
+
         // expecting locationsCount + 1 initial default statistics update
         assertEquals(locationsCount + 1, statisticsObserver.valueCount());
     }
@@ -113,17 +122,22 @@ public class TripViewModelTripManagerIntegration {
             mLocationObservable.onNext(location);
         }
 
+        mapOptionsObserver.awaitCount(itemsCount, BaseTestConsumer.TestWaitStrategy.YIELD, TimeUnit.SECONDS.toMillis(1));
+
         assertEquals(itemsCount, mapOptionsObserver.valueCount());
     }
 
     @Test
     public void shouldEmitGeolocationError_whenGeolocationUnavailable() throws Exception {
         TestObserver<Integer> snackbarMessageObserver = TestObserver.create();
+
         mViewModel.getShowSnackbarMessageBroadcast().subscribe(snackbarMessageObserver);
 
         mViewModel.onActionButtonClicked();
 
         mGeolocationAvailabilityObservable.onNext(false);
+
+        snackbarMessageObserver.awaitCount(1, BaseTestConsumer.TestWaitStrategy.YIELD, TimeUnit.SECONDS.toMillis(1));
 
         snackbarMessageObserver.assertValue(R.string.message_geolocation_unavailable);
     }

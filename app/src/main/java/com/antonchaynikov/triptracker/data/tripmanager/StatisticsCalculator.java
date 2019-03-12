@@ -1,6 +1,7 @@
 package com.antonchaynikov.triptracker.data.tripmanager;
 
 import android.location.Location;
+import android.util.Log;
 
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
 
@@ -14,6 +15,7 @@ public class StatisticsCalculator {
 
     private void updateStatistics(Location coordinate) {
         mDistance += mPrevLocation.distanceTo(coordinate);
+        Log.d("StatisticsCalculator" , "Updating distance to" + mDistance);
     }
 
     void addCoordinate(@NonNull Location coordinate) {

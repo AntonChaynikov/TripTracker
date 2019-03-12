@@ -60,6 +60,7 @@ public class TripsListActivityTest {
         IdlingRegistry.getInstance().register(activityActivityTestRule.getActivity().getIdlingResource());
 
         onView(withId(R.id.rv_trips_list)).check(new RecyclerViewItemCountAssertion(DB_TRIPS_COUNT));
+        IdlingRegistry.getInstance().unregister(activityActivityTestRule.getActivity().getIdlingResource());
     }
 
     @After
