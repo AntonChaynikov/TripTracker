@@ -14,6 +14,8 @@ import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
 import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
 import com.google.firebase.auth.FirebaseAuth;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -95,7 +97,7 @@ public class TripActivityTest {
 
         onView(withId(R.id.btn_layout_statistics)).perform(click());
 
-        onView(withId(R.id.tv_statistics_distance)).check(matches(withText("0,07 km")));
+        onView(withId(R.id.tv_statistics_distance)).check(matches(withText(new RegexMatcher("0(\\.|\\,)07 km"))));
         IdlingRegistry.getInstance().unregister(idlingResource);
     }
 
@@ -119,5 +121,27 @@ public class TripActivityTest {
         locations.add(location);
 
         return locations;
+    }
+
+    class RegexMatcher extends BaseMatcher<String> {
+
+        private String mPattern;
+
+        RegexMatcher(String pattern) {
+            mPattern = pattern;
+        }
+
+        @Override
+        public boolean matches(Object item) {
+            if (item instanceof String) {
+                return ((String) item).matches(mPattern);
+            }
+            return false;
+        }
+
+        @Override
+        public void describeTo(Description description) {
+
+        }
     }
 }
