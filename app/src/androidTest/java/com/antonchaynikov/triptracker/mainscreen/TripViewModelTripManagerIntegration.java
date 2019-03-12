@@ -78,7 +78,6 @@ public class TripViewModelTripManagerIntegration {
 
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        TripManager.resetInstance();
         TripManager tripManager = TripManager.getInstance(mockRepository, mockLocationSource, new StatisticsCalculator());
 
         mViewModel = new TripViewModel(tripManager, sFirebaseAuth, new StatisticsFormatter(context), true);
@@ -105,8 +104,7 @@ public class TripViewModelTripManagerIntegration {
 
         // expecting locationsCount + 1 initial default statistics update
         assertEquals(locationsCount + 1, statisticsObserver.valueCount());
-    }
-    */
+    }*/
 
     @Test
     public void shouldEmitMapOptions_onNewLocationUpdate() throws Exception {

@@ -14,6 +14,7 @@ import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
 import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
 import com.google.firebase.auth.FirebaseAuth;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -73,6 +74,11 @@ public class TripActivityTest {
                 new StatisticsFormatter(context),
                 true);
 
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        TripManager.resetInstance();
     }
 
     @Test
