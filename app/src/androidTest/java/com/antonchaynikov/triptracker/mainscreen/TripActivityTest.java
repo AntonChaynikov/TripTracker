@@ -101,6 +101,16 @@ public class TripActivityTest {
         IdlingRegistry.getInstance().unregister(idlingResource);
     }
 
+    @Test
+    public void shouldShowMarker_whenLocationReceived() throws Exception {
+        activityTestRule.launchActivity(TripActivity.getStartIntent(
+                InstrumentationRegistry.getInstrumentation().getTargetContext(),
+                sFirebaseAuth.getCurrentUser()
+        ));
+        TripActivity activity = activityTestRule.getActivity();
+        activity.injectViewModel(mViewModel);
+    }
+
     private List<Location> createLocationsList() {
         List<Location> locations = new ArrayList<>(LOCATIONS_COUNT);
 

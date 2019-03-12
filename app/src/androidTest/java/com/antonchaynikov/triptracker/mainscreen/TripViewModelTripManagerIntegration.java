@@ -38,7 +38,6 @@ import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
