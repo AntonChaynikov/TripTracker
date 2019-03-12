@@ -103,7 +103,7 @@ public class TripActivityTest {
     }
 
     @Test
-    public void shouldShowGeolocationError_when() throws Exception {
+    public void shouldShowGeolocationError_whenGeolocationIsUnavailable() throws Exception {
         activityTestRule.launchActivity(TripActivity.getStartIntent(
                 InstrumentationRegistry.getInstrumentation().getTargetContext(),
                 sFirebaseAuth.getCurrentUser()
