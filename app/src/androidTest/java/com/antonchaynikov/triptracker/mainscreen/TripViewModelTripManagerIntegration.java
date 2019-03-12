@@ -5,6 +5,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.SystemClock;
 
+import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.RxImmediateSchedulerRule;
 import com.antonchaynikov.triptracker.data.location.LocationSource;
 import com.antonchaynikov.triptracker.data.model.Trip;
@@ -13,6 +14,7 @@ import com.antonchaynikov.triptracker.data.repository.Repository;
 import com.antonchaynikov.triptracker.data.tripmanager.StatisticsCalculator;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
 import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
+import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.junit.After;
@@ -27,11 +29,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import io.reactivex.Completable;
+import io.reactivex.observers.BaseTestConsumer;
+import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -88,12 +94,6 @@ public class TripViewModelTripManagerIntegration {
     }
 
     @Test
-    public void testStub() {
-        assertTrue(2 == 2);
-    }
-
-    /*
-    @Test
     public void shouldEmitStatistics_onNewLocationUpdate() throws Exception {
         TestObserver<TripStatistics> statisticsObserver = TestObserver.create();
         mViewModel.getTripStatisticsStreamObservable().subscribe(statisticsObserver);
@@ -105,12 +105,12 @@ public class TripViewModelTripManagerIntegration {
             mLocationObservable.onNext(location);
         }
 
+        statisticsObserver.awaitCount(locationsCount + 1, BaseTestConsumer.TestWaitStrategy.YIELD, TimeUnit.SECONDS.toMillis(1));
+
         // expecting locationsCount + 1 initial default statistics update
         assertEquals(locationsCount + 1, statisticsObserver.valueCount());
     }
-    */
 
-    /*
     @Test
     public void shouldEmitMapOptions_onNewLocationUpdate() throws Exception {
         TestObserver<MapOptions> mapOptionsObserver = TestObserver.create();
@@ -123,23 +123,25 @@ public class TripViewModelTripManagerIntegration {
             mLocationObservable.onNext(location);
         }
 
+        mapOptionsObserver.awaitCount(itemsCount, BaseTestConsumer.TestWaitStrategy.YIELD, TimeUnit.SECONDS.toMillis(1));
+
         assertEquals(itemsCount, mapOptionsObserver.valueCount());
     }
-    */
 
-    /*
     @Test
     public void shouldEmitGeolocationError_whenGeolocationUnavailable() throws Exception {
         TestObserver<Integer> snackbarMessageObserver = TestObserver.create();
+
         mViewModel.getShowSnackbarMessageBroadcast().subscribe(snackbarMessageObserver);
 
         mViewModel.onActionButtonClicked();
 
         mGeolocationAvailabilityObservable.onNext(false);
 
+        snackbarMessageObserver.awaitCount(1, BaseTestConsumer.TestWaitStrategy.YIELD, TimeUnit.SECONDS.toMillis(1));
+
         snackbarMessageObserver.assertValue(R.string.message_geolocation_unavailable);
     }
-    */
 
     private List<Location> createLocationsList(int locationCount) {
         List<Location> locations = new ArrayList<>(locationCount);
