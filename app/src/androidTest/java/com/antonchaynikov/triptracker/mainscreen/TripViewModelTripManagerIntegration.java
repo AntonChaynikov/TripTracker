@@ -17,7 +17,6 @@ import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
 import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
 import com.google.firebase.auth.FirebaseAuth;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -82,14 +81,9 @@ public class TripViewModelTripManagerIntegration {
 
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        TripManager tripManager = TripManager.getInstance(mockRepository, mockLocationSource, new StatisticsCalculator());
+        TripManager tripManager = new TripManager(mockRepository, mockLocationSource, new StatisticsCalculator());
 
         mViewModel = new TripViewModel(tripManager, sFirebaseAuth, new StatisticsFormatter(context), true);
-    }
-
-    @After
-    public void tearDown() {
-        TripManager.resetInstance();
     }
 
     @Test

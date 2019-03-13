@@ -28,7 +28,8 @@ public final class TripManager {
     private StatisticsCalculator mStatisticsCalculator;
     private volatile Trip mCurrentStartedTrip;
 
-    private TripManager(
+    @VisibleForTesting
+    public TripManager(
             @NonNull Repository repository,
             @NonNull LocationSource locationSource,
             @NonNull StatisticsCalculator statisticsCalculator) {
