@@ -1,4 +1,4 @@
-package com.antonchaynikov.triptracker.mainscreen;
+package com.antonchaynikov.triptracker;
 
 import android.location.Location;
 
@@ -10,14 +10,13 @@ import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
-
-class MockLocationSource implements LocationSource {
+public class MockLocationSource implements LocationSource {
 
     private List<Location> mLocations;
     private PublishSubject<Location> mLocationsObservable = PublishSubject.create();
     private PublishSubject<Boolean> mGeolocationAvailabilityObservable = PublishSubject.create();
 
-    MockLocationSource(@NonNull List<Location> locations) {
+    public MockLocationSource(@NonNull List<Location> locations) {
         mLocations = locations;
     }
 
@@ -43,7 +42,7 @@ class MockLocationSource implements LocationSource {
         return mGeolocationAvailabilityObservable;
     }
 
-    void onGeolocationAvailabilityChanged(boolean isAvailable) {
+    public void onGeolocationAvailabilityChanged(boolean isAvailable) {
         mGeolocationAvailabilityObservable.onNext(isAvailable);
     }
 }

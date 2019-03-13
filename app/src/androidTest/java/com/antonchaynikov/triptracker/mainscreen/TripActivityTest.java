@@ -6,6 +6,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.SystemClock;
 
+import com.antonchaynikov.triptracker.MockLocationSource;
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.data.repository.Repository;
 import com.antonchaynikov.triptracker.data.tripmanager.StatisticsCalculator;
@@ -78,7 +79,6 @@ public class TripActivityTest {
                 sFirebaseAuth,
                 new StatisticsFormatter(context),
                 true);
-
     }
 
     @After

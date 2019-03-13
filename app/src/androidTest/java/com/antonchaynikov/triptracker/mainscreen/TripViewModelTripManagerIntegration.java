@@ -5,9 +5,9 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.SystemClock;
 
+import com.antonchaynikov.triptracker.MockLocationSource;
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.RxImmediateSchedulerRule;
-import com.antonchaynikov.triptracker.data.location.LocationSource;
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
 import com.antonchaynikov.triptracker.data.repository.Repository;
@@ -34,7 +34,6 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import io.reactivex.Completable;
 import io.reactivex.observers.BaseTestConsumer;
 import io.reactivex.observers.TestObserver;
-import io.reactivex.subjects.PublishSubject;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,17 +44,15 @@ public class TripViewModelTripManagerIntegration {
     @ClassRule
     public static final RxImmediateSchedulerRule IMMEDIATE_SCHEDULER_RULE = new RxImmediateSchedulerRule();
 
+    private static final int LOCATIONS_COUNT = 2;
     private static FirebaseAuth sFirebaseAuth;
 
     private TripViewModel mViewModel;
 
     @Mock
     private Repository mockRepository;
-    @Mock
-    private LocationSource mockLocationSource;
 
-    private PublishSubject<Location> mLocationObservable = PublishSubject.create();
-    private PublishSubject<Boolean> mGeolocationAvailabilityObservable = PublishSubject.create();
+    private MockLocationSource mockLocationSource;
 
     @BeforeClass
     public static void setTestEnv() throws Exception {
@@ -76,10 +73,9 @@ public class TripViewModelTripManagerIntegration {
         doReturn(Completable.complete()).when(mockRepository).addCoordinate(any(TripCoordinate.class), any(Trip.class));
         doReturn(Completable.complete()).when(mockRepository).updateTrip(any(Trip.class));
 
-        doReturn(mLocationObservable).when(mockLocationSource).getLocationsObservable();
-        doReturn(mGeolocationAvailabilityObservable).when(mockLocationSource).getGeolocationAvailabilityObservable();
-
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+
+        mockLocationSource = new MockLocationSource(createLocationsList(LOCATIONS_COUNT));
 
         TripManager tripManager = new TripManager(mockRepository, mockLocationSource, new StatisticsCalculator());
 
@@ -93,15 +89,10 @@ public class TripViewModelTripManagerIntegration {
 
         mViewModel.onActionButtonClicked();
 
-        int locationsCount = 2;
-        for (Location location : createLocationsList(locationsCount)) {
-            mLocationObservable.onNext(location);
-        }
-
-        statisticsObserver.awaitCount(locationsCount + 1, BaseTestConsumer.TestWaitStrategy.YIELD, TimeUnit.SECONDS.toMillis(1));
+        statisticsObserver.awaitCount(LOCATIONS_COUNT + 1, BaseTestConsumer.TestWaitStrategy.YIELD, TimeUnit.SECONDS.toMillis(1));
 
         // expecting locationsCount + 1 initial default statistics update
-        assertEquals(locationsCount + 1, statisticsObserver.valueCount());
+        assertEquals(LOCATIONS_COUNT + 1, statisticsObserver.valueCount());
     }
 
     @Test
@@ -111,14 +102,9 @@ public class TripViewModelTripManagerIntegration {
 
         mViewModel.onActionButtonClicked();
 
-        int itemsCount = 2;
-        for (Location location : createLocationsList(itemsCount)) {
-            mLocationObservable.onNext(location);
-        }
+        mapOptionsObserver.awaitCount(LOCATIONS_COUNT, BaseTestConsumer.TestWaitStrategy.YIELD, TimeUnit.SECONDS.toMillis(1));
 
-        mapOptionsObserver.awaitCount(itemsCount, BaseTestConsumer.TestWaitStrategy.YIELD, TimeUnit.SECONDS.toMillis(1));
-
-        assertEquals(itemsCount, mapOptionsObserver.valueCount());
+        assertEquals(LOCATIONS_COUNT, mapOptionsObserver.valueCount());
     }
 
     @Test
@@ -129,7 +115,7 @@ public class TripViewModelTripManagerIntegration {
 
         mViewModel.onActionButtonClicked();
 
-        mGeolocationAvailabilityObservable.onNext(false);
+        mockLocationSource.onGeolocationAvailabilityChanged(false);
 
         snackbarMessageObserver.awaitCount(1, BaseTestConsumer.TestWaitStrategy.YIELD, TimeUnit.SECONDS.toMillis(1));
 
