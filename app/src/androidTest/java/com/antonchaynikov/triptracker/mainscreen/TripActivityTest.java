@@ -7,7 +7,6 @@ import android.location.LocationManager;
 import android.os.SystemClock;
 
 import com.antonchaynikov.triptracker.R;
-import com.antonchaynikov.triptracker.data.location.LocationSource;
 import com.antonchaynikov.triptracker.data.repository.Repository;
 import com.antonchaynikov.triptracker.data.tripmanager.StatisticsCalculator;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
@@ -29,6 +28,8 @@ import java.util.concurrent.CountDownLatch;
 
 import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.IdlingResource;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
@@ -36,6 +37,7 @@ import androidx.test.rule.GrantPermissionRule;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
@@ -49,9 +51,10 @@ public class TripActivityTest {
 
     private ActivityTestRule<TripActivity> activityTestRule = new ActivityTestRule<>(TripActivity.class, true, false);
 
+    // Instantly returns Completable.complete()
     private Repository mockRepository;
     private TripViewModel mViewModel;
-    private LocationSource mockLocationSource;
+    private MockLocationSource mockLocationSource;
 
     @BeforeClass
     public static void initTestEnv() throws Exception {
@@ -102,13 +105,35 @@ public class TripActivityTest {
     }
 
     @Test
-    public void shouldShowMarker_whenLocationReceived() throws Exception {
+    public void shouldShowGeolocationError_whenGeolocationIsUnavailable() throws Exception {
         activityTestRule.launchActivity(TripActivity.getStartIntent(
                 InstrumentationRegistry.getInstrumentation().getTargetContext(),
                 sFirebaseAuth.getCurrentUser()
         ));
         TripActivity activity = activityTestRule.getActivity();
         activity.injectViewModel(mViewModel);
+
+        onView(withId(R.id.btn_layout_statistics)).perform(click());
+
+        mockLocationSource.onGeolocationAvailabilityChanged(false);
+
+        onView(withText(R.string.message_geolocation_unavailable)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+    }
+
+    @Test
+    public void shouldChangeActionButtonText_whenTripStarts() {
+        activityTestRule.launchActivity(TripActivity.getStartIntent(
+                InstrumentationRegistry.getInstrumentation().getTargetContext(),
+                sFirebaseAuth.getCurrentUser()
+        ));
+        TripActivity activity = activityTestRule.getActivity();
+        activity.injectViewModel(mViewModel);
+
+        ViewInteraction actionButtonInteraction = onView(withId(R.id.btn_layout_statistics));
+        actionButtonInteraction.check(matches(withText(R.string.button_act)));
+        actionButtonInteraction.perform(click());
+
+        actionButtonInteraction.check(matches(withText(R.string.button_stop)));
     }
 
     private List<Location> createLocationsList() {
@@ -151,7 +176,6 @@ public class TripActivityTest {
 
         @Override
         public void describeTo(Description description) {
-
         }
     }
 }

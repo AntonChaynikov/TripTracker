@@ -1,7 +1,6 @@
 package com.antonchaynikov.triptracker.data.tripmanager;
 
 import android.location.Location;
-import android.util.Log;
 
 import com.antonchaynikov.triptracker.data.location.LocationSource;
 import com.antonchaynikov.triptracker.data.model.Trip;
@@ -27,7 +26,7 @@ public final class TripManager {
     private Repository mRepository;
     private LocationSource mLocationSource;
     private StatisticsCalculator mStatisticsCalculator;
-    private Trip mCurrentStartedTrip;
+    private volatile Trip mCurrentStartedTrip;
 
     private TripManager(
             @NonNull Repository repository,
@@ -91,14 +90,12 @@ public final class TripManager {
     }
 
     private void onTripStarted(@NonNull Trip trip) {
-        Log.d("TripManager", "onTripStarted" + trip);
         mCurrentStartedTrip = trip;
         mLocationSource.startUpdates();
     }
 
     private void onTripFinished() {
         mLocationSource.finishUpdates();
-        Log.d("TripManager", "onTripFinished " + null);
         mCurrentStartedTrip = null;
     }
 
