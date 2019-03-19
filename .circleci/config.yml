@@ -159,7 +159,7 @@ jobs:
         command: ./gradlew androidDependencies
 
   ## Run instrumented tests
-  test_instrumented
+  test_instrumented:
     <<: *gcloud_config
     steps:
     - *attach_debug_workspace
