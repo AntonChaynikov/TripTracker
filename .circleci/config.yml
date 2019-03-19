@@ -212,9 +212,7 @@ workflows:
   version: 2
   workflow:
     jobs:
-
     - checkstyle
-    - init_fastlane
 
     - build_debug:
         requires:
