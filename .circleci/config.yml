@@ -216,7 +216,11 @@ workflows:
   version: 2
   workflow:
     jobs:
-    - checkstyle
+
+    - checkstyle:
+      filters:
+        tags:
+          only: /.*/
 
     - build_debug:
         requires:
