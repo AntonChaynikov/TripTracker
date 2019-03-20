@@ -93,6 +93,14 @@ references:
       name: Decode secret.json
       command: echo $GCLOUD_KEY > ./client-secret.json
 
+  ## Fastlane
+
+  #init
+  init_fastlane: &init_fastlane
+    run:
+      name: Init Fastlane
+      command: bundle install
+
 jobs:
 
   ## Build debug APK and instrumented test APK
@@ -171,9 +179,7 @@ jobs:
     - *decode_gplay_key
     - *decode_fabric_key
     - *attach_release_workspace
-    - run:
-        name: Init Fastlane
-        command: bundle install
+    - *init_fastlane
     - run:
         name: Deploy to Google Play alpha
         command: bundle exec fastlane deploy track:'alpha'
@@ -188,12 +194,10 @@ jobs:
     - *decode_gplay_key
     - *decode_fabric_key
     - *attach_release_workspace
-    - run:
-        name: Download dependencies
-        command: ./gradlew androidDependencies
+    - *init_fastlane
     - run:
         name: Deploy to Fabric
-        command: ./gradlew crashlyticsUploadDistributionPlatformRelease
+        command: bundle exec fastlane beta
 
   checkstyle:
     <<: *config
@@ -221,6 +225,9 @@ workflows:
     - build_release:
         requires:
         - checkstyle
+          filters:
+            tags:
+              only: /.*/
 
     - test_unit:
         requires:
@@ -235,13 +242,19 @@ workflows:
         - build_release
         - test_unit
         - test_instrumented
+        filters:
+          tags:
+            only: /^v.*/
+          branches:
+            ignore: /.*/
 
     - deploy_fabric:
-        filters:
-          branches:
-            only:
-            - master
         requires:
         - build_release
         - test_unit
         - test_instrumented
+        filters:
+          tags:
+            only: /^v.*/
+          branches:
+            ignore: /.*/
