@@ -218,9 +218,9 @@ workflows:
     jobs:
 
     - checkstyle:
-      filters:
-        tags:
-          only: /.*/
+        filters:
+          tags:
+            only: /.*/
 
     - build_debug:
         requires:
@@ -229,9 +229,9 @@ workflows:
     - build_release:
         requires:
         - checkstyle
-          filters:
-            tags:
-              only: /.*/
+        filters:
+          tags:
+            only: /.*/
 
     - test_unit:
         requires:
