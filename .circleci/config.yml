@@ -231,7 +231,9 @@ workflows:
         - checkstyle
         filters:
           tags:
-            only: /.*/
+            only: /^v.*/
+          branches:
+            ignore: /.*/
 
     - test_unit:
         requires:
@@ -246,19 +248,10 @@ workflows:
         - build_release
         - test_unit
         - test_instrumented
-        filters:
-          tags:
-            only: /^v.*/
-          branches:
-            ignore: /.*/
+
 
     - deploy_fabric:
         requires:
         - build_release
         - test_unit
         - test_instrumented
-        filters:
-          tags:
-            only: /^v.*/
-          branches:
-            ignore: /.*/
