@@ -225,6 +225,9 @@ workflows:
     - build_debug:
         requires:
         - checkstyle
+        filters:
+          tags:
+            only: /.*/
 
     - build_release:
         requires:
@@ -238,16 +241,27 @@ workflows:
     - test_unit:
         requires:
         - build_debug
+        filters:
+          tags:
+            only: /.*/
 
     - test_instrumented:
         requires:
         - build_debug
+        filters:
+          tags:
+            only: /.*/
 
     - deploy_google_play:
         requires:
         - build_release
         - test_unit
         - test_instrumented
+        filters:
+          tags:
+            only: /^v.*/
+          branches:
+            ignore: /.*/
 
 
     - deploy_fabric:
@@ -255,3 +269,8 @@ workflows:
         - build_release
         - test_unit
         - test_instrumented
+        filters:
+          tags:
+            only: /^v.*/
+          branches:
+            ignore: /.*/
