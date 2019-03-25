@@ -8,6 +8,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.antonchaynikov.triptracker.R;
+import com.antonchaynikov.triptracker.application.TripApplication;
 import com.antonchaynikov.triptracker.data.repository.firestore.FireStoreDB;
 import com.antonchaynikov.triptracker.viewmodel.BasicViewModel;
 import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
@@ -24,6 +25,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
@@ -36,7 +38,8 @@ public class HistoryActivity extends ViewModelActivity implements OnMapReadyCall
     private static final String EXTRA_TRIP_START_DATE = "com.antonchaynikov.triptracker.history.EXTRA_TRIP_START_DATE";
     private static final String IDLING_RES_NAME = "com.antonchaynikov.triptracker.history.HistoryActivity";
 
-    private HistoryViewModel mViewModel;
+    @Inject
+    HistoryViewModel mViewModel;
 
     private ProgressBar mProgressBar;
     private View vgStatisticsLayout;
@@ -74,24 +77,16 @@ public class HistoryActivity extends ViewModelActivity implements OnMapReadyCall
 
         addMapFragment();
 
-        initViewModel();
-    }
-
-    private void initViewModel() {
         long tripStartDate = getIntent().getLongExtra(EXTRA_TRIP_START_DATE, -1);
         if (tripStartDate == -1) {
             throw new IllegalArgumentException("Should have used getStartIntent(context, long)");
         }
-        ViewModelFactory factory = new ViewModelFactory() {
-            @Override
-            public <T extends BasicViewModel> T create(@NonNull Class<T> clazz) {
-                return (T) new HistoryViewModel(
-                        FireStoreDB.getInstance(),
-                        new StatisticsFormatter(HistoryActivity.this),
-                        tripStartDate);
-            }
-        };
-        mViewModel = ViewModelProviders.of(this, factory).get(HistoryViewModel.class);
+        ((TripApplication) getApplication()).injectHistoryActivityDependencies(this, tripStartDate);
+
+        initViewModel();
+    }
+
+    private void initViewModel() {
         mSubscriptions.add(mViewModel.getShowProgressBarEventBroadcast().subscribe(this::setProgressBarVisible));
         mSubscriptions.add(mViewModel.getMapOptionsObservable().subscribe(this::onMapOptionsLoaded));
         mSubscriptions.add(mViewModel.getStatisticsObservable().subscribe(this::onTripStatisticsLoaded));

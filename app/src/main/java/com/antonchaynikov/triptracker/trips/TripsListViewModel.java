@@ -1,5 +1,7 @@
 package com.antonchaynikov.triptracker.trips;
 
+import android.util.Log;
+
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.repository.Repository;
 import com.antonchaynikov.triptracker.viewmodel.BasicViewModel;
@@ -24,6 +26,7 @@ class TripsListViewModel extends BasicViewModel {
     }
 
     void onStart() {
+        Log.d(TripsListViewModel.class.getCanonicalName(), "onStart");
         mShowProgressBarEventBroadcast.onNext(true);
         mSubscriptions.add(mRepository
                 .getAllTrips()

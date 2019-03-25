@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.antonchaynikov.triptracker.R;
+import com.antonchaynikov.triptracker.application.TripApplication;
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.repository.firestore.FireStoreDB;
 import com.antonchaynikov.triptracker.viewmodel.BasicViewModel;
@@ -16,9 +17,12 @@ import com.antonchaynikov.triptracker.viewmodel.ViewModelProviders;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.idling.CountingIdlingResource;
@@ -31,7 +35,8 @@ public class TripsListActivity extends ViewModelActivity {
     private RecyclerView mRecyclerView;
     private View vProgressBar;
     private TextView tvNoTrips;
-    private TripsListViewModel mViewModel;
+    @Inject
+    TripsListViewModel mViewModel;
 
     private CountingIdlingResource mIdlingResource = new CountingIdlingResource(IDLING_RES_NAME);
 
@@ -47,6 +52,7 @@ public class TripsListActivity extends ViewModelActivity {
         mRecyclerView = findViewById(R.id.rv_trips_list);
         vProgressBar = findViewById(R.id.pb_trips_list);
         tvNoTrips = findViewById(R.id.tv_no_trips_trips_list);
+        ((TripApplication) getApplication()).injectTripsListActivityDependencies(this);
         initViewModel();
     }
 
@@ -77,15 +83,6 @@ public class TripsListActivity extends ViewModelActivity {
     }
 
     private void initViewModel() {
-
-        ViewModelFactory factory = new ViewModelFactory() {
-            @Override
-            public <T extends BasicViewModel> T create(@NonNull Class<T> clazz) {
-                return (T) new TripsListViewModel(FireStoreDB.getInstance());
-            }
-        };
-
-        mViewModel = ViewModelProviders.of(this, factory).get(TripsListViewModel.class);
         mSubscriptions.add(mViewModel.getEmptyListEventObservable().subscribe(event -> handleEmptyTripsList()));
         mSubscriptions.add(mViewModel.getShowProgressBarEventBroadcast().subscribe(this::handleShowProgressDialogEvent));
         mSubscriptions.add(mViewModel.getTripListObservable().subscribe(this::onTripsListLoaded));
@@ -104,6 +101,7 @@ public class TripsListActivity extends ViewModelActivity {
         if (tvNoTrips.getVisibility() == View.VISIBLE) {
             tvNoTrips.setVisibility(View.GONE);
         }
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(new TripsAdapter(trips));
         mIdlingResource.decrement();
     }

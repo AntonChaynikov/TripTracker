@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.antonchaynikov.triptracker.R;
+import com.antonchaynikov.triptracker.application.TripApplication;
 import com.antonchaynikov.triptracker.authentication.LaunchActivity;
 import com.antonchaynikov.triptracker.data.location.LocationFilter;
 import com.antonchaynikov.triptracker.data.location.LocationProviderModule;
@@ -23,7 +24,7 @@ import com.antonchaynikov.triptracker.data.tripmanager.StatisticsCalculator;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
 import com.antonchaynikov.triptracker.history.HistoryActivity;
 import com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState;
-import com.antonchaynikov.triptracker.trips.AbcActivity;
+import com.antonchaynikov.triptracker.trips.TripsListActivity;
 import com.antonchaynikov.triptracker.viewmodel.BasicViewModel;
 import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
 import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
@@ -40,6 +41,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
@@ -59,7 +62,8 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
     private static final String TAG = TripActivity.class.getSimpleName();
 
     private boolean mPermissionGranted;
-    private TripViewModel mViewModel;
+    @Inject
+    TripViewModel mViewModel;
 
     private View mRootView;
     private Button mButton;
@@ -101,6 +105,7 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
         addMapFragment();
         mSubscriptions = new CompositeDisposable();
 
+        ((TripApplication) getApplication()).injectTripActivityDependencies(this, mPermissionGranted);
         initViewModel();
     }
 
@@ -114,7 +119,7 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
     @VisibleForTesting
     void injectViewModel(@NonNull TripViewModel tripViewModel) {
         mViewModel = tripViewModel;
-        subscribeToViewModelEvents();
+        initViewModel();
     }
 
     @VisibleForTesting
@@ -124,26 +129,6 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
     }
 
     private void initViewModel() {
-        LocationSourceImpl locationSource = LocationSourceImpl.getInstance(this);
-        locationSource.setLocationProvider(LocationProviderModule.provide(this, new LocationFilter()));
-        ViewModelFactory factory = new ViewModelFactory() {
-            @Override
-            public <T extends BasicViewModel> T create(@NonNull Class<T> clazz) {
-                return (T) new TripViewModel(
-                        TripManager.getInstance(
-                                FireStoreDB.getInstance(),
-                                locationSource,
-                                new StatisticsCalculator()),
-                        FirebaseAuth.getInstance(),
-                        new StatisticsFormatter(TripActivity.this),
-                        mPermissionGranted);
-            }
-        };
-        mViewModel = ViewModelProviders.of(this, factory).get(TripViewModel.class);
-        subscribeToViewModelEvents();
-    }
-
-    private void subscribeToViewModelEvents() {
         mSubscriptions.add(mViewModel.getAskLocationPermissionEventObservable().subscribe(event -> onLocationPermissionRequested()));
         mSubscriptions.add(mViewModel.getUiStateChangeEventObservable().subscribe(this::onUiStateUpdate));
         mSubscriptions.add(mViewModel.getShowSnackbarMessageBroadcast().subscribe(this::showSnackbarMessage));
@@ -243,7 +228,7 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
     }
 
     private void goToStatisticsScreen() {
-        startActivity(new Intent(this, AbcActivity.class));
+        startActivity(new Intent(this, TripsListActivity.class));
     }
 
     private void goToSummaryScreen(long tripStartDate) {
