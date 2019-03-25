@@ -4,10 +4,15 @@ apply plugin: 'jacoco-android'
 apply from: '../checkstyle/checkstyle.gradle'
 apply plugin: 'io.fabric'
 
-def versionMajor = 1
-def versionMinor = 0
-def versionPatch = 2
-def versionBuild = 0
+def versionPropertiesFile = rootProject.file("version.properties")
+def versionProperties = new Properties()
+versionProperties.load(new FileInputStream(versionPropertiesFile))
+
+def versionMajor = Integer.parseInt(versionProperties['versionMajor'])
+def versionMinor = Integer.parseInt(versionProperties['versionMinor'])
+def versionPatch = Integer.parseInt(versionProperties['versionPatch'])
+def versionBuild = Integer.parseInt(versionProperties['versionBuild'])
+
 def versionSuffix = versionBuild > 0 ? "-beta" : ""
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -164,6 +169,45 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.1.1'
     androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"
+}
+
+task deployNewBuildVersion {
+    doLast{
+        versionProperties['versionBuild'] = Integer.toString(versionBuild + 1)
+        versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased build version")
+        addTag()
+    }
+}
+
+task deployNewMinorVersion {
+    doLast{
+        versionProperties['versionMinor'] = Integer.toString(versionMinor + 1)
+        versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased Minor version")
+        addTag()
+    }
+}
+
+task deployNewMajorVersion {
+    doLast{
+        versionProperties['versionMajor'] = Integer.toString(versionMajor + 1)
+        versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased Major version")
+        addTag()
+    }
+}
+
+task deployNewPatchVersion {
+    doLast{
+        versionProperties['versionPatch'] = Integer.toString(versionPatch + 1)
+        versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased patch version")
+        addTag()
+    }
+}
+
+def addTag() {
+    def version = "v${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}${versionSuffix}"
+    exec {
+        commandLine "git", "tag", "-a", "${version}", "-m", "Tag added automatically via gradle task"
+    }
 }
 
 apply plugin: 'com.google.gms.google-services'
