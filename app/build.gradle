@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.github.triplet.play'
 apply plugin: 'jacoco-android'
 apply from: '../checkstyle/checkstyle.gradle'
 apply plugin: 'io.fabric'
+apply from: './publish.gradle'
 
 project.ext.versionPropertiesFile = rootProject.file("version.properties")
 project.ext.versionProperties = new Properties()
@@ -26,16 +26,8 @@ jacoco {
 android {
     compileSdkVersion 28
 
-    playAccountConfigs {
-        defaultAccountConfig {
-            serviceAccountEmail = "gps-logger-gplay@api-7194191596450161697-308117.iam.gserviceaccount.com"
-            jsonFile = file('google_play_key.json')
-        }
-    }
-
     defaultConfig {
         applicationId "com.antonchaynikov.triptracker"
-        playAccountConfig = playAccountConfigs.defaultAccountConfig
         minSdkVersion 19
         targetSdkVersion 28
         versionCode versionMajor * 100000 + versionMinor * 10000 + versionPatch * 1000 + versionBuild
@@ -101,10 +93,6 @@ android {
     useLibrary 'android.test.mock'
 }
 
-play {
-    track = 'alpha'
-}
-
 ext {
     ANDROIDX_APPCOMPAT = '1.0.2'
     ANDROIDX_SUPPORT_V4 =  '1.0.0'
@@ -168,94 +156,6 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.1.1'
     androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"
-}
-
-task deployNewBuildVersion {
-    doLast{
-        deployNewVersion('versionBuild')
-    }
-}
-
-task deployNewMinorVersion {
-    doLast{
-        deployNewVersion('versionMinor')
-    }
-}
-
-task deployNewMajorVersion {
-    doLast{
-        deployNewVersion('versionMajor')
-    }
-}
-
-task deployNewPatchVersion {
-    doLast{
-        deployNewVersion('versionPatch')
-    }
-}
-
-def deployNewVersion(String versionField) {
-    checkAllChangesCommitted()
-    checkIsOnCorrectBranch('fastlane-test')
-    incrementVersionField(versionField)
-    commitVersionChanges()
-    addTag()
-    pushToRemote()
-}
-
-def addTag() {
-    def version = "v${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}${versionSuffix}"
-    exec {
-        commandLine "git", "tag", "-a", "${version}", "-m", "Tag added automatically via gradle task"
-    }
-}
-
-def checkAllChangesCommitted() {
-    try {
-        exec {
-            commandLine "git", "diff-index", "--quiet", "HEAD"
-        }
-    } catch (Exception e) {
-        throw new IllegalStateException("Commit or discard all changes before deployment", e)
-    }
-}
-
-def incrementVersionField(String versionField) {
-    versionProperties[versionField] = Integer.toString(project.ext."${versionField}" + 1)
-    project.ext."${versionField}" = project.ext."${versionField}" + 1
-    versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased patch version")
-}
-
-def commitVersionChanges() {
-    exec {
-        commandLine "git", "add", "../version.properties"
-    }
-    exec {
-        commandLine "git", "commit", "-m", "\"Increased app version via script\""
-    }
-}
-
-def checkIsOnCorrectBranch(String branchName) {
-    if (!getCurrentBranchName().equals(branchName)) {
-        throw new IllegalStateException("Can only deploy from ${branchName} branch. Current branch: ${getCurrentBranchName()}")
-    }
-}
-
-def getCurrentBranchName() {
-    new ByteArrayOutputStream().withStream { os ->
-        exec {
-            executable = "git"
-            args = ["rev-parse", "--abbrev-ref", "HEAD"]
-            standardOutput = os
-        }
-        return os.toString().trim()
-    }
-}
-
-def pushToRemote() {
-    exec {
-        commandLine "git", "push", "--follow-tags"
-    }
 }
 
 apply plugin: 'com.google.gms.google-services'

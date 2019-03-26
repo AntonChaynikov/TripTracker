@@ -1,0 +1,87 @@
+task deployNewBuildVersion {
+    doLast{
+        deployNewVersion('versionBuild')
+    }
+}
+
+task deployNewMinorVersion {
+    doLast{
+        deployNewVersion('versionMinor')
+    }
+}
+
+task deployNewMajorVersion {
+    doLast{
+        deployNewVersion('versionMajor')
+    }
+}
+
+task deployNewPatchVersion {
+    doLast{
+        deployNewVersion('versionPatch')
+    }
+}
+
+def deployNewVersion(String versionField) {
+    checkAllChangesCommitted()
+    checkIsOnCorrectBranch('fastlane-test')
+    incrementVersionField(versionField)
+    commitVersionChanges()
+    addTag()
+    pushToRemote()
+}
+
+def addTag() {
+    def version = "v${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}"
+    exec {
+        commandLine "git", "tag", "-a", "${version}", "-m", "Tag added automatically via gradle task"
+    }
+}
+
+def checkAllChangesCommitted() {
+    try {
+        exec {
+            commandLine "git", "diff-index", "--quiet", "HEAD"
+        }
+    } catch (Exception e) {
+        throw new IllegalStateException("Commit or discard all changes before deployment", e)
+    }
+}
+
+def incrementVersionField(String versionField) {
+    versionProperties[versionField] = Integer.toString(project.ext."${versionField}" + 1)
+    project.ext."${versionField}" = project.ext."${versionField}" + 1
+    versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased patch version")
+}
+
+def commitVersionChanges() {
+    exec {
+        commandLine "git", "add", "../version.properties"
+    }
+    exec {
+        commandLine "git", "commit", "-m", "\"Increased app version via script\""
+    }
+}
+
+def checkIsOnCorrectBranch(String branchName) {
+    if (!getCurrentBranchName().equals(branchName)) {
+        throw new IllegalStateException("Can only deploy from ${branchName} branch. Current branch: ${getCurrentBranchName()}")
+    }
+}
+
+def getCurrentBranchName() {
+    new ByteArrayOutputStream().withStream { os ->
+        exec {
+            executable = "git"
+            args = ["rev-parse", "--abbrev-ref", "HEAD"]
+            standardOutput = os
+        }
+        return os.toString().trim()
+    }
+}
+
+def pushToRemote() {
+    exec {
+        commandLine "git", "push", "--follow-tags"
+    }
+}
