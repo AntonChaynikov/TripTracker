@@ -218,7 +218,7 @@ def areAllChangesCommitted() {
     }
 }
 
-def incrementVersionField(def versionField) {
+def incrementVersionField(String versionField) {
     versionProperties[versionField] = Integer.toString(versionProperties[versionField] + 1)
     versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased patch version")
 }
