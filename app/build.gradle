@@ -200,9 +200,11 @@ task deployNewMajorVersion {
 task deployNewPatchVersion {
     doLast{
         areAllChangesCommitted()
-        incrementVersionField('versionPatch')
-        commitVersionChanges()
-        addTag()
+        if (isOnCorrectBranch('master')) {
+            incrementVersionField('versionPatch')
+            commitVersionChanges()
+            addTag()
+        }
     }
 }
 
@@ -235,6 +237,21 @@ def commitVersionChanges() {
     }
     exec {
         commandLine "git", "commit", "-m", "\"Increased app version via script\""
+    }
+}
+
+def isOnCorrectBranch(String branchName) {
+    return getCurrentBranchName.equals(branchName);
+}
+
+def getCurrentBranchName = {
+    new ByteArrayOutputStream().withStream { os ->
+        exec {
+            executable = "git"
+            args = ["rev-parse", "--abbrev-ref", "HEAD"]
+            standardOutput = os
+        }
+        return os.toString()
     }
 }
 
