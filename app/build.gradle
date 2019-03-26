@@ -173,53 +173,37 @@ dependencies {
 
 task deployNewBuildVersion {
     doLast{
-        checkForUncommittedChanges()
-        if (execResult == 0) {
-            versionProperties['versionBuild'] = Integer.toString(versionBuild + 1)
-            versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased build version")
-            addTag()
-        } else {
-            throw new IllegalStateException("There are uncommitted changes")
-        }
+        areAllChangesCommitted()
+        versionProperties['versionBuild'] = Integer.toString(versionBuild + 1)
+        versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased build version")
+        addTag()
     }
 }
 
 task deployNewMinorVersion {
     doLast{
-        checkForUncommittedChanges()
-        if (execResult == 0) {
-            versionProperties['versionMinor'] = Integer.toString(versionMinor + 1)
-            versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased Minor version")
-            addTag()
-        } else {
-            throw new IllegalStateException("There are uncommitted changes")
-        }
+        areAllChangesCommitted()
+        versionProperties['versionMinor'] = Integer.toString(versionMinor + 1)
+        versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased Minor version")
+        addTag()
     }
 }
 
 task deployNewMajorVersion {
     doLast{
-        checkForUncommittedChanges()
-        if (execResult == 0) {
-            versionProperties['versionMajor'] = Integer.toString(versionMajor + 1)
-            versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased Major version")
-            addTag()
-        } else {
-            throw new IllegalStateException("There are uncommitted changes")
-        }
+        areAllChangesCommitted()
+        versionProperties['versionMajor'] = Integer.toString(versionMajor + 1)
+        versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased Major version")
+        addTag()
     }
 }
 
 task deployNewPatchVersion {
     doLast{
-        checkForUncommittedChanges()
-        if (execResult == 0) {
-            versionProperties['versionPatch'] = Integer.toString(versionPatch + 1)
-            versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased patch version")
-            addTag()
-        } else {
-            throw new IllegalStateException("There are uncommitted changes")
-        }
+        areAllChangesCommitted()
+        versionProperties['versionPatch'] = Integer.toString(versionPatch + 1)
+        versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased patch version")
+        addTag()
     }
 }
 
@@ -230,9 +214,14 @@ def addTag() {
     }
 }
 
-def checkForUncommittedChanges() {
-    exec {
-        commandLine "git", "diff-index", "--quiet", "HEAD"
+def areAllChangesCommitted() {
+    try {
+        exec {
+            commandLine "git", "diff-index", "--quiet", "HEAD"
+        }
+    } catch (Exception e) {
+        System.out.println("Commit or discard all changes before deployment")
+        System.out.println(e.message);
     }
 }
 
