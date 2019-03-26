@@ -4,17 +4,8 @@ apply plugin: 'jacoco-android'
 apply from: '../checkstyle/checkstyle.gradle'
 apply plugin: 'io.fabric'
 
-def versionPropertiesFile = rootProject.file("version.properties")
-def versionProperties = new Properties()
-versionProperties.load(new FileInputStream(versionPropertiesFile))
-
-ext {
-    versionMajor = Integer.parseInt(versionProperties['versionMajor'])
-    versionMinor = Integer.parseInt(versionProperties['versionMinor'])
-    versionPatch = Integer.parseInt(versionProperties['versionPatch'])
-    versionBuild = Integer.parseInt(versionProperties['versionBuild'])
-    versionSuffix = versionBuild > 0 ? "-beta" : ""
-}
+project.ext.versionProperties = new Properties()
+updateVersionProperties()
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
@@ -204,6 +195,7 @@ task deployNewPatchVersion {
         areAllChangesCommitted()
         versionProperties['versionPatch'] = Integer.toString(versionPatch + 1)
         versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased patch version")
+        updateVersionProperties()
         addTag()
     }
 }
@@ -223,6 +215,16 @@ def areAllChangesCommitted() {
     } catch (Exception e) {
         throw new IllegalStateException("Commit or discard all changes before deployment", e)
     }
+}
+
+def updateVersionProperties() {
+    def versionPropertiesFile = rootProject.file("version.properties")
+    versionProperties.load(new FileInputStream(versionPropertiesFile))
+    project.ext.versionMajor = Integer.parseInt(versionProperties['versionMajor'])
+    project.ext.versionMinor = Integer.parseInt(versionProperties['versionMinor'])
+    project.ext.versionPatch = Integer.parseInt(versionProperties['versionPatch'])
+    project.ext.versionBuild = Integer.parseInt(versionProperties['versionBuild'])
+    project.ext.versionSuffix = versionBuild > 0 ? "-beta" : ""
 }
 
 apply plugin: 'com.google.gms.google-services'
