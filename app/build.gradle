@@ -235,7 +235,7 @@ def updateVersionProperties() {
 def commitVersionChanges() {
     exec {
         commandLine "git", "add", "version.properties"
-        commandLine "git", "commit", "-m", "Increased app version via script"
+        commandLine "git", "commit", "-m", "\"Increased app version via script\""
     }
 }
 
