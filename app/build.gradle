@@ -231,7 +231,7 @@ def incrementVersionField(String versionField) {
 
 def commitVersionChanges() {
     exec {
-        commandLine "git", "add", "version.properties"
+        commandLine "git", "add", "../version.properties"
     }
     exec {
         commandLine "git", "commit", "-m", "\"Increased app version via script\""
