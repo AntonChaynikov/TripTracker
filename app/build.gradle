@@ -173,33 +173,53 @@ dependencies {
 
 task deployNewBuildVersion {
     doLast{
-        versionProperties['versionBuild'] = Integer.toString(versionBuild + 1)
-        versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased build version")
-        addTag()
+        checkForUncommittedChanges()
+        if (execResult == 0) {
+            versionProperties['versionBuild'] = Integer.toString(versionBuild + 1)
+            versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased build version")
+            addTag()
+        } else {
+            throw new IllegalStateException("There are uncommitted changes")
+        }
     }
 }
 
 task deployNewMinorVersion {
     doLast{
-        versionProperties['versionMinor'] = Integer.toString(versionMinor + 1)
-        versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased Minor version")
-        addTag()
+        checkForUncommittedChanges()
+        if (execResult == 0) {
+            versionProperties['versionMinor'] = Integer.toString(versionMinor + 1)
+            versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased Minor version")
+            addTag()
+        } else {
+            throw new IllegalStateException("There are uncommitted changes")
+        }
     }
 }
 
 task deployNewMajorVersion {
     doLast{
-        versionProperties['versionMajor'] = Integer.toString(versionMajor + 1)
-        versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased Major version")
-        addTag()
+        checkForUncommittedChanges()
+        if (execResult == 0) {
+            versionProperties['versionMajor'] = Integer.toString(versionMajor + 1)
+            versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased Major version")
+            addTag()
+        } else {
+            throw new IllegalStateException("There are uncommitted changes")
+        }
     }
 }
 
 task deployNewPatchVersion {
     doLast{
-        versionProperties['versionPatch'] = Integer.toString(versionPatch + 1)
-        versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased patch version")
-        addTag()
+        checkForUncommittedChanges()
+        if (execResult == 0) {
+            versionProperties['versionPatch'] = Integer.toString(versionPatch + 1)
+            versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased patch version")
+            addTag()
+        } else {
+            throw new IllegalStateException("There are uncommitted changes")
+        }
     }
 }
 
@@ -207,6 +227,12 @@ def addTag() {
     def version = "v${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}${versionSuffix}"
     exec {
         commandLine "git", "tag", "-a", "${version}", "-m", "Tag added automatically via gradle task"
+    }
+}
+
+def checkForUncommittedChanges() {
+    exec {
+        commandLine "git", "diff-index", "--quiet", "HEAD"
     }
 }
 
