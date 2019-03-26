@@ -194,9 +194,9 @@ task deployNewMajorVersion {
 task deployNewPatchVersion {
     doLast{
         areAllChangesCommitted()
-        versionProperties['versionPatch'] = Integer.toString(versionPatch + 1)
-        versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased patch version")
+        incrementVersionField('versionPatch')
         updateVersionProperties()
+        commitVersionChanges()
         addTag()
     }
 }
@@ -218,6 +218,11 @@ def areAllChangesCommitted() {
     }
 }
 
+def incrementVersionField(def versionField) {
+    versionProperties[versionField] = Integer.toString(versionProperties[versionField] + 1)
+    versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased patch version")
+}
+
 def updateVersionProperties() {
     versionProperties.load(new FileInputStream(versionPropertiesFile))
     project.ext.versionMajor = Integer.parseInt(versionProperties['versionMajor'])
@@ -226,5 +231,14 @@ def updateVersionProperties() {
     project.ext.versionBuild = Integer.parseInt(versionProperties['versionBuild'])
     project.ext.versionSuffix = versionBuild > 0 ? "-beta" : ""
 }
+
+def commitVersionChanges() {
+    exec {
+        commandLine "git", "add", "version.properties"
+        commandLine "git", "commit", "-m", "Increased app version via script"
+    }
+}
+
+
 
 apply plugin: 'com.google.gms.google-services'
