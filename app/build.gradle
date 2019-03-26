@@ -8,12 +8,13 @@ def versionPropertiesFile = rootProject.file("version.properties")
 def versionProperties = new Properties()
 versionProperties.load(new FileInputStream(versionPropertiesFile))
 
-def versionMajor = Integer.parseInt(versionProperties['versionMajor'])
-def versionMinor = Integer.parseInt(versionProperties['versionMinor'])
-def versionPatch = Integer.parseInt(versionProperties['versionPatch'])
-def versionBuild = Integer.parseInt(versionProperties['versionBuild'])
-
-def versionSuffix = versionBuild > 0 ? "-beta" : ""
+ext {
+    versionMajor = Integer.parseInt(versionProperties['versionMajor'])
+    versionMinor = Integer.parseInt(versionProperties['versionMinor'])
+    versionPatch = Integer.parseInt(versionProperties['versionPatch'])
+    versionBuild = Integer.parseInt(versionProperties['versionBuild'])
+    versionSuffix = versionBuild > 0 ? "-beta" : ""
+}
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
@@ -220,8 +221,7 @@ def areAllChangesCommitted() {
             commandLine "git", "diff-index", "--quiet", "HEAD"
         }
     } catch (Exception e) {
-        System.out.println("Commit or discard all changes before deployment")
-        System.out.println(e.message);
+        throw new IllegalStateException("Commit or discard all changes before deployment", e)
     }
 }
 
