@@ -172,40 +172,35 @@ dependencies {
 
 task deployNewBuildVersion {
     doLast{
-        areAllChangesCommitted()
-        versionProperties['versionBuild'] = Integer.toString(versionBuild + 1)
-        versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased build version")
-        addTag()
+        deployNewVersion('versionBuild')
     }
 }
 
 task deployNewMinorVersion {
     doLast{
-        areAllChangesCommitted()
-        versionProperties['versionMinor'] = Integer.toString(versionMinor + 1)
-        versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased Minor version")
-        addTag()
+        deployNewVersion('versionMinor')
     }
 }
 
 task deployNewMajorVersion {
     doLast{
-        areAllChangesCommitted()
-        versionProperties['versionMajor'] = Integer.toString(versionMajor + 1)
-        versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased Major version")
-        addTag()
+        deployNewVersion('versionMajor')
     }
 }
 
 task deployNewPatchVersion {
     doLast{
-        areAllChangesCommitted()
-        if (isOnCorrectBranch('master')) {
-            incrementVersionField('versionPatch')
-            commitVersionChanges()
-            addTag()
-        }
+        deployNewVersion('versionPatch')
     }
+}
+
+def deployNewVersion(String versionField) {
+    checkAllChangesCommitted()
+    checkIsOnCorrectBranch('fastlane-test')
+    incrementVersionField(versionField)
+    commitVersionChanges()
+    addTag()
+    pushToRemote()
 }
 
 def addTag() {
@@ -215,7 +210,7 @@ def addTag() {
     }
 }
 
-def areAllChangesCommitted() {
+def checkAllChangesCommitted() {
     try {
         exec {
             commandLine "git", "diff-index", "--quiet", "HEAD"
@@ -227,7 +222,7 @@ def areAllChangesCommitted() {
 
 def incrementVersionField(String versionField) {
     versionProperties[versionField] = Integer.toString(project.ext."${versionField}" + 1)
-    project.ext."${versionField}" = project.ext."${versionField}" + 1;
+    project.ext."${versionField}" = project.ext."${versionField}" + 1
     versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased patch version")
 }
 
@@ -240,18 +235,26 @@ def commitVersionChanges() {
     }
 }
 
-def isOnCorrectBranch(String branchName) {
-    return getCurrentBranchName.equals(branchName);
+def checkIsOnCorrectBranch(String branchName) {
+    if (!getCurrentBranchName().equals(branchName)) {
+        throw new IllegalStateException("Can only deploy from ${branchName} branch. Current branch: ${getCurrentBranchName()}")
+    }
 }
 
-def getCurrentBranchName = {
+def getCurrentBranchName() {
     new ByteArrayOutputStream().withStream { os ->
         exec {
             executable = "git"
             args = ["rev-parse", "--abbrev-ref", "HEAD"]
             standardOutput = os
         }
-        return os.toString()
+        return os.toString().trim()
+    }
+}
+
+def pushToRemote() {
+    exec {
+        commandLine "git", "push", "--follow-tags"
     }
 }
 
