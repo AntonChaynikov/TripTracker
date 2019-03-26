@@ -4,9 +4,15 @@ apply plugin: 'jacoco-android'
 apply from: '../checkstyle/checkstyle.gradle'
 apply plugin: 'io.fabric'
 
-project.ext.versionProperties = new Properties()
 project.ext.versionPropertiesFile = rootProject.file("version.properties")
-updateVersionProperties()
+project.ext.versionProperties = new Properties()
+versionProperties.load(new FileInputStream(versionPropertiesFile))
+
+project.ext.versionMajor = Integer.parseInt(versionProperties['versionMajor'])
+project.ext.versionMinor = Integer.parseInt(versionProperties['versionMinor'])
+project.ext.versionPatch = Integer.parseInt(versionProperties['versionPatch'])
+project.ext.versionBuild = Integer.parseInt(versionProperties['versionBuild'])
+project.ext.versionSuffix = versionBuild > 0 ? "-beta" : ""
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
@@ -195,7 +201,6 @@ task deployNewPatchVersion {
     doLast{
         areAllChangesCommitted()
         incrementVersionField('versionPatch')
-        updateVersionProperties()
         commitVersionChanges()
         addTag()
     }
@@ -219,17 +224,9 @@ def areAllChangesCommitted() {
 }
 
 def incrementVersionField(String versionField) {
-    versionProperties[versionField] = Integer.toString(Integer.parseInt(versionProperties[versionField]) + 1)
+    versionProperties[versionField] = Integer.toString(project.ext."${versionField}" + 1)
+    project.ext."${versionField}" = project.ext."${versionField}" + 1;
     versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased patch version")
-}
-
-def updateVersionProperties() {
-    versionProperties.load(new FileInputStream(versionPropertiesFile))
-    project.ext.versionMajor = Integer.parseInt(versionProperties['versionMajor'])
-    project.ext.versionMinor = Integer.parseInt(versionProperties['versionMinor'])
-    project.ext.versionPatch = Integer.parseInt(versionProperties['versionPatch'])
-    project.ext.versionBuild = Integer.parseInt(versionProperties['versionBuild'])
-    project.ext.versionSuffix = versionBuild > 0 ? "-beta" : ""
 }
 
 def commitVersionChanges() {
@@ -240,7 +237,5 @@ def commitVersionChanges() {
         commandLine "git", "commit", "-m", "\"Increased app version via script\""
     }
 }
-
-
 
 apply plugin: 'com.google.gms.google-services'
