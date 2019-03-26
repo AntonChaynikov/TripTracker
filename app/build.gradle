@@ -5,6 +5,7 @@ apply from: '../checkstyle/checkstyle.gradle'
 apply plugin: 'io.fabric'
 
 project.ext.versionProperties = new Properties()
+project.ext.versionPropertiesFile = rootProject.file("version.properties")
 updateVersionProperties()
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -218,7 +219,6 @@ def areAllChangesCommitted() {
 }
 
 def updateVersionProperties() {
-    def versionPropertiesFile = rootProject.file("version.properties")
     versionProperties.load(new FileInputStream(versionPropertiesFile))
     project.ext.versionMajor = Integer.parseInt(versionProperties['versionMajor'])
     project.ext.versionMinor = Integer.parseInt(versionProperties['versionMinor'])
