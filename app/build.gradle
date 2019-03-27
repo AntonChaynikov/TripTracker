@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 apply plugin: 'jacoco-android'
 apply from: '../checkstyle/checkstyle.gradle'
 apply plugin: 'io.fabric'
@@ -157,6 +159,10 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.1.1'
     androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 apply plugin: 'com.google.gms.google-services'
+repositories {
+    mavenCentral()
+}

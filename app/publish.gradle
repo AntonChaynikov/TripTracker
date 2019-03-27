@@ -28,7 +28,7 @@ def deployNewVersion(String versionField) {
     incrementVersionField(versionField)
     commitVersionChanges()
     addTag()
-    pushToRemote()
+    //pushToRemote()
 }
 
 def addTag() {
@@ -59,8 +59,8 @@ def incrementVersionField(String versionField) {
     def precedenceMap = getVersionPropertiesPrecedenceMap()
     precedenceMap.entrySet().each {
         if (it.value > precedenceMap.get(versionField)) {
-            project.ext."${it.key}" = 0;
-            versionProperties[it.key] = "0";
+            project.ext."${it.key}" = 0
+            versionProperties[it.key] = "0"
         }
     }
 
@@ -70,7 +70,7 @@ def incrementVersionField(String versionField) {
 def commitVersionChanges() {
     try {
         exec {
-            commandLine "git", "add", "../version.properties"
+            commandLine "git", "add", "./version.properties"
         }
     } catch (Exception e) {
         throw new Exception("Failed to stage version.properties", e)
@@ -81,6 +81,7 @@ def commitVersionChanges() {
             commandLine "git", "commit", "-m", "\"Increased app version via script\""
         }
     } catch (Exception e) {
+        revertVersionChange()
         throw new Exception("Failed to commit changes", e)
     }
 }
@@ -115,4 +116,22 @@ def getVersionPropertiesPrecedenceMap() {
         put('versionPatch', 3)
         put('versionBuild', 4)
     }}
+}
+
+def revertVersionChange() {
+    try {
+        exec {
+            commandLine "git", "checkout", "../version.properties"
+        }
+    } catch (Exception e) {
+        throw new Exception("Failed to revert version change", e)
+    }
+}
+
+def cancelCommit() {
+
+}
+
+def deleteTag() {
+
 }
