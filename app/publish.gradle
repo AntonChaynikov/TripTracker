@@ -176,3 +176,19 @@ def deleteTag(Exception cause) {
 def getVersion() {
     return "v${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}"
 }
+
+def revertChanges(Stage stage, Exception cause) {
+    switch(stage) {
+        case Stage.PUSH:
+            deleteTag(cause)
+        case Stage.ADD_TAG:
+            cancelCommit(cause)
+        case Stage.INCREASE_VERSION:
+        case Stage.COMMIT_CHANGES:
+            revertVersionChange(cause)
+    }
+}
+
+enum Stage {
+    INCREASE_VERSION, COMMIT_CHANGES, ADD_TAG, PUSH
+}
