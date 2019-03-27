@@ -34,7 +34,7 @@ def deployNewVersion(String versionField) {
     incrementVersionField(versionField)
     commitVersionChanges()
     addTag()
-    //pushToRemote()
+    pushToRemote()
 }
 
 def addTag() {
