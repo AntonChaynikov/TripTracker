@@ -115,8 +115,16 @@ def getCurrentBranchName() {
 }
 
 def pushToRemote() {
-    exec {
-        commandLine "git", "push", "--follow-tags"
+    try {
+        exec {
+            commandLine "git", "push", "--follow-tags"
+        }
+    } catch (Exception e) {
+        def exception = new Exception("Failed to add tag ${getVersion()}. Does it already exist?", e)
+        deleteTag(e)
+        cancelCommit(e)
+        revertVersionChange(e)
+        throw exception
     }
 }
 
@@ -131,6 +139,7 @@ def getVersionPropertiesPrecedenceMap() {
 
 def revertVersionChange(Exception cause) {
     try {
+        System.out.println("Reverting version change")
         exec {
             commandLine "git", "checkout", "../version.properties"
         }
@@ -142,6 +151,7 @@ def revertVersionChange(Exception cause) {
 
 def cancelCommit(Exception cause) {
     try {
+        System.out.println("Undoing commit")
         exec {
             commandLine "git", "reset", "HEAD~"
         }
@@ -153,12 +163,13 @@ def cancelCommit(Exception cause) {
 
 def deleteTag(Exception cause) {
     try {
+        System.out.println("Removing tag")
         exec {
             commandLine "git", "tag", "-d", "${getVersion()}"
         }
     } catch (Exception e) {
         e.printStackTrace()
-        throw new Exception("Failed to undo the version change commit", cause)
+        throw new Exception("Failed to remove tag", cause)
     }
 }
 
