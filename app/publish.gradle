@@ -44,8 +44,7 @@ def addTag() {
         }
     } catch (Exception e) {
         def exception = new Exception("Failed to add tag ${version}. Does it already exist?", e)
-        cancelCommit(e)
-        revertVersionChange(e)
+        revertChanges(Stage.ADD_TAG, e)
         throw exception
     }
 }
@@ -92,7 +91,7 @@ def commitVersionChanges() {
         }
     } catch (Exception e) {
         def exception = new Exception("Failed to commit changes", e)
-        revertVersionChange(e)
+        revertChanges(Stage.COMMIT_CHANGES, e)
         throw exception
     }
 }
@@ -121,9 +120,7 @@ def pushToRemote() {
         }
     } catch (Exception e) {
         def exception = new Exception("Failed to push changes to the remote", e)
-        deleteTag(e)
-        cancelCommit(e)
-        revertVersionChange(e)
+        revertChanges(Stage.PUSH, e)
         throw exception
     }
 }
