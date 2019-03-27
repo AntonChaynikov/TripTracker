@@ -116,7 +116,7 @@ def getCurrentBranchName() {
 def pushToRemote() {
     try {
         exec {
-            commandLine "git", "sdfpush", "dsfsadg--follow-tags"
+            commandLine "git", "push", "--follow-tags"
         }
     } catch (Exception e) {
         def exception = new Exception("Failed to push changes to the remote", e)
