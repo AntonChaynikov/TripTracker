@@ -73,6 +73,7 @@ def commitVersionChanges() {
             commandLine "git", "add", "./version.properties"
         }
     } catch (Exception e) {
+        revertVersionChange()
         throw new Exception("Failed to stage version.properties", e)
     }
 
