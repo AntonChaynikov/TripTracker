@@ -12,6 +12,7 @@ project.ext.versionMajor = Integer.parseInt(versionProperties['versionMajor'])
 project.ext.versionMinor = Integer.parseInt(versionProperties['versionMinor'])
 project.ext.versionPatch = Integer.parseInt(versionProperties['versionPatch'])
 project.ext.versionBuild = Integer.parseInt(versionProperties['versionBuild'])
+
 project.ext.versionSuffix = versionBuild > 0 ? "-beta" : ""
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")

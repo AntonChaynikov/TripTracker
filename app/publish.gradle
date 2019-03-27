@@ -33,8 +33,12 @@ def deployNewVersion(String versionField) {
 
 def addTag() {
     def version = "v${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}"
-    exec {
-        commandLine "git", "tag", "-a", "${version}", "-m", "Tag added automatically via gradle task"
+    try {
+        exec {
+            commandLine "git", "tag", "-a", "${version}", "-m", "Tag added automatically via gradle task"
+        }
+    } catch (Exception e) {
+        throw new Exception("Failed to add tag ${version}. Does it already exist?", e)
     }
 }
 
@@ -49,17 +53,35 @@ def checkAllChangesCommitted() {
 }
 
 def incrementVersionField(String versionField) {
-    versionProperties[versionField] = Integer.toString(project.ext."${versionField}" + 1)
     project.ext."${versionField}" = project.ext."${versionField}" + 1
-    versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased patch version")
+    versionProperties[versionField] = Integer.toString(project.ext."${versionField}")
+
+    def precedenceMap = getVersionPropertiesPrecedenceMap()
+    precedenceMap.entrySet().each {
+        if (it.value > precedenceMap.get(versionField)) {
+            project.ext."${it.key}" = 0;
+            versionProperties[it.key] = "0";
+        }
+    }
+
+    versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased ${versionField}")
 }
 
 def commitVersionChanges() {
-    exec {
-        commandLine "git", "add", "../version.properties"
+    try {
+        exec {
+            commandLine "git", "add", "../version.properties"
+        }
+    } catch (Exception e) {
+        throw new Exception("Failed to stage version.properties", e)
     }
-    exec {
-        commandLine "git", "commit", "-m", "\"Increased app version via script\""
+
+    try {
+        exec {
+            commandLine "git", "commit", "-m", "\"Increased app version via script\""
+        }
+    } catch (Exception e) {
+        throw new Exception("Failed to commit changes", e)
     }
 }
 
@@ -84,4 +106,13 @@ def pushToRemote() {
     exec {
         commandLine "git", "push", "--follow-tags"
     }
+}
+
+def getVersionPropertiesPrecedenceMap() {
+    return new HashMap<String, Integer>() {{
+        put('versionMajor', 1)
+        put('versionMinor', 2)
+        put('versionPatch', 3)
+        put('versionBuild', 4)
+    }}
 }
