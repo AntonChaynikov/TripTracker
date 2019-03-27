@@ -38,7 +38,10 @@ def addTag() {
             commandLine "git", "tag", "-a", "${version}", "-m", "Tag added automatically via gradle task"
         }
     } catch (Exception e) {
-        throw new Exception("Failed to add tag ${version}. Does it already exist?", e)
+        def exception = new Exception("Failed to add tag ${version}. Does it already exist?", e)
+        cancelCommit(e)
+        revertVersionChange(e)
+        throw exception
     }
 }
 
@@ -70,11 +73,12 @@ def incrementVersionField(String versionField) {
 def commitVersionChanges() {
     try {
         exec {
-            commandLine "git", "add", "./version.properties"
+            commandLine "git", "add", "../version.properties"
         }
     } catch (Exception e) {
-        revertVersionChange()
-        throw new Exception("Failed to stage version.properties", e)
+        def exception = new Exception("Failed to commit changes", e)
+        revertVersionChange(e)
+        throw exception
     }
 
     try {
@@ -82,8 +86,9 @@ def commitVersionChanges() {
             commandLine "git", "commit", "-m", "\"Increased app version via script\""
         }
     } catch (Exception e) {
-        revertVersionChange()
-        throw new Exception("Failed to commit changes", e)
+        def exception = new Exception("Failed to commit changes", e)
+        revertVersionChange(e)
+        throw exception
     }
 }
 
@@ -119,20 +124,36 @@ def getVersionPropertiesPrecedenceMap() {
     }}
 }
 
-def revertVersionChange() {
+def revertVersionChange(Exception cause) {
     try {
         exec {
             commandLine "git", "checkout", "../version.properties"
         }
     } catch (Exception e) {
-        throw new Exception("Failed to revert version change", e)
+        e.printStackTrace()
+        throw new Exception("Failed to revert version change", cause)
     }
 }
 
-def cancelCommit() {
-
+def cancelCommit(Exception cause) {
+    try {
+        exec {
+            commandLine "git", "reset", "HEAD~"
+        }
+    } catch (Exception e) {
+        e.printStackTrace()
+        throw new Exception("Failed to undo the version change commit", cause)
+    }
 }
 
-def deleteTag() {
-
+def deleteTag(Exception cause) {
+    def version = "v${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}"
+    try {
+        exec {
+            commandLine "git", "tag", "-d", "${version}"
+        }
+    } catch (Exception e) {
+        e.printStackTrace()
+        throw new Exception("Failed to undo the version change commit", cause)
+    }
 }
