@@ -117,7 +117,7 @@ def getCurrentBranchName() {
 def pushToRemote() {
     try {
         exec {
-            commandLine "git", "push", "--follow-tags"
+            commandLine "git", "push", "--follow-tag"
         }
     } catch (Exception e) {
         def exception = new Exception("Failed to add tag ${getVersion()}. Does it already exist?", e)
