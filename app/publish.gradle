@@ -22,6 +22,12 @@ task deployNewPatchVersion {
     }
 }
 
+task appVersion {
+    doLast{
+        System.out.println(getVersion())
+    }
+}
+
 def deployNewVersion(String versionField) {
     checkAllChangesCommitted()
     checkIsOnCorrectBranch('fastlane-test')
@@ -32,13 +38,12 @@ def deployNewVersion(String versionField) {
 }
 
 def addTag() {
-    def version = "v${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}"
     try {
         exec {
             commandLine "git", "tag", "-a", "${version}", "-m", "Tag added automatically via gradle task"
         }
     } catch (Exception e) {
-        def exception = new Exception("Failed to add tag ${version}. Does it already exist?", e)
+        def exception = new Exception("Failed to add tag ${getVersion()}. Does it already exist?", e)
         cancelCommit(e)
         revertVersionChange(e)
         throw exception
@@ -147,13 +152,16 @@ def cancelCommit(Exception cause) {
 }
 
 def deleteTag(Exception cause) {
-    def version = "v${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}"
     try {
         exec {
-            commandLine "git", "tag", "-d", "${version}"
+            commandLine "git", "tag", "-d", "${getVersion()}"
         }
     } catch (Exception e) {
         e.printStackTrace()
         throw new Exception("Failed to undo the version change commit", cause)
     }
+}
+
+def getVersion() {
+    return "v${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}"
 }
