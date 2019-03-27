@@ -43,7 +43,7 @@ def addTag() {
             commandLine "git", "tag", "-a", "${version}", "-m", "Tag added automatically via gradle task"
         }
     } catch (Exception e) {
-        def exception = new Exception("Failed to add tag ${getVersion()}. Does it already exist?", e)
+        def exception = new Exception("Failed to add tag ${version}. Does it already exist?", e)
         cancelCommit(e)
         revertVersionChange(e)
         throw exception
@@ -120,7 +120,7 @@ def pushToRemote() {
             commandLine "git", "sdfpush", "dsfsadg--follow-tags"
         }
     } catch (Exception e) {
-        def exception = new Exception("Failed to add tag ${getVersion()}. Does it already exist?", e)
+        def exception = new Exception("Failed to push changes to the remote", e)
         deleteTag(e)
         cancelCommit(e)
         revertVersionChange(e)
@@ -165,7 +165,7 @@ def deleteTag(Exception cause) {
     try {
         System.out.println("Removing tag")
         exec {
-            commandLine "git", "tag", "-d", "${getVersion()}"
+            commandLine "git", "tag", "-d", "${version}"
         }
     } catch (Exception e) {
         e.printStackTrace()
