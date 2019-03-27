@@ -40,6 +40,9 @@ def deployNewVersion(String versionField) {
 def addTag() {
     try {
         exec {
+            commandLine "git", "fetch"
+        }
+        exec {
             commandLine "git", "tag", "-a", "${version}", "-m", "Tag added automatically via gradle task"
         }
     } catch (Exception e) {
