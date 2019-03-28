@@ -27,7 +27,7 @@ public class LaunchActivity extends AppCompatActivity {
         setContentView(R.layout.frame_layout);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            startActivity(TripActivity.getStartIntent(this, user));
+            startActivity(TripActivity.getStartIntent(this));
             finish();
         }
         else {

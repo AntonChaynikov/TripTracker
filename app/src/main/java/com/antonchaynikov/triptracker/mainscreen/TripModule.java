@@ -14,17 +14,17 @@ import dagger.Provides;
 @Module
 public class TripModule {
 
-    private TripActivity mActivity;
+    private TripFragment mFragment;
     private boolean mIsLocationPermissionGranted;
 
-    public TripModule(TripActivity activity, boolean isLocationPermissionGranted) {
-        mActivity = activity;
+    public TripModule(TripFragment fragment, boolean isLocationPermissionGranted) {
+        mFragment = fragment;
         mIsLocationPermissionGranted = isLocationPermissionGranted;
     }
 
     @Provides
     public TripViewModel provideTripViewModel(ViewModelFactory factory) {
-        return ViewModelProviders.of(mActivity, factory).get(TripViewModel.class);
+        return ViewModelProviders.of(mFragment, factory).get(TripViewModel.class);
     }
 
     @Provides

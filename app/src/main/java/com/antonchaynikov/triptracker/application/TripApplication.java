@@ -10,6 +10,7 @@ import com.antonchaynikov.triptracker.history.HistoryModule;
 import com.antonchaynikov.triptracker.mainscreen.DaggerTripComponent;
 import com.antonchaynikov.triptracker.mainscreen.TripActivity;
 
+import com.antonchaynikov.triptracker.mainscreen.TripFragment;
 import com.antonchaynikov.triptracker.mainscreen.TripModule;
 import com.antonchaynikov.triptracker.trips.DaggerTripsListComponent;
 import com.antonchaynikov.triptracker.trips.TripsListActivity;
@@ -47,15 +48,15 @@ public class TripApplication extends MultiDexApplication {
                 .inject(activity);
     }
 
-    public void injectTripActivityDependencies(TripActivity activity, boolean isLocationPermissionGranted) {
+    public void injectTripFragmentDependencies(TripFragment fragment, boolean isLocationPermissionGranted) {
         DaggerTripComponent.builder()
                 .appComponent(mAppComponent)
                 .authModule(new AuthModule())
                 .commonViewModelModule(new CommonViewModelModule())
                 .locationSourceModule(new LocationSourceModule())
                 .tripManagerModule(new TripManagerModule())
-                .tripModule(new TripModule(activity, isLocationPermissionGranted))
+                .tripModule(new TripModule(fragment, isLocationPermissionGranted))
                 .build()
-                .inject(activity);
+                .inject(fragment);
     }
 }

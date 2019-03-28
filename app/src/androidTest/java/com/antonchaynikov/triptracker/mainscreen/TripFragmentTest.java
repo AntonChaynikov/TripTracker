@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import androidx.fragment.app.testing.FragmentScenario;
 import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.ViewInteraction;
@@ -42,15 +43,13 @@ import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibilit
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-public class TripActivityTest {
+public class TripFragmentTest {
 
     private static final int LOCATIONS_COUNT = 2;
     private static FirebaseAuth sFirebaseAuth;
 
     @Rule
     public final GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION);
-
-    private ActivityTestRule<TripActivity> activityTestRule = new ActivityTestRule<>(TripActivity.class, true, false);
 
     // Instantly returns Completable.complete()
     private Repository mockRepository;
@@ -88,30 +87,25 @@ public class TripActivityTest {
 
     @Test
     public void shouldShowStatistics_whenTripStarts() throws Exception {
-        activityTestRule.launchActivity(TripActivity.getStartIntent(
-                InstrumentationRegistry.getInstrumentation().getTargetContext(),
-                sFirebaseAuth.getCurrentUser()
-        ));
-        TripActivity activity = activityTestRule.getActivity();
-        activity.injectViewModel(mViewModel);
-        // Expecting 2 updates
-        IdlingResource idlingResource = activity.initStatisticsIdlingResource(LOCATIONS_COUNT + 1);
-        IdlingRegistry.getInstance().register(idlingResource);
+        FragmentScenario<TripFragment> scenario = FragmentScenario.launchInContainer(TripFragment.class);
+        scenario.onFragment(fragment -> {
+            fragment.injectViewModel(mViewModel);
+            IdlingResource idlingResource = fragment.initStatisticsIdlingResource(LOCATIONS_COUNT + 1);
+            IdlingRegistry.getInstance().register(idlingResource);
+        });
 
         onView(withId(R.id.btn_layout_statistics)).perform(click());
 
         onView(withId(R.id.tv_statistics_distance)).check(matches(withText(new RegexMatcher("0(\\.|\\,)07 km"))));
-        IdlingRegistry.getInstance().unregister(idlingResource);
+        IdlingRegistry.getInstance().getResources().removeIf(resource -> resource.getName().equals("com.antonchaynikov.triptracker.mainscreen.TripFragment"));
     }
 
     @Test
     public void shouldShowGeolocationError_whenGeolocationIsUnavailable() throws Exception {
-        activityTestRule.launchActivity(TripActivity.getStartIntent(
-                InstrumentationRegistry.getInstrumentation().getTargetContext(),
-                sFirebaseAuth.getCurrentUser()
-        ));
-        TripActivity activity = activityTestRule.getActivity();
-        activity.injectViewModel(mViewModel);
+        FragmentScenario<TripFragment> scenario = FragmentScenario.launchInContainer(TripFragment.class, null, R.style.AppTheme, null);
+        scenario.onFragment(fragment -> {
+            fragment.injectViewModel(mViewModel);
+        });
 
         onView(withId(R.id.btn_layout_statistics)).perform(click());
 
@@ -122,12 +116,10 @@ public class TripActivityTest {
 
     @Test
     public void shouldChangeActionButtonText_whenTripStarts() {
-        activityTestRule.launchActivity(TripActivity.getStartIntent(
-                InstrumentationRegistry.getInstrumentation().getTargetContext(),
-                sFirebaseAuth.getCurrentUser()
-        ));
-        TripActivity activity = activityTestRule.getActivity();
-        activity.injectViewModel(mViewModel);
+        FragmentScenario<TripFragment> scenario = FragmentScenario.launchInContainer(TripFragment.class);
+        scenario.onFragment(fragment -> {
+            fragment.injectViewModel(mViewModel);
+        });
 
         ViewInteraction actionButtonInteraction = onView(withId(R.id.btn_layout_statistics));
         actionButtonInteraction.check(matches(withText(R.string.button_act)));

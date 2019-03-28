@@ -128,6 +128,7 @@ ext {
     ANDROID_TEST_CORE = '1.0.0'
     ANDROID_TEST_RULES = '1.1.0'
     DAGGER = '2.21'
+    FRAGMENT_TESTING = '1.1.0-alpha05'
 }
 
 dependencies {
@@ -148,6 +149,8 @@ dependencies {
     implementation "com.crashlytics.sdk.android:crashlytics:$CRASHLYTICS"
     implementation "com.google.dagger:dagger:$DAGGER"
     implementation "androidx.test.espresso:espresso-idling-resource:$ESPRESSO_IDLING_RESOURCE"
+
+    debugImplementation "androidx.fragment:fragment-testing:$FRAGMENT_TESTING"
 
     annotationProcessor "com.google.dagger:dagger-compiler:$DAGGER"
 

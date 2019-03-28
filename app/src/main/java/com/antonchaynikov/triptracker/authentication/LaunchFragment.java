@@ -53,7 +53,7 @@ public class LaunchFragment extends Fragment {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                startActivity(TripActivity.getStartIntent(getContext(), user));
+                startActivity(TripActivity.getStartIntent(getContext()));
                 getActivity().finish();
             }
         }
