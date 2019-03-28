@@ -1,6 +1,7 @@
 package com.antonchaynikov.triptracker.history;
 
 import android.content.Context;
+import android.os.Bundle;
 
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.data.model.Trip;
@@ -15,20 +16,18 @@ import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 
+import androidx.fragment.app.testing.FragmentScenario;
 import androidx.test.espresso.IdlingRegistry;
 import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ActivityTestRule;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-public class HistoryActivityTest {
+public class HistoryFragmentTest {
 
     private static FirebaseAuth sFirebaseAuth;
-
-    private ActivityTestRule<HistoryActivity> activityTestRule = new ActivityTestRule<>(HistoryActivity.class, true, false);
 
     private FireStoreDB mFirestore;
     private Trip mTrip;
@@ -54,13 +53,19 @@ public class HistoryActivityTest {
     }
 
     @Test
-    public void shouldStatisticsTrips_whenActivityResumes() throws Exception {
+    public void shouldShowTripsStatistics_whenFragmentIsVisible() throws Exception {
+        Bundle args = new Bundle();
+        args.putLong("com.antonchaynikov.triptracker.history.EXTRA_TRIP_START_DATE", mTrip.getStartDate());
+
+        FragmentScenario<HistoryFragment> scenario = FragmentScenario.launchInContainer(HistoryFragment.class, args);
+        scenario.onFragment(fragment -> IdlingRegistry.getInstance().register(fragment.getIdlingResource()));
+
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        activityTestRule.launchActivity(HistoryActivity.getStartIntent(context, mTrip.getStartDate()));
-        IdlingRegistry.getInstance().register(activityTestRule.getActivity().getIdlingResource());
 
         String expectedStartDate = new StatisticsFormatter(context).formatTrip(mTrip).getStartDate();
         onView(withId(R.id.tv_statistics_extended_start_date)).check(matches(withText(expectedStartDate)));
+
+        IdlingRegistry.getInstance().getResources().removeIf(resource -> resource.getName().equals("com.antonchaynikov.triptracker.history.HistoryFragment"));
     }
 
     @After

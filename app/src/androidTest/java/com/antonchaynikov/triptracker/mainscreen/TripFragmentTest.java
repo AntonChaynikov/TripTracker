@@ -89,9 +89,9 @@ public class TripFragmentTest {
     public void shouldShowStatistics_whenTripStarts() throws Exception {
         FragmentScenario<TripFragment> scenario = FragmentScenario.launchInContainer(TripFragment.class);
         scenario.onFragment(fragment -> {
-            fragment.injectViewModel(mViewModel);
             IdlingResource idlingResource = fragment.initStatisticsIdlingResource(LOCATIONS_COUNT + 1);
             IdlingRegistry.getInstance().register(idlingResource);
+            fragment.injectViewModel(mViewModel);
         });
 
         onView(withId(R.id.btn_layout_statistics)).perform(click());

@@ -9,5 +9,5 @@ import dagger.Component;
 @CommonViewModelScope
 @Component(dependencies = AppComponent.class, modules = {HistoryModule.class, CommonViewModelModule.class})
 public interface HistoryComponent {
-    void inject(HistoryActivity activity);
+    void inject(HistoryFragment fragment);
 }

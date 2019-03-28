@@ -7,6 +7,7 @@ import androidx.test.espresso.IdlingResource;
 
 class MainScreenIdlingResource implements IdlingResource {
 
+    private static final String TAG = MainScreenIdlingResource.class.getCanonicalName();
     private final int mResourceCount;
     private AtomicInteger mBusyResourceCount = new AtomicInteger();
     private String mName;

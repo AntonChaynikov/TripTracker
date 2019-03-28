@@ -13,17 +13,17 @@ import dagger.Provides;
 @Module
 public class HistoryModule {
 
-    private HistoryActivity mActivity;
+    private HistoryFragment mFragment;
     private long mTripStartDate;
 
-    public HistoryModule(HistoryActivity activity, long tripStartDate) {
-        mActivity = activity;
+    public HistoryModule(HistoryFragment fragment, long tripStartDate) {
+        mFragment = fragment;
         mTripStartDate = tripStartDate;
     }
 
     @Provides
     public HistoryViewModel provideViewModel(ViewModelFactory factory) {
-        return ViewModelProviders.of(mActivity, factory).get(HistoryViewModel.class);
+        return ViewModelProviders.of(mFragment, factory).get(HistoryViewModel.class);
     }
 
     @Provides
