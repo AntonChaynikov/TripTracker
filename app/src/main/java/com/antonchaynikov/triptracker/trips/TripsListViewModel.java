@@ -26,7 +26,6 @@ class TripsListViewModel extends BasicViewModel {
     }
 
     void onStart() {
-        Log.d(TripsListViewModel.class.getCanonicalName(), "onStart");
         mShowProgressBarEventBroadcast.onNext(true);
         mSubscriptions.add(mRepository
                 .getAllTrips()
@@ -42,6 +41,7 @@ class TripsListViewModel extends BasicViewModel {
     }
 
     private void onTripsLoaded(@NonNull List<Trip> trips) {
+        Log.d(TripsListViewModel.class.getCanonicalName(), "onTripsLoaded " + trips.size());
         if (trips.isEmpty()) {
             mShowEmptyListMessageEvent.onNext(true);
         }

@@ -15,6 +15,7 @@ import com.antonchaynikov.triptracker.mainscreen.TripFragment;
 import com.antonchaynikov.triptracker.mainscreen.TripModule;
 import com.antonchaynikov.triptracker.trips.DaggerTripsListComponent;
 import com.antonchaynikov.triptracker.trips.TripsListActivity;
+import com.antonchaynikov.triptracker.trips.TripsListFragment;
 import com.antonchaynikov.triptracker.trips.TripsListModule;
 import com.antonchaynikov.triptracker.viewmodel.CommonViewModelModule;
 
@@ -32,12 +33,12 @@ public class TripApplication extends MultiDexApplication {
                 .build();
     }
 
-    public void injectTripsListActivityDependencies(TripsListActivity activity) {
+    public void injectTripsListFragmentDependencies(TripsListFragment fragment) {
        DaggerTripsListComponent.builder()
                 .appComponent(mAppComponent)
-                .tripsListModule(new TripsListModule(activity))
+                .tripsListModule(new TripsListModule(fragment))
                 .build()
-                .inject(activity);
+                .inject(fragment);
     }
 
     public void injectHistoryFragmentDependencies(HistoryFragment fragment, long tripStartDate) {

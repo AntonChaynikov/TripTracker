@@ -2,8 +2,8 @@ package com.antonchaynikov.triptracker.trips;
 
 import com.antonchaynikov.triptracker.data.repository.Repository;
 import com.antonchaynikov.triptracker.viewmodel.BasicViewModel;
-import com.antonchaynikov.triptracker.viewmodel.ViewModelActivity;
 import com.antonchaynikov.triptracker.viewmodel.ViewModelFactory;
+import com.antonchaynikov.triptracker.viewmodel.ViewModelFragment;
 import com.antonchaynikov.triptracker.viewmodel.ViewModelProviders;
 
 import androidx.annotation.NonNull;
@@ -13,15 +13,15 @@ import dagger.Provides;
 @Module
 public class TripsListModule {
 
-    private ViewModelActivity mActivity;
+    private ViewModelFragment mFragment;
 
-    public TripsListModule(ViewModelActivity activity) {
-        mActivity = activity;
+    public TripsListModule(ViewModelFragment fragment) {
+        mFragment = fragment;
     }
 
     @Provides
     TripsListViewModel provideTripsListViewModel(ViewModelFactory factory) {
-        return ViewModelProviders.of(mActivity, factory).get(TripsListViewModel.class);
+        return ViewModelProviders.of(mFragment, factory).get(TripsListViewModel.class);
     }
 
     @Provides

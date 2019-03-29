@@ -12,9 +12,8 @@ import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 
+import androidx.fragment.app.testing.FragmentScenario;
 import androidx.test.espresso.IdlingRegistry;
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ActivityTestRule;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -23,10 +22,6 @@ public class TripsListActivityTest {
 
     private static final int DB_TRIPS_COUNT = 2;
     private static FirebaseAuth sFirebaseAuth;
-
-    private ActivityTestRule<TripsListActivity>
-            activityActivityTestRule = new ActivityTestRule<>(TripsListActivity.class, true, false);
-
 
     private FireStoreDB mFirestore;
 
@@ -55,12 +50,13 @@ public class TripsListActivityTest {
 
     @Test
     public void shouldShowTrips_whenActivityResumes() throws Exception {
-        activityActivityTestRule.launchActivity(
-                TripsListActivity.getStartIntent(InstrumentationRegistry.getInstrumentation().getTargetContext()));
-        IdlingRegistry.getInstance().register(activityActivityTestRule.getActivity().getIdlingResource());
+        FragmentScenario<TripsListFragment> scenario = FragmentScenario.launchInContainer(TripsListFragment.class);
+        scenario.onFragment(fragment -> {
+            IdlingRegistry.getInstance().register(fragment.getIdlingResource());
+        });
 
         onView(withId(R.id.rv_trips_list)).check(new RecyclerViewItemCountAssertion(DB_TRIPS_COUNT));
-        IdlingRegistry.getInstance().unregister(activityActivityTestRule.getActivity().getIdlingResource());
+        IdlingRegistry.getInstance().getResources().removeIf(resource -> resource.getName().equals("com.antonchaynikov.triptracker.trips.TripsListFragment"));
     }
 
     @After

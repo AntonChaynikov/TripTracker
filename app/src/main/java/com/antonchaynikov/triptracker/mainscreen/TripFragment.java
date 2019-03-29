@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -73,6 +74,8 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
         mRootView = view.findViewById(R.id.vg_trip_activity_map_frame);
         mButton = view.findViewById(R.id.btn_layout_statistics);
         mButton.setOnClickListener(this);
+
+        setHasOptionsMenu(true);
 
         addMapFragment();
         mSubscriptions = new CompositeDisposable();
@@ -195,7 +198,7 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
     }
 
     private void goToStatisticsScreen() {
-        startActivity(new Intent(getContext(), TripsListActivity.class));
+        startActivity(TripsListActivity.getStartIntent(getContext()));
     }
 
     private void goToSummaryScreen(long tripStartDate) {

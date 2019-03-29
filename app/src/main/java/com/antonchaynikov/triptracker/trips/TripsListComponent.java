@@ -9,5 +9,5 @@ import dagger.Component;
 @TripsListScope
 @Component(dependencies = AppComponent.class, modules = {TripsListModule.class})
 public interface TripsListComponent {
-    void inject(TripsListActivity activity);
+    void inject(TripsListFragment fragment);
 }
