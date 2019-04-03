@@ -1,10 +1,8 @@
 package com.antonchaynikov.triptracker.mainscreen;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,10 +12,7 @@ import android.widget.TextView;
 
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.application.TripApplication;
-import com.antonchaynikov.triptracker.authentication.LaunchActivity;
-import com.antonchaynikov.triptracker.history.HistoryActivity;
 import com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState;
-import com.antonchaynikov.triptracker.trips.TripsListActivity;
 import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
 import com.antonchaynikov.triptracker.viewmodel.ViewModelFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -37,8 +32,11 @@ import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.test.espresso.IdlingResource;
 import io.reactivex.disposables.CompositeDisposable;
+
+import static com.antonchaynikov.triptracker.mainscreen.TripFragmentDirections.*;
 
 public class TripFragment extends ViewModelFragment implements View.OnClickListener, OnMapReadyCallback {
     private static final int ACCESS_FINE_LOCATION_REQUEST_CODE = 1;
@@ -46,7 +44,6 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
     private static final String IDLING_RES_NAME = "com.antonchaynikov.triptracker.mainscreen.TripFragment";
     private static final String TAG = TripFragment.class.getSimpleName();
 
-    private boolean mPermissionGranted;
     @Inject
     TripViewModel mViewModel;
 
@@ -57,8 +54,23 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
     private TextView tvSpeed;
 
     private CompositeDisposable mSubscriptions;
-
     private MainScreenIdlingResource mStatisticsIdlingResource;
+    private boolean mPermissionGranted;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mPermissionGranted =
+                ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) ==
+                        PackageManager.PERMISSION_GRANTED;
+
+        ((TripApplication) getActivity().getApplication()).injectTripFragmentDependencies(this, mPermissionGranted);
+
+        mSubscriptions = new CompositeDisposable();
+
+        initViewModel();
+    }
 
     @Nullable
     @Override
@@ -67,10 +79,6 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
         tvDistance = view.findViewById(R.id.tv_statistics_distance);
         tvSpeed = view.findViewById(R.id.tv_statistics_speed);
 
-        mPermissionGranted =
-                ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) ==
-                        PackageManager.PERMISSION_GRANTED;
-
         mRootView = view.findViewById(R.id.vg_trip_activity_map_frame);
         mButton = view.findViewById(R.id.btn_layout_statistics);
         mButton.setOnClickListener(this);
@@ -78,11 +86,7 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
         setHasOptionsMenu(true);
 
         addMapFragment();
-        mSubscriptions = new CompositeDisposable();
 
-        ((TripApplication) getActivity().getApplication()).injectTripFragmentDependencies(this, mPermissionGranted);
-
-        initViewModel();
         return view;
     }
 
@@ -198,16 +202,17 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
     }
 
     private void goToStatisticsScreen() {
-        startActivity(TripsListActivity.getStartIntent(getContext()));
+        NavHostFragment.findNavController(this).navigate(R.id.action_tripFragment_to_tripsListFragment);
     }
 
     private void goToSummaryScreen(long tripStartDate) {
-        startActivity(HistoryActivity.getStartIntent(getContext(), tripStartDate));
+        ActionTripFragmentToHistoryFragment action = actionTripFragmentToHistoryFragment();
+        action.setTripStartDate(tripStartDate);
+        NavHostFragment.findNavController(this).navigate(action);
     }
 
     private void logout() {
-        startActivity(LaunchActivity.getStartIntent(getContext()));
-        getActivity().finish();
+        NavHostFragment.findNavController(this).navigate(R.id.action_tripFragment_to_launchFragment);
     }
 
     private void showSnackbarMessage(@StringRes int stringId) {

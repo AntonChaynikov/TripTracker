@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/launchFragment">
+
+    <fragment
+        android:id="@+id/tripFragment"
+        android:name="com.antonchaynikov.triptracker.mainscreen.TripFragment"
+        android:label="Trip"
+        tools:layout="@layout/activity_map" >
+        <action
+            android:id="@+id/action_tripFragment_to_historyFragment"
+            app:destination="@id/historyFragment" />
+        <action
+            android:id="@+id/action_tripFragment_to_tripsListFragment"
+            app:destination="@id/tripsListFragment" />
+        <action
+            android:id="@+id/action_tripFragment_to_launchFragment"
+            app:destination="@id/launchFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="com.antonchaynikov.triptracker.history.HistoryFragment"
+        android:label="History"
+        tools:layout="@layout/activity_map" >
+        <argument
+            android:name="tripStartDate"
+            app:argType="long"
+            android:defaultValue="-1L" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/tripsListFragment"
+        android:name="com.antonchaynikov.triptracker.trips.TripsListFragment"
+        android:label="Trips"
+        tools:layout="@layout/trips_list_layout" >
+    </fragment>
+
+    <fragment
+        android:id="@+id/launchFragment"
+        android:name="com.antonchaynikov.triptracker.authentication.LaunchFragment"
+        android:label="Login"
+        tools:layout="@layout/launch_fragment_layout" >
+        <action
+            android:id="@+id/action_launchFragment_to_tripFragment"
+            app:destination="@id/tripFragment" />
+    </fragment>
+</navigation>

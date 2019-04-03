@@ -6,6 +6,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.SystemClock;
 
+import com.antonchaynikov.triptracker.AndroidTestUtils;
 import com.antonchaynikov.triptracker.MockLocationSource;
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.data.repository.Repository;
@@ -33,7 +34,6 @@ import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
 
 import static androidx.test.espresso.Espresso.onView;
@@ -97,7 +97,7 @@ public class TripFragmentTest {
         onView(withId(R.id.btn_layout_statistics)).perform(click());
 
         onView(withId(R.id.tv_statistics_distance)).check(matches(withText(new RegexMatcher("0(\\.|\\,)07 km"))));
-        IdlingRegistry.getInstance().getResources().removeIf(resource -> resource.getName().equals("com.antonchaynikov.triptracker.mainscreen.TripFragment"));
+        AndroidTestUtils.unregisterIdlingResource("com.antonchaynikov.triptracker.mainscreen.TripFragment");
     }
 
     @Test

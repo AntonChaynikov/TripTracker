@@ -1,9 +1,6 @@
 package com.antonchaynikov.triptracker.history;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,18 +49,10 @@ public class HistoryFragment extends ViewModelFragment implements OnMapReadyCall
 
     private CompositeDisposable mSubscriptions = new CompositeDisposable();
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.d(HistoryFragment.class.getCanonicalName(), "onCreate");
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_history, container, false);
-
-        Log.d(HistoryFragment.class.getCanonicalName(), "onCreateView");
 
         mProgressBar = view.findViewById(R.id.pb_history);
         vgStatisticsLayout = view.findViewById(R.id.vg_layout_statistics);
@@ -76,7 +65,7 @@ public class HistoryFragment extends ViewModelFragment implements OnMapReadyCall
 
         addMapFragment();
 
-        long tripStartDate = getArguments().getLong(EXTRA_TRIP_START_DATE, -1);
+        long tripStartDate = HistoryFragmentArgs.fromBundle(getArguments()).getTripStartDate();
         if (tripStartDate == -1) {
             throw new IllegalArgumentException("Should have used getStartIntent(context, long)");
         }

@@ -4,22 +4,21 @@ import com.antonchaynikov.triptracker.authentication.AuthModule;
 import com.antonchaynikov.triptracker.data.location.LocationSourceModule;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManagerModule;
 import com.antonchaynikov.triptracker.history.DaggerHistoryComponent;
-import com.antonchaynikov.triptracker.history.HistoryActivity;
 import com.antonchaynikov.triptracker.history.HistoryFragment;
 import com.antonchaynikov.triptracker.history.HistoryModule;
 
 import com.antonchaynikov.triptracker.mainscreen.DaggerTripComponent;
-import com.antonchaynikov.triptracker.mainscreen.TripActivity;
 
 import com.antonchaynikov.triptracker.mainscreen.TripFragment;
 import com.antonchaynikov.triptracker.mainscreen.TripModule;
 import com.antonchaynikov.triptracker.trips.DaggerTripsListComponent;
-import com.antonchaynikov.triptracker.trips.TripsListActivity;
 import com.antonchaynikov.triptracker.trips.TripsListFragment;
 import com.antonchaynikov.triptracker.trips.TripsListModule;
 import com.antonchaynikov.triptracker.viewmodel.CommonViewModelModule;
+import com.crashlytics.android.Crashlytics;
 
 import androidx.multidex.MultiDexApplication;
+import io.fabric.sdk.android.Fabric;
 
 public class TripApplication extends MultiDexApplication {
 
@@ -28,6 +27,7 @@ public class TripApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
         mAppComponent = DaggerAppComponent.builder()
                 .appModule(new AppModule(getApplicationContext()))
                 .build();

@@ -3,6 +3,7 @@ package com.antonchaynikov.triptracker.history;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.antonchaynikov.triptracker.AndroidTestUtils;
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.repository.firestore.FireStoreDB;
@@ -55,7 +56,7 @@ public class HistoryFragmentTest {
     @Test
     public void shouldShowTripsStatistics_whenFragmentIsVisible() throws Exception {
         Bundle args = new Bundle();
-        args.putLong("com.antonchaynikov.triptracker.history.EXTRA_TRIP_START_DATE", mTrip.getStartDate());
+        args.putLong("tripStartDate", mTrip.getStartDate());
 
         FragmentScenario<HistoryFragment> scenario = FragmentScenario.launchInContainer(HistoryFragment.class, args);
         scenario.onFragment(fragment -> IdlingRegistry.getInstance().register(fragment.getIdlingResource()));
@@ -65,7 +66,7 @@ public class HistoryFragmentTest {
         String expectedStartDate = new StatisticsFormatter(context).formatTrip(mTrip).getStartDate();
         onView(withId(R.id.tv_statistics_extended_start_date)).check(matches(withText(expectedStartDate)));
 
-        IdlingRegistry.getInstance().getResources().removeIf(resource -> resource.getName().equals("com.antonchaynikov.triptracker.history.HistoryFragment"));
+        AndroidTestUtils.unregisterIdlingResource("com.antonchaynikov.triptracker.history.HistoryFragment");
     }
 
     @After

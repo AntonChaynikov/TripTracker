@@ -1,7 +1,6 @@
 package com.antonchaynikov.triptracker.trips;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,11 +27,12 @@ import io.reactivex.disposables.CompositeDisposable;
 public class TripsListFragment extends ViewModelFragment {
     private static final String IDLING_RES_NAME = "com.antonchaynikov.triptracker.trips.TripsListFragment";
 
+    @Inject
+    TripsListViewModel mViewModel;
+
     private RecyclerView mRecyclerView;
     private View vProgressBar;
     private TextView tvNoTrips;
-    @Inject
-    TripsListViewModel mViewModel;
 
     private CountingIdlingResource mIdlingResource = new CountingIdlingResource(IDLING_RES_NAME);
 
@@ -92,7 +92,6 @@ public class TripsListFragment extends ViewModelFragment {
     }
 
     private void onTripsListLoaded(@NonNull List<Trip> trips) {
-        Log.d("fragment", "onTripsListLoaded");
         if (tvNoTrips.getVisibility() == View.VISIBLE) {
             tvNoTrips.setVisibility(View.GONE);
         }

@@ -1,5 +1,6 @@
 package com.antonchaynikov.triptracker.trips;
 
+import com.antonchaynikov.triptracker.AndroidTestUtils;
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.repository.firestore.FireStoreDB;
@@ -18,7 +19,7 @@ import androidx.test.espresso.IdlingRegistry;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
-public class TripsListActivityTest {
+public class TripsListFragmentTest {
 
     private static final int DB_TRIPS_COUNT = 2;
     private static FirebaseAuth sFirebaseAuth;
@@ -56,7 +57,7 @@ public class TripsListActivityTest {
         });
 
         onView(withId(R.id.rv_trips_list)).check(new RecyclerViewItemCountAssertion(DB_TRIPS_COUNT));
-        IdlingRegistry.getInstance().getResources().removeIf(resource -> resource.getName().equals("com.antonchaynikov.triptracker.trips.TripsListFragment"));
+        AndroidTestUtils.unregisterIdlingResource("com.antonchaynikov.triptracker.trips.TripsListFragment");
     }
 
     @After

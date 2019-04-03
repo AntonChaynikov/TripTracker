@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.antonchaynikov.triptracker.R;
-import com.antonchaynikov.triptracker.mainscreen.TripActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,6 +18,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -26,8 +26,13 @@ public class LaunchFragment extends Fragment {
 
     private static final int RC_SIGN_IN = 123;
 
-    static Fragment getFragment() {
-        return new LaunchFragment();
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            navigateToTheMainView();
+        }
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -52,11 +57,13 @@ public class LaunchFragment extends Fragment {
         if (requestCode == RC_SIGN_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                startActivity(TripActivity.getStartIntent(getContext()));
-                getActivity().finish();
+                navigateToTheMainView();
             }
         }
+    }
+
+    private void navigateToTheMainView() {
+        NavHostFragment.findNavController(this).navigate(R.id.action_launchFragment_to_tripFragment);
     }
 
 }

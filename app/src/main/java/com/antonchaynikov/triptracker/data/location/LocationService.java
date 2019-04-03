@@ -15,7 +15,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.antonchaynikov.triptracker.R;
-import com.antonchaynikov.triptracker.mainscreen.TripActivity;
+import com.antonchaynikov.triptracker.TripActivity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

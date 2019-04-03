@@ -2,8 +2,6 @@ package com.antonchaynikov.triptracker.trips;
 
 import com.antonchaynikov.triptracker.application.AppComponent;
 
-import javax.inject.Singleton;
-
 import dagger.Component;
 
 @TripsListScope

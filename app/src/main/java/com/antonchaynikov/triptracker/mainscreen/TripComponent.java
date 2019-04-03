@@ -8,7 +8,9 @@ import com.antonchaynikov.triptracker.viewmodel.CommonViewModelModule;
 import dagger.Component;
 
 @TripScope
-@Component(dependencies = AppComponent.class, modules = {TripModule.class, CommonViewModelModule.class, AuthModule.class, TripManagerModule.class})
+@Component(
+        dependencies = AppComponent.class,
+        modules = {TripModule.class, CommonViewModelModule.class, AuthModule.class, TripManagerModule.class})
 public interface TripComponent {
     void inject(TripFragment fragment);
 }
