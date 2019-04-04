@@ -10,9 +10,7 @@ import com.antonchaynikov.triptracker.AndroidTestUtils;
 import com.antonchaynikov.triptracker.MockLocationSource;
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.data.repository.Repository;
-import com.antonchaynikov.triptracker.data.tripmanager.StatisticsCalculator;
 import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
-import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.hamcrest.BaseMatcher;
@@ -27,6 +25,8 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+
+import javax.inject.Inject;
 
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.test.espresso.IdlingRegistry;
@@ -51,9 +51,11 @@ public class TripFragmentTest {
     @Rule
     public final GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION);
 
+    @Inject
+    TripViewModel mViewModel;
+
     // Instantly returns Completable.complete()
     private Repository mockRepository;
-    private TripViewModel mViewModel;
     private MockLocationSource mockLocationSource;
 
     @BeforeClass
@@ -71,13 +73,6 @@ public class TripFragmentTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        mockRepository = new MockRepository();
-        mockLocationSource = new MockLocationSource(createLocationsList());
-        mViewModel = new TripViewModel(
-                TripManager.getInstance(mockRepository, mockLocationSource, new StatisticsCalculator()),
-                sFirebaseAuth,
-                new StatisticsFormatter(context),
-                true);
     }
 
     @After

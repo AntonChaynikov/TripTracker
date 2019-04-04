@@ -1,6 +1,6 @@
 package com.antonchaynikov.triptracker.trips;
 
-import com.antonchaynikov.triptracker.application.AppComponent;
+import com.antonchaynikov.triptracker.injection.AppComponent;
 
 import dagger.Component;
 
