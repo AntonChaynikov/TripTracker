@@ -5,16 +5,21 @@ import android.location.Location;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import dagger.Module;
+import dagger.Provides;
 
-public final class LocationProviderModule {
+@Module
+public class LocationProviderModule {
 
-    private LocationProviderModule() {
-    }
-
-    public static LocationProvider provide(@NonNull Context context, @Nullable Filter<Location> locationFilter) {
+    @Provides
+    public LocationProvider provide(@NonNull Context context, @Nullable Filter<Location> locationFilter) {
         LocationProvider locationProvider = new LocationProviderImpl(context);
         locationProvider.setFilter(locationFilter);
         return locationProvider;
     }
 
+    @Provides
+    public Filter<Location> provideLocationFilter() {
+        return new LocationFilter();
+    }
 }

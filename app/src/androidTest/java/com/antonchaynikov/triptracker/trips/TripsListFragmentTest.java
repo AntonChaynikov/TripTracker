@@ -1,11 +1,9 @@
-package com.antonchaynikov.triptracker.history;
+package com.antonchaynikov.triptracker.trips;
 
-import android.content.Context;
-
+import com.antonchaynikov.triptracker.AndroidTestUtils;
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.repository.firestore.FireStoreDB;
-import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.junit.After;
@@ -15,23 +13,18 @@ import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 
+import androidx.fragment.app.testing.FragmentScenario;
 import androidx.test.espresso.IdlingRegistry;
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ActivityTestRule;
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-public class HistoryActivityTest {
+public class TripsListFragmentTest {
 
+    private static final int DB_TRIPS_COUNT = 2;
     private static FirebaseAuth sFirebaseAuth;
 
-    private ActivityTestRule<HistoryActivity> activityTestRule = new ActivityTestRule<>(HistoryActivity.class, true, false);
-
     private FireStoreDB mFirestore;
-    private Trip mTrip;
 
     @BeforeClass
     public static void initTestEnv() throws Exception {
@@ -48,19 +41,23 @@ public class HistoryActivityTest {
     @Before
     public void setUp() throws Exception {
         mFirestore = FireStoreDB.getInstance();
-        mTrip = new Trip(System.currentTimeMillis());
-        mTrip.updateStatistics(1000, 36);
-        mFirestore.addTrip(mTrip);
+        for (int i = 0; i < DB_TRIPS_COUNT; i++) {
+            Trip trip = new Trip(System.currentTimeMillis());
+            trip.updateStatistics(i, i);
+            trip.setEndDate(System.currentTimeMillis());
+            mFirestore.addTrip(trip).blockingAwait();
+        }
     }
 
     @Test
-    public void shouldStatisticsTrips_whenActivityResumes() throws Exception {
-        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        activityTestRule.launchActivity(HistoryActivity.getStartIntent(context, mTrip.getStartDate()));
-        IdlingRegistry.getInstance().register(activityTestRule.getActivity().getIdlingResource());
+    public void shouldShowTrips_whenActivityResumes() throws Exception {
+        FragmentScenario<TripsListFragment> scenario = FragmentScenario.launchInContainer(TripsListFragment.class);
+        scenario.onFragment(fragment -> {
+            IdlingRegistry.getInstance().register(fragment.getIdlingResource());
+        });
 
-        String expectedStartDate = new StatisticsFormatter(context).formatTrip(mTrip).getStartDate();
-        onView(withId(R.id.tv_statistics_extended_start_date)).check(matches(withText(expectedStartDate)));
+        onView(withId(R.id.rv_trips_list)).check(new RecyclerViewItemCountAssertion(DB_TRIPS_COUNT));
+        AndroidTestUtils.unregisterIdlingResource("com.antonchaynikov.triptracker.trips.TripsListFragment");
     }
 
     @After

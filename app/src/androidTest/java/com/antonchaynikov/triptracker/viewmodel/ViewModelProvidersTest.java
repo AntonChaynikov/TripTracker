@@ -3,7 +3,7 @@ package com.antonchaynikov.triptracker.viewmodel;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 
-import com.antonchaynikov.triptracker.mainscreen.TripActivity;
+import com.antonchaynikov.triptracker.TripActivity;
 
 import org.junit.After;
 import org.junit.Before;

@@ -1,5 +1,7 @@
 package com.antonchaynikov.triptracker.trips;
 
+import android.util.Log;
+
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.repository.Repository;
 import com.antonchaynikov.triptracker.viewmodel.BasicViewModel;
@@ -39,6 +41,7 @@ class TripsListViewModel extends BasicViewModel {
     }
 
     private void onTripsLoaded(@NonNull List<Trip> trips) {
+        Log.d(TripsListViewModel.class.getCanonicalName(), "onTripsLoaded " + trips.size());
         if (trips.isEmpty()) {
             mShowEmptyListMessageEvent.onNext(true);
         }

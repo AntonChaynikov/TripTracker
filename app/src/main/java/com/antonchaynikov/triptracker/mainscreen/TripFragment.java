@@ -1,35 +1,20 @@
 package com.antonchaynikov.triptracker.mainscreen;
 
 import android.Manifest;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.antonchaynikov.triptracker.R;
-import com.antonchaynikov.triptracker.authentication.LaunchActivity;
-import com.antonchaynikov.triptracker.data.location.LocationFilter;
-import com.antonchaynikov.triptracker.data.location.LocationProviderModule;
-import com.antonchaynikov.triptracker.data.location.LocationSourceImpl;
-import com.antonchaynikov.triptracker.data.repository.firestore.FireStoreDB;
-import com.antonchaynikov.triptracker.data.tripmanager.StatisticsCalculator;
-import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
-import com.antonchaynikov.triptracker.history.HistoryActivity;
+import com.antonchaynikov.triptracker.application.TripApplication;
 import com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState;
-import com.antonchaynikov.triptracker.trips.AbcActivity;
-import com.antonchaynikov.triptracker.viewmodel.BasicViewModel;
-import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
 import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
-import com.antonchaynikov.triptracker.viewmodel.ViewModelActivity;
-import com.antonchaynikov.triptracker.viewmodel.ViewModelFactory;
-import com.antonchaynikov.triptracker.viewmodel.ViewModelProviders;
+import com.antonchaynikov.triptracker.viewmodel.ViewModelFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -38,28 +23,29 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.test.espresso.IdlingResource;
 import io.reactivex.disposables.CompositeDisposable;
 
-public class TripActivity extends ViewModelActivity implements View.OnClickListener, OnMapReadyCallback {
+import static com.antonchaynikov.triptracker.mainscreen.TripFragmentDirections.*;
 
+public class TripFragment extends ViewModelFragment implements View.OnClickListener, OnMapReadyCallback {
     private static final int ACCESS_FINE_LOCATION_REQUEST_CODE = 1;
 
-    private static final String EXTRA_USER = "com.antonchaynikov.triptracker.TripActivity.user";
-    private static final String IDLING_RES_NAME = "com.antonchaynikov.triptracker.mainscreen.TripActivity";
-    private static final String TAG = TripActivity.class.getSimpleName();
+    private static final String IDLING_RES_NAME = "com.antonchaynikov.triptracker.mainscreen.TripFragment";
+    private static final String TAG = TripFragment.class.getSimpleName();
 
-    private boolean mPermissionGranted;
-    private TripViewModel mViewModel;
+    @Inject
+    TripViewModel mViewModel;
 
     private View mRootView;
     private Button mButton;
@@ -68,53 +54,46 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
     private TextView tvSpeed;
 
     private CompositeDisposable mSubscriptions;
-
     private MainScreenIdlingResource mStatisticsIdlingResource;
-
-    public static Intent getStartIntent(Context context, FirebaseUser user) {
-        return new Intent(context, TripActivity.class)
-                .putExtra(EXTRA_USER, user);
-    }
-
-    public static PendingIntent getNotificationContentIntent(@NonNull Context context) {
-        return null;
-    }
+    private boolean mPermissionGranted;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map);
-        Toolbar toolbar = findViewById(R.id.trip_toolbar);
-        setSupportActionBar(toolbar);
-
-        tvDistance = findViewById(R.id.tv_statistics_distance);
-        tvSpeed = findViewById(R.id.tv_statistics_speed);
 
         mPermissionGranted =
-                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) ==
                         PackageManager.PERMISSION_GRANTED;
 
-        mRootView = findViewById(R.id.vg_trip_activity_map_frame);
-        mButton = findViewById(R.id.btn_layout_statistics);
-        mButton.setOnClickListener(this);
+        ((TripApplication) getActivity().getApplication()).injectTripFragmentDependencies(this, mPermissionGranted);
 
-        addMapFragment();
         mSubscriptions = new CompositeDisposable();
 
         initViewModel();
     }
 
+    @Nullable
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_trip_activity, menu);
-        return true;
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_map, container, false);
+        tvDistance = view.findViewById(R.id.tv_statistics_distance);
+        tvSpeed = view.findViewById(R.id.tv_statistics_speed);
+
+        mRootView = view.findViewById(R.id.vg_trip_activity_map_frame);
+        mButton = view.findViewById(R.id.btn_layout_statistics);
+        mButton.setOnClickListener(this);
+
+        setHasOptionsMenu(true);
+
+        addMapFragment();
+
+        return view;
     }
 
     @VisibleForTesting
     void injectViewModel(@NonNull TripViewModel tripViewModel) {
         mViewModel = tripViewModel;
-        subscribeToViewModelEvents();
+        initViewModel();
     }
 
     @VisibleForTesting
@@ -124,26 +103,6 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
     }
 
     private void initViewModel() {
-        LocationSourceImpl locationSource = LocationSourceImpl.getInstance(this);
-        locationSource.setLocationProvider(LocationProviderModule.provide(this, new LocationFilter()));
-        ViewModelFactory factory = new ViewModelFactory() {
-            @Override
-            public <T extends BasicViewModel> T create(@NonNull Class<T> clazz) {
-                return (T) new TripViewModel(
-                        TripManager.getInstance(
-                                FireStoreDB.getInstance(),
-                                locationSource,
-                                new StatisticsCalculator()),
-                        FirebaseAuth.getInstance(),
-                        new StatisticsFormatter(TripActivity.this),
-                        mPermissionGranted);
-            }
-        };
-        mViewModel = ViewModelProviders.of(this, factory).get(TripViewModel.class);
-        subscribeToViewModelEvents();
-    }
-
-    private void subscribeToViewModelEvents() {
         mSubscriptions.add(mViewModel.getAskLocationPermissionEventObservable().subscribe(event -> onLocationPermissionRequested()));
         mSubscriptions.add(mViewModel.getUiStateChangeEventObservable().subscribe(this::onUiStateUpdate));
         mSubscriptions.add(mViewModel.getShowSnackbarMessageBroadcast().subscribe(this::showSnackbarMessage));
@@ -202,7 +161,7 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
     private void addMapFragment() {
         SupportMapFragment mapFragment = SupportMapFragment.newInstance();
         mapFragment.getMapAsync(this);
-        getSupportFragmentManager()
+        getChildFragmentManager()
                 .beginTransaction()
                 .add(R.id.vg_trip_activity_map_frame, mapFragment)
                 .commit();
@@ -210,7 +169,7 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
 
     private void onLocationPermissionRequested() {
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
-        ActivityCompat.requestPermissions(this, permissions, ACCESS_FINE_LOCATION_REQUEST_CODE);
+        ActivityCompat.requestPermissions(getActivity(), permissions, ACCESS_FINE_LOCATION_REQUEST_CODE);
     }
 
     private void onUiStateUpdate(@NonNull TripUiState state) {
@@ -243,16 +202,17 @@ public class TripActivity extends ViewModelActivity implements View.OnClickListe
     }
 
     private void goToStatisticsScreen() {
-        startActivity(new Intent(this, AbcActivity.class));
+        NavHostFragment.findNavController(this).navigate(R.id.action_tripFragment_to_tripsListFragment);
     }
 
     private void goToSummaryScreen(long tripStartDate) {
-        startActivity(HistoryActivity.getStartIntent(this, tripStartDate));
+        ActionTripFragmentToHistoryFragment action = actionTripFragmentToHistoryFragment();
+        action.setTripStartDate(tripStartDate);
+        NavHostFragment.findNavController(this).navigate(action);
     }
 
     private void logout() {
-        startActivity(LaunchActivity.getStartIntent(this));
-        finish();
+        NavHostFragment.findNavController(this).navigate(R.id.action_tripFragment_to_launchFragment);
     }
 
     private void showSnackbarMessage(@StringRes int stringId) {

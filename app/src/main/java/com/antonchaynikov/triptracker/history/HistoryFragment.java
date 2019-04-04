@@ -1,42 +1,38 @@
 package com.antonchaynikov.triptracker.history;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.antonchaynikov.triptracker.R;
-import com.antonchaynikov.triptracker.data.repository.firestore.FireStoreDB;
-import com.antonchaynikov.triptracker.viewmodel.BasicViewModel;
-import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
+import com.antonchaynikov.triptracker.application.TripApplication;
 import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
-import com.antonchaynikov.triptracker.viewmodel.ViewModelActivity;
-import com.antonchaynikov.triptracker.viewmodel.ViewModelFactory;
-import com.antonchaynikov.triptracker.viewmodel.ViewModelProviders;
+import com.antonchaynikov.triptracker.viewmodel.ViewModelFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
-import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.idling.CountingIdlingResource;
 import io.reactivex.disposables.CompositeDisposable;
 
-public class HistoryActivity extends ViewModelActivity implements OnMapReadyCallback {
-
+public class HistoryFragment extends ViewModelFragment implements OnMapReadyCallback {
     private static final String EXTRA_TRIP_START_DATE = "com.antonchaynikov.triptracker.history.EXTRA_TRIP_START_DATE";
-    private static final String IDLING_RES_NAME = "com.antonchaynikov.triptracker.history.HistoryActivity";
+    private static final String IDLING_RES_NAME = "com.antonchaynikov.triptracker.history.HistoryFragment";
 
-    private HistoryViewModel mViewModel;
+    @Inject
+    HistoryViewModel mViewModel;
 
     private ProgressBar mProgressBar;
     private View vgStatisticsLayout;
@@ -53,45 +49,33 @@ public class HistoryActivity extends ViewModelActivity implements OnMapReadyCall
 
     private CompositeDisposable mSubscriptions = new CompositeDisposable();
 
-    public static Intent getStartIntent(@NonNull Context context, long tripStartDate) {
-        Intent intent = new Intent(context, HistoryActivity.class);
-        intent.putExtra(EXTRA_TRIP_START_DATE, tripStartDate);
-        return intent;
-    }
-
+    @Nullable
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_history);
-        mProgressBar = findViewById(R.id.pb_history);
-        vgStatisticsLayout = findViewById(R.id.vg_layout_statistics);
-        vgMapFrame = findViewById(R.id.vg_history_activity_map_frame);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_history, container, false);
 
-        tvStartDate = findViewById(R.id.tv_statistics_extended_start_date);
-        tvDuration = findViewById(R.id.tv_statistics_extended_duration);
-        tvSpeed = findViewById(R.id.tv_statistics_speed);
-        tvDistance = findViewById(R.id.tv_statistics_distance);
+        mProgressBar = view.findViewById(R.id.pb_history);
+        vgStatisticsLayout = view.findViewById(R.id.vg_layout_statistics);
+        vgMapFrame = view.findViewById(R.id.vg_history_activity_map_frame);
+
+        tvStartDate = view.findViewById(R.id.tv_statistics_extended_start_date);
+        tvDuration = view.findViewById(R.id.tv_statistics_extended_duration);
+        tvSpeed = view.findViewById(R.id.tv_statistics_speed);
+        tvDistance = view.findViewById(R.id.tv_statistics_distance);
 
         addMapFragment();
 
-        initViewModel();
-    }
-
-    private void initViewModel() {
-        long tripStartDate = getIntent().getLongExtra(EXTRA_TRIP_START_DATE, -1);
+        long tripStartDate = HistoryFragmentArgs.fromBundle(getArguments()).getTripStartDate();
         if (tripStartDate == -1) {
             throw new IllegalArgumentException("Should have used getStartIntent(context, long)");
         }
-        ViewModelFactory factory = new ViewModelFactory() {
-            @Override
-            public <T extends BasicViewModel> T create(@NonNull Class<T> clazz) {
-                return (T) new HistoryViewModel(
-                        FireStoreDB.getInstance(),
-                        new StatisticsFormatter(HistoryActivity.this),
-                        tripStartDate);
-            }
-        };
-        mViewModel = ViewModelProviders.of(this, factory).get(HistoryViewModel.class);
+        ((TripApplication) getActivity().getApplication()).injectHistoryFragmentDependencies(this, tripStartDate);
+
+        initViewModel();
+        return view;
+    }
+
+    private void initViewModel() {
         mSubscriptions.add(mViewModel.getShowProgressBarEventBroadcast().subscribe(this::setProgressBarVisible));
         mSubscriptions.add(mViewModel.getMapOptionsObservable().subscribe(this::onMapOptionsLoaded));
         mSubscriptions.add(mViewModel.getStatisticsObservable().subscribe(this::onTripStatisticsLoaded));
@@ -105,7 +89,7 @@ public class HistoryActivity extends ViewModelActivity implements OnMapReadyCall
     private void addMapFragment() {
         SupportMapFragment mapFragment = SupportMapFragment.newInstance();
         mapFragment.getMapAsync(this);
-        getSupportFragmentManager()
+        getChildFragmentManager()
                 .beginTransaction()
                 .add(R.id.vg_history_activity_map_frame, mapFragment)
                 .commit();
@@ -146,7 +130,7 @@ public class HistoryActivity extends ViewModelActivity implements OnMapReadyCall
                     .zoom(markerOptions.getCameraZoomLevel())
                     .build();
             mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(campos));
-            mGoogleMap.addMarker(new MarkerOptions()
+            mGoogleMap.addMarker(new com.google.android.gms.maps.model.MarkerOptions()
                     .position(coords));
 
             mGoogleMap.addPolyline(mapOptions.getPolylineOptions());

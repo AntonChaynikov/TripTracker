@@ -17,6 +17,14 @@ public final class ViewModelProviders {
         return new ViewModelProvider(activity.getViewModelRegistry(), factory == null ? getDefaultFactory() : factory);
     }
 
+    public static ViewModelProvider of(@NonNull ViewModelFragment fragment) {
+        return new ViewModelProvider(fragment.getViewModelRegistry(), null);
+    }
+
+    public static ViewModelProvider of(@NonNull ViewModelFragment fragment, @Nullable ViewModelFactory factory) {
+        return new ViewModelProvider(fragment.getViewModelRegistry(), factory == null ? getDefaultFactory() : factory);
+    }
+
     private static ViewModelFactory getDefaultFactory() {
         if (sDefaultFactory == null) {
             sDefaultFactory = new ViewModelFactory() {
