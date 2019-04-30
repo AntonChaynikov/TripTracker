@@ -4,9 +4,14 @@ apply plugin: 'kotlin-android'
 apply plugin: 'jacoco-android'
 apply from: '../checkstyle/checkstyle.gradle'
 apply plugin: 'io.fabric'
-apply from: './publish.gradle'
+apply plugin: 'com.antonchaynikov.oneclickpublish'
 
-project.ext.versionPropertiesFile = rootProject.file("version.properties")
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+
+def versionPropertiesFilePath = "version.properties"
+
+project.ext.versionPropertiesFile = rootProject.file(versionPropertiesFilePath)
 project.ext.versionProperties = new Properties()
 versionProperties.load(new FileInputStream(versionPropertiesFile))
 
@@ -15,12 +20,13 @@ project.ext.versionMinor = Integer.parseInt(versionProperties['versionMinor'])
 project.ext.versionPatch = Integer.parseInt(versionProperties['versionPatch'])
 project.ext.versionBuild = Integer.parseInt(versionProperties['versionBuild'])
 
-project.ext.versionSuffix = versionBuild > 0 ? "-beta" : ""
-
-def keystorePropertiesFile = rootProject.file("keystore.properties")
-def keystoreProperties = new Properties()
-
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+oneClickPublish {
+    branchName = "master"
+    versionFilePath = versionPropertiesFilePath
+    remoteRepoName = "origin"
+}
 
 jacoco {
     toolVersion = "0.8.0"
@@ -34,7 +40,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         versionCode versionMajor * 100000 + versionMinor * 10000 + versionPatch * 1000 + versionBuild
-        versionName "${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}${versionSuffix}"
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}"
         setProperty("archivesBaseName", "$rootProject.name-v$versionName")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -163,6 +169,3 @@ dependencies {
 }
 
 apply plugin: 'com.google.gms.google-services'
-repositories {
-    mavenCentral()
-}
