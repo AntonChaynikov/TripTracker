@@ -1,0 +1,194 @@
+task deployNewBuildVersion {
+    doLast{
+        deployNewVersion('versionBuild')
+    }
+}
+
+task deployNewMinorVersion {
+    doLast{
+        deployNewVersion('versionMinor')
+    }
+}
+
+task deployNewMajorVersion {
+    doLast{
+        deployNewVersion('versionMajor')
+    }
+}
+
+task deployNewPatchVersion {
+    doLast{
+        deployNewVersion('versionPatch')
+    }
+}
+
+task appVersion {
+    doLast{
+        System.out.println(getVersion())
+    }
+}
+
+def deployNewVersion(String versionField) {
+    checkAllChangesCommitted()
+    checkIsOnCorrectBranch('fastlane-test')
+    incrementVersionField(versionField)
+    commitVersionChanges()
+    addTag()
+    pushToRemote()
+}
+
+def addTag() {
+    try {
+        exec {
+            commandLine "git", "fetch"
+        }
+        exec {
+            commandLine "git", "tag", "-a", "${version}", "-m", "Tag added automatically via gradle task"
+        }
+    } catch (Exception e) {
+        def exception = new Exception("Failed to add tag ${version}. Does it already exist?", e)
+        revertChanges(Stage.ADD_TAG, e)
+        throw exception
+    }
+}
+
+def checkAllChangesCommitted() {
+    try {
+        exec {
+            commandLine "git", "diff-index", "--quiet", "HEAD"
+        }
+    } catch (Exception e) {
+        throw new IllegalStateException("Commit or discard all changes before deployment", e)
+    }
+}
+
+def incrementVersionField(String versionField) {
+    project.ext."${versionField}" = project.ext."${versionField}" + 1
+    versionProperties[versionField] = Integer.toString(project.ext."${versionField}")
+
+    def precedenceMap = getVersionPropertiesPrecedenceMap()
+    precedenceMap.entrySet().each {
+        if (it.value > precedenceMap.get(versionField)) {
+            project.ext."${it.key}" = 0
+            versionProperties[it.key] = "0"
+        }
+    }
+
+    versionProperties.store(new FileOutputStream(versionPropertiesFile), "Increased ${versionField}")
+}
+
+def commitVersionChanges() {
+    try {
+        exec {
+            commandLine "git", "add", "../version.properties"
+        }
+    } catch (Exception e) {
+        def exception = new Exception("Failed to commit changes", e)
+        revertVersionChange(e)
+        throw exception
+    }
+
+    try {
+        exec {
+            commandLine "git", "commit", "-m", "\"Increased app version via script\""
+        }
+    } catch (Exception e) {
+        def exception = new Exception("Failed to commit changes", e)
+        revertChanges(Stage.COMMIT_CHANGES, e)
+        throw exception
+    }
+}
+
+def checkIsOnCorrectBranch(String branchName) {
+    if (!getCurrentBranchName().equals(branchName)) {
+        throw new IllegalStateException("Can only deploy from ${branchName} branch. Current branch: ${getCurrentBranchName()}")
+    }
+}
+
+def getCurrentBranchName() {
+    new ByteArrayOutputStream().withStream { os ->
+        exec {
+            executable = "git"
+            args = ["rev-parse", "--abbrev-ref", "HEAD"]
+            standardOutput = os
+        }
+        return os.toString().trim()
+    }
+}
+
+def pushToRemote() {
+    try {
+        exec {
+            commandLine "git", "push", "--follow-tags"
+        }
+    } catch (Exception e) {
+        def exception = new Exception("Failed to push changes to the remote", e)
+        revertChanges(Stage.PUSH, e)
+        throw exception
+    }
+}
+
+def getVersionPropertiesPrecedenceMap() {
+    return new HashMap<String, Integer>() {{
+        put('versionMajor', 1)
+        put('versionMinor', 2)
+        put('versionPatch', 3)
+        put('versionBuild', 4)
+    }}
+}
+
+def revertVersionChange(Exception cause) {
+    try {
+        System.out.println("Reverting version change")
+        exec {
+            commandLine "git", "checkout", "../version.properties"
+        }
+    } catch (Exception e) {
+        e.printStackTrace()
+        throw new Exception("Failed to revert version change", cause)
+    }
+}
+
+def cancelCommit(Exception cause) {
+    try {
+        System.out.println("Undoing commit")
+        exec {
+            commandLine "git", "reset", "HEAD~"
+        }
+    } catch (Exception e) {
+        e.printStackTrace()
+        throw new Exception("Failed to undo the version change commit", cause)
+    }
+}
+
+def deleteTag(Exception cause) {
+    try {
+        System.out.println("Removing tag")
+        exec {
+            commandLine "git", "tag", "-d", "${version}"
+        }
+    } catch (Exception e) {
+        e.printStackTrace()
+        throw new Exception("Failed to remove tag", cause)
+    }
+}
+
+def getVersion() {
+    return "v${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}"
+}
+
+def revertChanges(Stage stage, Exception cause) {
+    switch(stage) {
+        case Stage.PUSH:
+            deleteTag(cause)
+        case Stage.ADD_TAG:
+            cancelCommit(cause)
+        case Stage.INCREASE_VERSION:
+        case Stage.COMMIT_CHANGES:
+            revertVersionChange(cause)
+    }
+}
+
+enum Stage {
+    INCREASE_VERSION, COMMIT_CHANGES, ADD_TAG, PUSH
+}
