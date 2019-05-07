@@ -57,7 +57,7 @@ public class TripViewModelTest {
         doReturn(Completable.complete()).when(mockTripManager).finishTrip();
         doReturn(statsStream).when(mockTripManager).getTripUpdatesStream();
         doReturn(coordsStream).when(mockTripManager).getCoordinatesStream();
-        doReturn(Observable.empty()).when(mockTripManager).getGeoloactionAvailabilityChangeObservable();
+        doReturn(Observable.empty()).when(mockTripManager).getGeolocationAvailabilityChangeObservable();
         doReturn(new Trip()).when(mockTripManager).getCurrentTrip();
         mTestSubject = new TripViewModel(mockTripManager, mockFirebaseAuth, mockFormatter, true);
     }

@@ -68,7 +68,7 @@ public final class TripManager {
         return mCoordinatesStream;
     }
 
-    public Observable<Boolean> getGeoloactionAvailabilityChangeObservable() {
+    public Observable<Boolean> getGeolocationAvailabilityChangeObservable() {
         return mLocationSource.getGeolocationAvailabilityObservable();
     }
 

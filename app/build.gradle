@@ -5,7 +5,7 @@ apply plugin: 'jacoco-android'
 apply from: '../checkstyle/checkstyle.gradle'
 apply plugin: 'io.fabric'
 apply plugin: "androidx.navigation.safeargs"
-apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'com.antonchaynikov.oneclickpublish'
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -94,6 +94,10 @@ android {
         }
     }
 
+    kapt {
+        generateStubs = true
+    }
+
     lintOptions {
         lintConfig file("../lintConfig.xml")
         warningsAsErrors true
@@ -133,6 +137,8 @@ ext {
     DAGGER = '2.21'
     FRAGMENT_TESTING = '1.1.0-alpha05'
     NAV_COMPONENTS = "2.1.0-alpha01"
+    DAGGER_MOCK = "0.8.5"
+    MULTIDEX = "1.0.3"
 }
 
 dependencies {
@@ -155,20 +161,21 @@ dependencies {
     implementation "androidx.test.espresso:espresso-idling-resource:$ESPRESSO_IDLING_RESOURCE"
     implementation "androidx.navigation:navigation-fragment:$NAV_COMPONENTS"
     implementation "androidx.navigation:navigation-ui:$NAV_COMPONENTS"
+    implementation "com.android.support:multidex:$MULTIDEX"
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
 
     debugImplementation "androidx.fragment:fragment-testing:$FRAGMENT_TESTING"
 
-    annotationProcessor "com.google.dagger:dagger-compiler:$DAGGER"
-
-    implementation 'com.android.support:multidex:1.0.3'
+    kapt "com.google.dagger:dagger-compiler:$DAGGER"
+    kapt "com.google.dagger:dagger-android-processor:$DAGGER"
 
     testImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     testImplementation "junit:junit:$JUNIT"
     testImplementation "org.mockito:mockito-inline:$MOCKITO_INLINE"
+    testImplementation "com.github.fabioCollini.daggermock:daggermock:$DAGGER_MOCK"
 
-    // AndroidJUnitRunner and JUnit Rules
+    androidTestImplementation "com.github.fabioCollini.daggermock:daggermock:$DAGGER_MOCK"
     androidTestImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     androidTestImplementation "org.mockito:mockito-android:$MOCKITO_ANDROID"
     androidTestImplementation 'androidx.test:core:1.1.0'

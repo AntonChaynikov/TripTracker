@@ -7,8 +7,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.antonchaynikov.triptracker.R;
-import com.antonchaynikov.triptracker.application.TripApplication;
 import com.antonchaynikov.triptracker.data.model.Trip;
+import com.antonchaynikov.triptracker.injection.Injector;
 import com.antonchaynikov.triptracker.viewmodel.ViewModelFragment;
 
 import java.util.List;
@@ -45,7 +45,7 @@ public class TripsListFragment extends ViewModelFragment {
         mRecyclerView = view.findViewById(R.id.rv_trips_list);
         vProgressBar = view.findViewById(R.id.pb_trips_list);
         tvNoTrips = view.findViewById(R.id.tv_no_trips_trips_list);
-        ((TripApplication) getActivity().getApplication()).injectTripsListFragmentDependencies(this);
+        Injector.injectTripsListFragmentDependencies(this);
         initViewModel();
         return view;
     }

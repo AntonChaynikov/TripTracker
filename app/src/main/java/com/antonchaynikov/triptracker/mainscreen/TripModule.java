@@ -8,6 +8,8 @@ import com.antonchaynikov.triptracker.viewmodel.ViewModelProviders;
 import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -17,14 +19,16 @@ public class TripModule {
     private TripFragment mFragment;
     private boolean mIsLocationPermissionGranted;
 
-    public TripModule(TripFragment fragment, boolean isLocationPermissionGranted) {
+    public TripModule(@Nullable TripFragment fragment, boolean isLocationPermissionGranted) {
         mFragment = fragment;
         mIsLocationPermissionGranted = isLocationPermissionGranted;
     }
 
     @Provides
     public TripViewModel provideTripViewModel(ViewModelFactory factory) {
-        return ViewModelProviders.of(mFragment, factory).get(TripViewModel.class);
+        return mFragment == null ?
+                factory.create(TripViewModel.class) :
+                ViewModelProviders.of(mFragment, factory).get(TripViewModel.class);
     }
 
     @Provides
