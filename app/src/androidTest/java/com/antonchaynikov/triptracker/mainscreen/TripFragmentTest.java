@@ -41,7 +41,7 @@ public class TripFragmentTest {
     private static FirebaseAuth sFirebaseAuth;
 
     @Rule
-    public final TripFragmentMockRule tripFragmentMockRule = new TripFragmentMockRule(createLocationsList());
+    public final TripFragmentMockInjectionRule tripFragmentMockInjectionRule = new TripFragmentMockInjectionRule(createLocationsList());
 
     @Rule
     public final GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION);
@@ -66,7 +66,7 @@ public class TripFragmentTest {
     public void shouldShowStatistics_whenTripStarts() throws Exception {
         FragmentScenario.launchInContainer(TripFragment.class)
                 .onFragment(fragment -> {
-                    IdlingResource idlingResource = fragment.initStatisticsIdlingResource(LOCATIONS_COUNT + 1);
+                    IdlingResource idlingResource = fragment.initStatisticsIdlingResource(LOCATIONS_COUNT);
                     IdlingRegistry.getInstance().register(idlingResource);
                 });
 
@@ -82,7 +82,7 @@ public class TripFragmentTest {
 
         onView(withId(R.id.btn_layout_statistics)).perform(click());
 
-        tripFragmentMockRule.getLocationSource().onGeolocationAvailabilityChanged(false);
+        tripFragmentMockInjectionRule.getInjectedLocationSource().onGeolocationAvailabilityChanged(false);
 
         onView(withText(R.string.message_geolocation_unavailable)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
     }

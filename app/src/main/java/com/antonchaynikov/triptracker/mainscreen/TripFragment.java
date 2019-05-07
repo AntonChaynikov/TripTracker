@@ -3,13 +3,21 @@ package com.antonchaynikov.triptracker.mainscreen;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.annotation.VisibleForTesting;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.test.espresso.IdlingResource;
 
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.injection.Injector;
@@ -27,14 +35,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.annotation.VisibleForTesting;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.test.espresso.IdlingResource;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static com.antonchaynikov.triptracker.mainscreen.TripFragmentDirections.ActionTripFragmentToHistoryFragment;
@@ -108,14 +108,6 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
         mSubscriptions.add(mViewModel.getGotToStatisticsObservable().subscribe(event -> goToStatisticsScreen()));
         mSubscriptions.add(mViewModel.getLogoutObservable().subscribe(event -> logout()));
         mSubscriptions.add(mViewModel.getProceedToSummaryObservable().subscribe(this::goToSummaryScreen));
-    }
-
-    @VisibleForTesting
-    void setViewModel(TripViewModel viewModel) {
-        mViewModel = viewModel;
-        System.out.println("testInit");
-        Log.d("testInit", "testInit");
-        initViewModel();
     }
 
     @Override

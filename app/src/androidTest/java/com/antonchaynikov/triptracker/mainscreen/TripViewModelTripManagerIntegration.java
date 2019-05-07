@@ -1,28 +1,23 @@
 package com.antonchaynikov.triptracker.mainscreen;
 
-import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.SystemClock;
 
-import com.antonchaynikov.triptracker.MockLocationSource;
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.RxImmediateSchedulerRule;
 import com.antonchaynikov.triptracker.data.model.Trip;
 import com.antonchaynikov.triptracker.data.model.TripCoordinate;
 import com.antonchaynikov.triptracker.data.repository.Repository;
-import com.antonchaynikov.triptracker.data.tripmanager.StatisticsCalculator;
-import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
-import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
 import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +25,10 @@ import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import androidx.test.platform.app.InstrumentationRegistry;
 import io.reactivex.Completable;
 import io.reactivex.observers.BaseTestConsumer;
 import io.reactivex.observers.TestObserver;
+import it.cosenonjaviste.daggermock.InjectFromComponent;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,21 +40,22 @@ public class TripViewModelTripManagerIntegration {
     public static final RxImmediateSchedulerRule IMMEDIATE_SCHEDULER_RULE = new RxImmediateSchedulerRule();
 
     private static final int LOCATIONS_COUNT = 2;
-    private static FirebaseAuth sFirebaseAuth;
 
+    @Rule
+    public final TripViewModelInjectionRule viewModelInjectionRule = new TripViewModelInjectionRule(createLocationsList(LOCATIONS_COUNT));
+
+    @InjectFromComponent(TripFragment.class)
     private TripViewModel mViewModel;
 
     @Mock
     private Repository mockRepository;
 
-    private MockLocationSource mockLocationSource;
-
     @BeforeClass
     public static void setTestEnv() throws Exception {
         // Authenticate as a test user
-        sFirebaseAuth = FirebaseAuth.getInstance();
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         CountDownLatch authInProcessLatch = new CountDownLatch(1);
-        sFirebaseAuth.signInWithEmailAndPassword("test@test.test", "123456").addOnCompleteListener(t -> authInProcessLatch.countDown());
+        firebaseAuth.signInWithEmailAndPassword("test@test.test", "123456").addOnCompleteListener(t -> authInProcessLatch.countDown());
         while (authInProcessLatch.getCount() > 0) {
             authInProcessLatch.await();
         }
@@ -67,19 +63,9 @@ public class TripViewModelTripManagerIntegration {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
         doReturn(Completable.complete()).when(mockRepository).addTrip(any(Trip.class));
         doReturn(Completable.complete()).when(mockRepository).addCoordinate(any(TripCoordinate.class), any(Trip.class));
         doReturn(Completable.complete()).when(mockRepository).updateTrip(any(Trip.class));
-
-        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-
-        mockLocationSource = new MockLocationSource(createLocationsList(LOCATIONS_COUNT));
-
-        TripManager tripManager = new TripManager(mockRepository, mockLocationSource, new StatisticsCalculator());
-
-        mViewModel = new TripViewModel(tripManager, sFirebaseAuth, new StatisticsFormatter(context), true);
     }
 
     @Test
@@ -115,7 +101,7 @@ public class TripViewModelTripManagerIntegration {
 
         mViewModel.onActionButtonClicked();
 
-        mockLocationSource.onGeolocationAvailabilityChanged(false);
+        viewModelInjectionRule.getInjectedLocationSource().onGeolocationAvailabilityChanged(false);
 
         snackbarMessageObserver.awaitCount(1, BaseTestConsumer.TestWaitStrategy.YIELD, TimeUnit.SECONDS.toMillis(1));
 

@@ -1,5 +1,7 @@
 package com.antonchaynikov.triptracker.mainscreen;
 
+import android.util.Log;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 import androidx.annotation.NonNull;
@@ -15,6 +17,7 @@ class MainScreenIdlingResource implements IdlingResource {
     private ResourceCallback mCallback;
 
     MainScreenIdlingResource(@NonNull String resourceName, int resourceCount) {
+        Log.d(TAG, "Resource initialized " + resourceCount);
         mResourceCount = resourceCount > 0 ? resourceCount : 0;
         mName = resourceName;
     }
@@ -36,13 +39,16 @@ class MainScreenIdlingResource implements IdlingResource {
 
     void set() {
         mBusyResourceCount.set(mResourceCount);
+        Log.d(TAG, "Resource set to " + mBusyResourceCount.get());
     }
 
     void onItemEmitted() {
         if (mBusyResourceCount.get() > 0) {
             mBusyResourceCount.decrementAndGet();
+            Log.d(TAG, "OnItemEmitted, left " + mBusyResourceCount.get());
         } else {
             if (mCallback != null) {
+                Log.d(TAG, "Is idle");
                 mCallback.onTransitionToIdle();
             }
         }
