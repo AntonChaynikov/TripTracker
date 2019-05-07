@@ -1,40 +1,32 @@
 package com.antonchaynikov.triptracker.mainscreen;
 
 import android.Manifest;
-import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.SystemClock;
-
-import com.antonchaynikov.triptracker.AndroidTestUtils;
-import com.antonchaynikov.triptracker.MockLocationSource;
-import com.antonchaynikov.triptracker.R;
-import com.antonchaynikov.triptracker.data.repository.Repository;
-import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
-import com.google.firebase.auth.FirebaseAuth;
-
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.MockitoAnnotations;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-
-import javax.inject.Inject;
 
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.matcher.ViewMatchers;
-import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.GrantPermissionRule;
+
+import com.antonchaynikov.triptracker.AndroidTestUtils;
+import com.antonchaynikov.triptracker.R;
+import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
+import com.google.firebase.auth.FirebaseAuth;
+
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -49,14 +41,10 @@ public class TripFragmentTest {
     private static FirebaseAuth sFirebaseAuth;
 
     @Rule
+    public final TripFragmentMockRule tripFragmentMockRule = new TripFragmentMockRule(createLocationsList());
+
+    @Rule
     public final GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION);
-
-    @Inject
-    TripViewModel mViewModel;
-
-    // Instantly returns Completable.complete()
-    private Repository mockRepository;
-    private MockLocationSource mockLocationSource;
 
     @BeforeClass
     public static void initTestEnv() throws Exception {
@@ -69,12 +57,6 @@ public class TripFragmentTest {
         }
     }
 
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-    }
-
     @After
     public void tearDown() throws Exception {
         TripManager.resetInstance();
@@ -82,12 +64,11 @@ public class TripFragmentTest {
 
     @Test
     public void shouldShowStatistics_whenTripStarts() throws Exception {
-        FragmentScenario<TripFragment> scenario = FragmentScenario.launchInContainer(TripFragment.class);
-        scenario.onFragment(fragment -> {
-            IdlingResource idlingResource = fragment.initStatisticsIdlingResource(LOCATIONS_COUNT + 1);
-            IdlingRegistry.getInstance().register(idlingResource);
-            fragment.injectViewModel(mViewModel);
-        });
+        FragmentScenario.launchInContainer(TripFragment.class)
+                .onFragment(fragment -> {
+                    IdlingResource idlingResource = fragment.initStatisticsIdlingResource(LOCATIONS_COUNT + 1);
+                    IdlingRegistry.getInstance().register(idlingResource);
+                });
 
         onView(withId(R.id.btn_layout_statistics)).perform(click());
 
@@ -97,24 +78,18 @@ public class TripFragmentTest {
 
     @Test
     public void shouldShowGeolocationError_whenGeolocationIsUnavailable() throws Exception {
-        FragmentScenario<TripFragment> scenario = FragmentScenario.launchInContainer(TripFragment.class, null, R.style.AppTheme, null);
-        scenario.onFragment(fragment -> {
-            fragment.injectViewModel(mViewModel);
-        });
+        FragmentScenario.launchInContainer(TripFragment.class, null, R.style.AppTheme, null);
 
         onView(withId(R.id.btn_layout_statistics)).perform(click());
 
-        mockLocationSource.onGeolocationAvailabilityChanged(false);
+        tripFragmentMockRule.getLocationSource().onGeolocationAvailabilityChanged(false);
 
         onView(withText(R.string.message_geolocation_unavailable)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
     }
 
     @Test
     public void shouldChangeActionButtonText_whenTripStarts() {
-        FragmentScenario<TripFragment> scenario = FragmentScenario.launchInContainer(TripFragment.class);
-        scenario.onFragment(fragment -> {
-            fragment.injectViewModel(mViewModel);
-        });
+        FragmentScenario.launchInContainer(TripFragment.class);
 
         ViewInteraction actionButtonInteraction = onView(withId(R.id.btn_layout_statistics));
         actionButtonInteraction.check(matches(withText(R.string.button_act)));

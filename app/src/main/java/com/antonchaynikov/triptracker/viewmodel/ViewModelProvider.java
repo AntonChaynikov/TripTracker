@@ -25,5 +25,4 @@ public class ViewModelProvider {
         }
         return (T) vm;
     }
-
 }

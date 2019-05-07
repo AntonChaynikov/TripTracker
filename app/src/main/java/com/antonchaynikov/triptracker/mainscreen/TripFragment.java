@@ -3,6 +3,7 @@ package com.antonchaynikov.triptracker.mainscreen;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -92,18 +93,13 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
     }
 
     @VisibleForTesting
-    void injectViewModel(@NonNull TripViewModel tripViewModel) {
-        mViewModel = tripViewModel;
-        initViewModel();
-    }
-
-    @VisibleForTesting
     IdlingResource initStatisticsIdlingResource(int itemsToWait) {
         mStatisticsIdlingResource = new MainScreenIdlingResource(IDLING_RES_NAME, itemsToWait);
         return mStatisticsIdlingResource;
     }
 
-    private void initViewModel() {
+    @VisibleForTesting
+    void initViewModel() {
         mSubscriptions.add(mViewModel.getAskLocationPermissionEventObservable().subscribe(event -> onLocationPermissionRequested()));
         mSubscriptions.add(mViewModel.getUiStateChangeEventObservable().subscribe(this::onUiStateUpdate));
         mSubscriptions.add(mViewModel.getShowSnackbarMessageBroadcast().subscribe(this::showSnackbarMessage));
@@ -112,6 +108,14 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
         mSubscriptions.add(mViewModel.getGotToStatisticsObservable().subscribe(event -> goToStatisticsScreen()));
         mSubscriptions.add(mViewModel.getLogoutObservable().subscribe(event -> logout()));
         mSubscriptions.add(mViewModel.getProceedToSummaryObservable().subscribe(this::goToSummaryScreen));
+    }
+
+    @VisibleForTesting
+    void setViewModel(TripViewModel viewModel) {
+        mViewModel = viewModel;
+        System.out.println("testInit");
+        Log.d("testInit", "testInit");
+        initViewModel();
     }
 
     @Override
