@@ -1,10 +1,10 @@
 package com.antonchaynikov.triptracker.injection
 
 import android.content.Context
+import com.antonchaynikov.core.data.location.LocationSourceModule
+import com.antonchaynikov.core.data.tripmanager.TripManagerModule
 
-import com.antonchaynikov.triptracker.authentication.AuthModule
-import com.antonchaynikov.triptracker.data.location.LocationSourceModule
-import com.antonchaynikov.triptracker.data.tripmanager.TripManagerModule
+import com.antonchaynikov.core.authentication.AuthModule
 import com.antonchaynikov.triptracker.history.DaggerHistoryComponent
 import com.antonchaynikov.triptracker.history.HistoryFragment
 import com.antonchaynikov.triptracker.history.HistoryModule
@@ -15,7 +15,6 @@ import com.antonchaynikov.triptracker.mainscreen.TripModule
 import com.antonchaynikov.triptracker.trips.DaggerTripsListComponent
 import com.antonchaynikov.triptracker.trips.TripsListFragment
 import com.antonchaynikov.triptracker.trips.TripsListModule
-import com.antonchaynikov.triptracker.viewmodel.CommonViewModelModule
 
 object Injector {
 
@@ -48,7 +47,7 @@ object Injector {
         DaggerHistoryComponent.builder()
                 .appComponent(appComponent)
                 .historyModule(HistoryModule(fragment, tripStartDate))
-                .commonViewModelModule(CommonViewModelModule())
+                .commonViewModelModule(com.antonchaynikov.core.viewmodel.CommonViewModelModule())
                 .build()
                 .inject(fragment)
     }
@@ -61,7 +60,7 @@ object Injector {
             DaggerTripComponent.builder()
                     .appComponent(appComponent)
                     .authModule(AuthModule())
-                    .commonViewModelModule(CommonViewModelModule())
+                    .commonViewModelModule(com.antonchaynikov.core.viewmodel.CommonViewModelModule())
                     .locationSourceModule(LocationSourceModule())
                     .tripManagerModule(TripManagerModule())
                     .tripModule(TripModule(fragment, isLocationPermissionGranted))

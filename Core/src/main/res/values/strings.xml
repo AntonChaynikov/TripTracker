@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name" translatable="false">Core</string>
+    <string name="statistics_duration_eternity">Eternity</string>
+    <string name="statistics_duration_zero">0s</string>
+    <string name="statistics_speed_kmh">%s km/h</string>
+    <string name="statistics_speed_mps">%s m/s</string>
+    <string name="statistics_distance_km">%s km</string>
+    <string name="statistics_distance_m">%s m</string>
+    <string name="notification_location_service">Covertly spying on you</string>
+</resources>

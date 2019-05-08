@@ -1,15 +1,16 @@
 package com.antonchaynikov.triptracker.history;
 
-import com.antonchaynikov.triptracker.data.model.Trip;
-import com.antonchaynikov.triptracker.data.model.TripCoordinate;
-import com.antonchaynikov.triptracker.data.repository.Repository;
-import com.antonchaynikov.triptracker.viewmodel.BasicViewModel;
-import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
-import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
+import androidx.annotation.NonNull;
+
+import com.antonchaynikov.core.data.model.Trip;
+import com.antonchaynikov.core.data.model.TripCoordinate;
+import com.antonchaynikov.core.data.repository.Repository;
+import com.antonchaynikov.core.viewmodel.BasicViewModel;
+import com.antonchaynikov.core.viewmodel.StatisticsFormatter;
+import com.antonchaynikov.core.viewmodel.TripStatistics;
 
 import java.util.List;
 
-import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.PublishSubject;

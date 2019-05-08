@@ -3,13 +3,13 @@ package com.antonchaynikov.triptracker.trips;
 import android.view.View;
 import android.widget.TextView;
 
-import com.antonchaynikov.triptracker.R;
-import com.antonchaynikov.triptracker.data.model.Trip;
-
-import java.util.Locale;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.antonchaynikov.core.data.model.Trip;
+import com.antonchaynikov.triptracker.R;
+
+import java.util.Locale;
 
 class TripsViewHolder extends RecyclerView.ViewHolder {
 

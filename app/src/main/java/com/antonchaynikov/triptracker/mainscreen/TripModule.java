@@ -1,14 +1,14 @@
 package com.antonchaynikov.triptracker.mainscreen;
 
-import com.antonchaynikov.triptracker.data.tripmanager.TripManager;
-import com.antonchaynikov.triptracker.viewmodel.BasicViewModel;
-import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
-import com.antonchaynikov.triptracker.viewmodel.ViewModelFactory;
-import com.antonchaynikov.triptracker.viewmodel.ViewModelProviders;
-import com.google.firebase.auth.FirebaseAuth;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.antonchaynikov.core.data.tripmanager.TripManager;
+import com.antonchaynikov.core.viewmodel.BasicViewModel;
+import com.antonchaynikov.core.viewmodel.StatisticsFormatter;
+import com.antonchaynikov.core.viewmodel.ViewModelFactory;
+import com.antonchaynikov.core.viewmodel.ViewModelProviders;
+import com.google.firebase.auth.FirebaseAuth;
 
 import dagger.Module;
 import dagger.Provides;

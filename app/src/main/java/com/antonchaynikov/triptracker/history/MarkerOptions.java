@@ -1,10 +1,10 @@
 package com.antonchaynikov.triptracker.history;
 
-import com.antonchaynikov.triptracker.data.model.TripCoordinate;
+import androidx.annotation.Nullable;
+
+import com.antonchaynikov.core.data.model.TripCoordinate;
 
 import java.util.Objects;
-
-import androidx.annotation.Nullable;
 
 public class MarkerOptions {
 

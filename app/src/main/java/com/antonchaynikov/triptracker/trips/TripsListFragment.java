@@ -6,15 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.antonchaynikov.triptracker.R;
-import com.antonchaynikov.triptracker.data.model.Trip;
-import com.antonchaynikov.triptracker.injection.Injector;
-import com.antonchaynikov.triptracker.viewmodel.ViewModelFragment;
-
-import java.util.List;
-
-import javax.inject.Inject;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -22,6 +13,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.idling.CountingIdlingResource;
+
+import com.antonchaynikov.core.data.model.Trip;
+import com.antonchaynikov.core.viewmodel.ViewModelFragment;
+import com.antonchaynikov.triptracker.R;
+import com.antonchaynikov.triptracker.injection.Injector;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
 import io.reactivex.disposables.CompositeDisposable;
 
 public class TripsListFragment extends ViewModelFragment {

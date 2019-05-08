@@ -2,7 +2,7 @@ package com.antonchaynikov.triptracker.injection;
 
 import android.content.Context;
 
-import com.antonchaynikov.triptracker.data.repository.Repository;
+import com.antonchaynikov.core.data.repository.Repository;
 
 import javax.inject.Singleton;
 

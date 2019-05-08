@@ -1,14 +1,14 @@
 package com.antonchaynikov.triptracker.history;
 
-import com.antonchaynikov.triptracker.data.model.TripCoordinate;
-import com.antonchaynikov.triptracker.utils.CollectionUtils;
+import androidx.annotation.NonNull;
+
+import com.antonchaynikov.core.data.model.TripCoordinate;
+import com.antonchaynikov.core.utils.CollectionUtils;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.List;
 import java.util.Objects;
-
-import androidx.annotation.NonNull;
 
 public class MapOptions {
 

@@ -1,12 +1,13 @@
 package com.antonchaynikov.triptracker.history;
 
-import com.antonchaynikov.triptracker.data.repository.Repository;
-import com.antonchaynikov.triptracker.viewmodel.BasicViewModel;
-import com.antonchaynikov.triptracker.viewmodel.StatisticsFormatter;
-import com.antonchaynikov.triptracker.viewmodel.ViewModelFactory;
-import com.antonchaynikov.triptracker.viewmodel.ViewModelProviders;
-
 import androidx.annotation.NonNull;
+
+import com.antonchaynikov.core.data.repository.Repository;
+import com.antonchaynikov.core.viewmodel.BasicViewModel;
+import com.antonchaynikov.core.viewmodel.StatisticsFormatter;
+import com.antonchaynikov.core.viewmodel.ViewModelFactory;
+import com.antonchaynikov.core.viewmodel.ViewModelProviders;
+
 import dagger.Module;
 import dagger.Provides;
 

@@ -7,10 +7,16 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import androidx.test.espresso.IdlingResource;
+import androidx.test.espresso.idling.CountingIdlingResource;
+
+import com.antonchaynikov.core.viewmodel.TripStatistics;
+import com.antonchaynikov.core.viewmodel.ViewModelFragment;
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.injection.Injector;
-import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
-import com.antonchaynikov.triptracker.viewmodel.ViewModelFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -20,11 +26,6 @@ import com.google.android.gms.maps.model.LatLng;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
-import androidx.test.espresso.IdlingResource;
-import androidx.test.espresso.idling.CountingIdlingResource;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class HistoryFragment extends ViewModelFragment implements OnMapReadyCallback {

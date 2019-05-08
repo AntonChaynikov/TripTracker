@@ -19,11 +19,11 @@ import androidx.core.content.ContextCompat;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.test.espresso.IdlingResource;
 
+import com.antonchaynikov.core.viewmodel.TripStatistics;
+import com.antonchaynikov.core.viewmodel.ViewModelFragment;
 import com.antonchaynikov.triptracker.R;
 import com.antonchaynikov.triptracker.injection.Injector;
 import com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState;
-import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
-import com.antonchaynikov.triptracker.viewmodel.ViewModelFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;

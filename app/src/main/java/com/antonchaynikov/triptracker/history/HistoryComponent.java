@@ -1,8 +1,8 @@
 package com.antonchaynikov.triptracker.history;
 
+import com.antonchaynikov.core.viewmodel.CommonViewModelModule;
+import com.antonchaynikov.core.viewmodel.CommonViewModelScope;
 import com.antonchaynikov.triptracker.injection.AppComponent;
-import com.antonchaynikov.triptracker.viewmodel.CommonViewModelModule;
-import com.antonchaynikov.triptracker.viewmodel.CommonViewModelScope;
 
 import dagger.Component;
 

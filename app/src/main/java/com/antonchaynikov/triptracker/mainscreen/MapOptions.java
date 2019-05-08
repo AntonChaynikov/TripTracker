@@ -1,8 +1,8 @@
 package com.antonchaynikov.triptracker.mainscreen;
 
-import com.antonchaynikov.triptracker.data.model.TripCoordinate;
-
 import androidx.annotation.NonNull;
+
+import com.antonchaynikov.core.data.model.TripCoordinate;
 
 class MapOptions {
 

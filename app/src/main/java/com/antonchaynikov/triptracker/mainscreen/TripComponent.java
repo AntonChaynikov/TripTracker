@@ -1,9 +1,9 @@
 package com.antonchaynikov.triptracker.mainscreen;
 
+import com.antonchaynikov.core.data.tripmanager.TripManagerModule;
+import com.antonchaynikov.core.viewmodel.CommonViewModelModule;
+import com.antonchaynikov.core.authentication.AuthModule;
 import com.antonchaynikov.triptracker.injection.AppComponent;
-import com.antonchaynikov.triptracker.authentication.AuthModule;
-import com.antonchaynikov.triptracker.data.tripmanager.TripManagerModule;
-import com.antonchaynikov.triptracker.viewmodel.CommonViewModelModule;
 
 import dagger.Component;
 

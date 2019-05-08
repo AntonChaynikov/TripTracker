@@ -2,8 +2,8 @@ package com.antonchaynikov.triptracker.injection;
 
 import android.content.Context;
 
-import com.antonchaynikov.triptracker.data.repository.Repository;
-import com.antonchaynikov.triptracker.data.repository.firestore.FireStoreDB;
+import com.antonchaynikov.core.data.repository.Repository;
+import com.antonchaynikov.core.data.repository.firestore.FireStoreDB;
 
 import javax.inject.Singleton;
 
@@ -30,5 +30,4 @@ public class AppModule {
     public Repository provideRepository() {
         return FireStoreDB.getInstance();
     }
-
 }

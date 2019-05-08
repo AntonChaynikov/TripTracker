@@ -39,7 +39,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".data.location.LocationService" />
+        <service android:name="com.antonchaynikov.core.data.location.LocationService" />
 
         <meta-data
             android:name="io.fabric.ApiKey"
