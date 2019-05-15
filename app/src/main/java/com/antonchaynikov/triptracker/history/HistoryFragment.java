@@ -8,7 +8,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.antonchaynikov.triptracker.R;
-import com.antonchaynikov.triptracker.application.TripApplication;
+import com.antonchaynikov.triptracker.injection.Injector;
 import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
 import com.antonchaynikov.triptracker.viewmodel.ViewModelFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -69,7 +69,7 @@ public class HistoryFragment extends ViewModelFragment implements OnMapReadyCall
         if (tripStartDate == -1) {
             throw new IllegalArgumentException("Should have used getStartIntent(context, long)");
         }
-        ((TripApplication) getActivity().getApplication()).injectHistoryFragmentDependencies(this, tripStartDate);
+        Injector.injectHistoryFragmentDependencies(this, tripStartDate);
 
         initViewModel();
         return view;

@@ -1,4 +1,4 @@
-package com.antonchaynikov.triptracker.application;
+package com.antonchaynikov.triptracker.injection;
 
 import android.content.Context;
 

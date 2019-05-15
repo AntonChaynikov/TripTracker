@@ -1,21 +1,34 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.github.triplet.play'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 apply plugin: 'jacoco-android'
 apply from: '../checkstyle/checkstyle.gradle'
 apply plugin: 'io.fabric'
 apply plugin: "androidx.navigation.safeargs"
-apply plugin: 'kotlin-android'
-
-def versionMajor = 1
-def versionMinor = 0
-def versionPatch = 0
-def versionBuild = 8
-def versionSuffix = versionBuild > 0 ? "-beta" : ""
+apply plugin: 'kotlin-kapt'
+apply plugin: 'com.antonchaynikov.oneclickpublish'
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 
+def versionPropertiesFilePath = "version.properties"
+
+project.ext.versionPropertiesFile = rootProject.file(versionPropertiesFilePath)
+project.ext.versionProperties = new Properties()
+versionProperties.load(new FileInputStream(versionPropertiesFile))
+
+project.ext.versionMajor = Integer.parseInt(versionProperties['versionMajor'])
+project.ext.versionMinor = Integer.parseInt(versionProperties['versionMinor'])
+project.ext.versionPatch = Integer.parseInt(versionProperties['versionPatch'])
+project.ext.versionBuild = Integer.parseInt(versionProperties['versionBuild'])
+
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+oneClickPublish {
+    branchName = "master"
+    versionFilePath = versionPropertiesFilePath
+    remoteRepoName = "origin"
+}
 
 jacoco {
     toolVersion = "0.8.0"
@@ -24,20 +37,12 @@ jacoco {
 android {
     compileSdkVersion 28
 
-    playAccountConfigs {
-        defaultAccountConfig {
-            serviceAccountEmail = "gps-logger-gplay@api-7194191596450161697-308117.iam.gserviceaccount.com"
-            jsonFile = file('google_play_key.json')
-        }
-    }
-
     defaultConfig {
         applicationId "com.antonchaynikov.triptracker"
-        playAccountConfig = playAccountConfigs.defaultAccountConfig
         minSdkVersion 19
         targetSdkVersion 28
         versionCode versionMajor * 100000 + versionMinor * 10000 + versionPatch * 1000 + versionBuild
-        versionName "${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}${versionSuffix}"
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}"
         setProperty("archivesBaseName", "$rootProject.name-v$versionName")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -89,6 +94,10 @@ android {
         }
     }
 
+    kapt {
+        generateStubs = true
+    }
+
     lintOptions {
         lintConfig file("../lintConfig.xml")
         warningsAsErrors true
@@ -97,10 +106,6 @@ android {
     useLibrary 'android.test.runner'
     useLibrary 'android.test.base'
     useLibrary 'android.test.mock'
-}
-
-play {
-    track = 'alpha'
 }
 
 ext {
@@ -132,6 +137,8 @@ ext {
     DAGGER = '2.21'
     FRAGMENT_TESTING = '1.1.0-alpha05'
     NAV_COMPONENTS = "2.1.0-alpha01"
+    DAGGER_MOCK = "0.8.5"
+    MULTIDEX = "1.0.3"
 }
 
 dependencies {
@@ -154,20 +161,21 @@ dependencies {
     implementation "androidx.test.espresso:espresso-idling-resource:$ESPRESSO_IDLING_RESOURCE"
     implementation "androidx.navigation:navigation-fragment:$NAV_COMPONENTS"
     implementation "androidx.navigation:navigation-ui:$NAV_COMPONENTS"
+    implementation "com.android.support:multidex:$MULTIDEX"
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
 
     debugImplementation "androidx.fragment:fragment-testing:$FRAGMENT_TESTING"
 
-    annotationProcessor "com.google.dagger:dagger-compiler:$DAGGER"
-
-    implementation 'com.android.support:multidex:1.0.3'
+    kapt "com.google.dagger:dagger-compiler:$DAGGER"
+    kapt "com.google.dagger:dagger-android-processor:$DAGGER"
 
     testImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     testImplementation "junit:junit:$JUNIT"
     testImplementation "org.mockito:mockito-inline:$MOCKITO_INLINE"
+    testImplementation "com.github.fabioCollini.daggermock:daggermock:$DAGGER_MOCK"
 
-    // AndroidJUnitRunner and JUnit Rules
+    androidTestImplementation "com.github.fabioCollini.daggermock:daggermock:$DAGGER_MOCK"
     androidTestImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     androidTestImplementation "org.mockito:mockito-android:$MOCKITO_ANDROID"
     androidTestImplementation 'androidx.test:core:1.1.0'

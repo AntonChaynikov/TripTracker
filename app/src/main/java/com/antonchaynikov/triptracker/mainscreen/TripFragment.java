@@ -10,8 +10,17 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.annotation.VisibleForTesting;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.test.espresso.IdlingResource;
+
 import com.antonchaynikov.triptracker.R;
-import com.antonchaynikov.triptracker.application.TripApplication;
+import com.antonchaynikov.triptracker.injection.Injector;
 import com.antonchaynikov.triptracker.mainscreen.uistate.TripUiState;
 import com.antonchaynikov.triptracker.viewmodel.TripStatistics;
 import com.antonchaynikov.triptracker.viewmodel.ViewModelFragment;
@@ -26,17 +35,10 @@ import com.google.android.material.snackbar.Snackbar;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.annotation.VisibleForTesting;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.test.espresso.IdlingResource;
 import io.reactivex.disposables.CompositeDisposable;
 
-import static com.antonchaynikov.triptracker.mainscreen.TripFragmentDirections.*;
+import static com.antonchaynikov.triptracker.mainscreen.TripFragmentDirections.ActionTripFragmentToHistoryFragment;
+import static com.antonchaynikov.triptracker.mainscreen.TripFragmentDirections.actionTripFragmentToHistoryFragment;
 
 public class TripFragment extends ViewModelFragment implements View.OnClickListener, OnMapReadyCallback {
     private static final int ACCESS_FINE_LOCATION_REQUEST_CODE = 1;
@@ -65,7 +67,7 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
                 ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) ==
                         PackageManager.PERMISSION_GRANTED;
 
-        ((TripApplication) getActivity().getApplication()).injectTripFragmentDependencies(this, mPermissionGranted);
+        Injector.injectTripFragmentDependencies(this, mPermissionGranted);
 
         mSubscriptions = new CompositeDisposable();
 
@@ -91,18 +93,13 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
     }
 
     @VisibleForTesting
-    void injectViewModel(@NonNull TripViewModel tripViewModel) {
-        mViewModel = tripViewModel;
-        initViewModel();
-    }
-
-    @VisibleForTesting
     IdlingResource initStatisticsIdlingResource(int itemsToWait) {
         mStatisticsIdlingResource = new MainScreenIdlingResource(IDLING_RES_NAME, itemsToWait);
         return mStatisticsIdlingResource;
     }
 
-    private void initViewModel() {
+    @VisibleForTesting
+    void initViewModel() {
         mSubscriptions.add(mViewModel.getAskLocationPermissionEventObservable().subscribe(event -> onLocationPermissionRequested()));
         mSubscriptions.add(mViewModel.getUiStateChangeEventObservable().subscribe(this::onUiStateUpdate));
         mSubscriptions.add(mViewModel.getShowSnackbarMessageBroadcast().subscribe(this::showSnackbarMessage));

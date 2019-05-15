@@ -58,7 +58,7 @@ class TripViewModel extends BasicViewModel {
         mFirebaseAuth = firebaseAuth;
         mSubscriptions.add(mTripManager.getTripUpdatesStream().subscribe(this::handleTripUpdate));
         mSubscriptions.add(mTripManager.getCoordinatesStream().subscribe(this::handleLocationUpdate));
-        mSubscriptions.add(mTripManager.getGeoloactionAvailabilityChangeObservable().subscribe(this::handleGeolocationAvailabilityChange));
+        mSubscriptions.add(mTripManager.getGeolocationAvailabilityChangeObservable().subscribe(this::handleGeolocationAvailabilityChange));
     }
 
     Observable<TripUiState> getUiStateChangeEventObservable() {
