@@ -112,7 +112,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "androidx.appcompat:appcompat:$ANDROIDX_APPCOMPAT"
     implementation "androidx.legacy:legacy-support-v4:$ANDROIDX_SUPPORT_V4"
-    implementation "androidx.constraintlayout:constraintlayout:$CONSTRAINT_LAYOUT"
+
     implementation "io.reactivex.rxjava2:rxjava:$RX_JAVA"
     implementation "io.reactivex.rxjava2:rxandroid:$RX_ANDROID"
     implementation "com.google.android.gms:play-services-maps:$GOOGLE_MAPS_SDK"
@@ -129,8 +129,14 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment:$NAV_COMPONENTS"
     implementation "androidx.navigation:navigation-ui:$NAV_COMPONENTS"
     implementation "com.android.support:multidex:$MULTIDEX"
+    implementation "com.google.dagger:dagger-android-support:$DAGGER" // if you use the support libraries
 
-    implementation project(path: ':Core')
+
+    implementation project(path: ':core')
+    implementation project(path: ':login')
+    implementation project(path: ':tripscreen')
+    implementation project(path: ':tripshistory')
+    implementation project(path: ':tripslist')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
 

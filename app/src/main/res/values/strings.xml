@@ -1,16 +1,12 @@
 <resources>
     <string name="app_name">TripTracker</string>
-    <string name="button_act">Receive Coordinates</string>
-    <string name="button_stop">Stop Receiving Coordinates</string>
     <string name="authentication_button_text">Login</string>
-    <string name="message_geolocation_unavailable">Geolocation service is unavailable</string>
-    <string name="message_geolocation_available">Geolocation service is available</string>
     <string name="menu_trip_activity_item_statistics">Statistics</string>
     <string name="statistics_caption">Statistics</string>
     <string name="statistics_distance_description">Distance</string>
     <string name="statistics_speed_descriptions">Speed</string>
-    <string name="statistics_distance">%s km</string>
-    <string name="statistics_speed">%s km/h</string>
+
+
     <string name="no_trips_trips_list">There are no trips yet</string>
     <string name="menu_trip_activity_item_logout">logout</string>
     <string name="statistics_duration_eternity">Eternity</string>

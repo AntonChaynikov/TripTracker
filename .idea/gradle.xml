@@ -8,8 +8,12 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/Core" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/login" />
+            <option value="$PROJECT_DIR$/tripscreen" />
+            <option value="$PROJECT_DIR$/tripshistory" />
+            <option value="$PROJECT_DIR$/tripslist" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

@@ -1,14 +1,12 @@
 package com.antonchaynikov.triptracker;
 
-import android.app.PendingIntent;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -16,16 +14,23 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.antonchaynikov.core.viewmodel.ViewModelActivity;
 
-public class TripActivity extends ViewModelActivity {
+import javax.inject.Inject;
+
+import dagger.android.AndroidInjection;
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.support.HasSupportFragmentInjector;
+
+public class TripActivity extends ViewModelActivity implements HasSupportFragmentInjector {
+
+    @Inject
+    DispatchingAndroidInjector<Fragment> fragmentInjector;
 
     private boolean shouldShowActionBarItems;
 
-    public static PendingIntent getNotificationContentIntent(@NonNull Context context) {
-        return null;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.frame_activity);
         Toolbar toolbar = findViewById(R.id.trip_toolbar);
@@ -43,6 +48,11 @@ public class TripActivity extends ViewModelActivity {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public AndroidInjector<Fragment> supportFragmentInjector() {
+        return fragmentInjector;
     }
 
     @Override

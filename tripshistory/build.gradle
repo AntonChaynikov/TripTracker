@@ -1,0 +1,67 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion 28
+
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation "androidx.appcompat:appcompat:$ANDROIDX_APPCOMPAT"
+
+    implementation "io.reactivex.rxjava2:rxjava:$RX_JAVA"
+    implementation "io.reactivex.rxjava2:rxandroid:$RX_ANDROID"
+
+    implementation "com.google.android.gms:play-services-maps:$GOOGLE_MAPS_SDK"
+    implementation "com.google.android.gms:play-services-base:$GOOGLE_PLAY_SERVICES_BASE"
+    implementation "com.google.android.gms:play-services-location:$GOOGLE_PALY_SERVICES_LOCATION"
+
+    implementation "androidx.navigation:navigation-fragment:$NAV_COMPONENTS"
+    implementation "androidx.navigation:navigation-ui:$NAV_COMPONENTS"
+
+    implementation "androidx.test.espresso:espresso-idling-resource:$ESPRESSO_IDLING_RESOURCE"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
+
+    implementation project(path: ':core')
+
+    implementation "com.google.dagger:dagger:$DAGGER"
+    implementation "com.google.dagger:dagger-android-support:$DAGGER"
+
+    kapt "com.google.dagger:dagger-compiler:$DAGGER"
+    kapt "com.google.dagger:dagger-android-processor:$DAGGER"
+
+    testImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
+    testImplementation "junit:junit:$JUNIT"
+    testImplementation "org.mockito:mockito-inline:$MOCKITO_INLINE"
+
+    androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"
+}

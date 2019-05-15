@@ -1,0 +1,80 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    testOptions {
+        unitTests {
+            returnDefaultValues = true
+        }
+    }
+
+    lintOptions {
+        lintConfig file("../lintConfig.xml")
+        warningsAsErrors true
+    }
+
+    useLibrary 'android.test.runner'
+    useLibrary 'android.test.base'
+    useLibrary 'android.test.mock'
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation "androidx.appcompat:appcompat:$ANDROIDX_APPCOMPAT"
+    implementation "androidx.legacy:legacy-support-v4:$ANDROIDX_SUPPORT_V4"
+    implementation "io.reactivex.rxjava2:rxjava:$RX_JAVA"
+    implementation "io.reactivex.rxjava2:rxandroid:$RX_ANDROID"
+    implementation "com.google.dagger:dagger:$DAGGER"
+    implementation "joda-time:joda-time:$JODA_TIME"
+    implementation "org.joda:joda-convert:$JODA_CONVERT:classic"
+    implementation "com.firebaseui:firebase-ui-auth:$FIREBASE_UI_AUTH"
+    implementation "com.google.firebase:firebase-core:$FIREBASE_CORE"
+    implementation "com.google.firebase:firebase-firestore:$FIREBASE_FIRESTORE"
+    implementation "com.google.android.gms:play-services-base:$GOOGLE_PLAY_SERVICES_BASE"
+    implementation "com.google.android.gms:play-services-location:$GOOGLE_PALY_SERVICES_LOCATION"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
+
+    kapt "com.google.dagger:dagger-compiler:$DAGGER"
+    kapt "com.google.dagger:dagger-android-processor:$DAGGER"
+
+    testImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
+    testImplementation "junit:junit:$JUNIT"
+    testImplementation "org.mockito:mockito-inline:$MOCKITO_INLINE"
+
+    androidTestImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
+    androidTestImplementation "org.mockito:mockito-android:$MOCKITO_ANDROID"
+    androidTestImplementation 'androidx.test:core:1.1.0'
+    androidTestImplementation 'androidx.test:rules:1.1.1'
+    androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"
+}
+
+repositories {
+    mavenCentral()
+}

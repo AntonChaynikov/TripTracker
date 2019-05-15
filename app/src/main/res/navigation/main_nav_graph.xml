@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/tripFragment"
-        android:name="com.antonchaynikov.triptracker.mainscreen.TripFragment"
+        android:name="com.antonchaynikov.tripscreen.TripFragment"
         android:label="Trip"
         tools:layout="@layout/activity_map" >
         <action
@@ -23,25 +23,21 @@
 
     <fragment
         android:id="@+id/historyFragment"
-        android:name="com.antonchaynikov.triptracker.history.HistoryFragment"
+        android:name="com.antonchaynikov.tripshistory.HistoryFragment"
         android:label="History"
         tools:layout="@layout/activity_map" >
-        <argument
-            android:name="tripStartDate"
-            app:argType="long"
-            android:defaultValue="-1L" />
     </fragment>
 
     <fragment
         android:id="@+id/tripsListFragment"
-        android:name="com.antonchaynikov.triptracker.trips.TripsListFragment"
+        android:name="com.antonchaynikov.tripslist.TripsListFragment"
         android:label="Trips"
         tools:layout="@layout/trips_list_layout" >
     </fragment>
 
     <fragment
         android:id="@+id/launchFragment"
-        android:name="com.antonchaynikov.triptracker.authentication.LaunchFragment"
+        android:name="com.antonchaynikov.login.LaunchFragment"
         android:label="Login"
         tools:layout="@layout/launch_fragment_layout" >
         <action

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">TripScreen</string>
+    <string name="message_geolocation_unavailable">Geolocation service is unavailable</string>
+    <string name="message_geolocation_available">Geolocation service is available</string>
+    <string name="button_act">Receive Coordinates</string>
+    <string name="button_stop">Stop Receiving Coordinates</string>
+</resources>
