@@ -7,8 +7,8 @@ import dagger.Provides
 
 //TODO return platform or servicesApi source depending on name parameter
 @Module
-object LocationProviderModule {
-    @JvmStatic
+open class LocationProviderModule {
+
     @Provides
     fun provide(context: Context, locationFilter: Filter<Location>): LocationProvider {
         val locationProvider = LocationProviderPlatform(context)
@@ -16,7 +16,6 @@ object LocationProviderModule {
         return locationProvider
     }
 
-    @JvmStatic
     @Provides
     fun provideLocationFilter(): Filter<Location> {
         return LocationFilter()

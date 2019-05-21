@@ -1,6 +1,7 @@
 package com.antonchaynikov.tripshistory;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 
 import com.antonchaynikov.core.data.model.Trip;
 import com.antonchaynikov.core.data.model.TripCoordinate;
@@ -26,7 +27,7 @@ public class HistoryViewModel extends BasicViewModel {
 
     private CompositeDisposable mSubscriptions = new CompositeDisposable();
 
-    HistoryViewModel(@NonNull Repository repository, @NonNull StatisticsFormatter statisticsFormatter, long tripStartDate) {
+    public HistoryViewModel(@NonNull Repository repository, @NonNull StatisticsFormatter statisticsFormatter, long tripStartDate) {
         mRepository = repository;
         mStatisticsFormatter = statisticsFormatter;
         mStartDate = tripStartDate;

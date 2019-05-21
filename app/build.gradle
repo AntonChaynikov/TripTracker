@@ -44,7 +44,8 @@ android {
         versionCode versionMajor * 100000 + versionMinor * 10000 + versionPatch * 1000 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}"
         setProperty("archivesBaseName", "$rootProject.name-v$versionName")
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        //testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'com.antonchaynikov.triptracker.DexOpenerRunner'
     }
 
     signingConfigs {
@@ -151,12 +152,15 @@ dependencies {
     testImplementation "com.github.fabioCollini.daggermock:daggermock:$DAGGER_MOCK"
 
     androidTestImplementation "com.github.fabioCollini.daggermock:daggermock:$DAGGER_MOCK"
+    androidTestImplementation "com.github.fabioCollini.daggermock:daggermock-kotlin:$DAGGER_MOCK"
     androidTestImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     androidTestImplementation "org.mockito:mockito-android:$MOCKITO_ANDROID"
     androidTestImplementation 'androidx.test:core:1.1.0'
     androidTestImplementation 'androidx.test:rules:1.1.1'
     androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"
+
+    androidTestImplementation 'com.github.tmurakami:dexopener:2.0.2'
 }
 
 apply plugin: 'com.google.gms.google-services'

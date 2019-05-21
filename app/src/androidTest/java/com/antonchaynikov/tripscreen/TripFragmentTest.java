@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.SystemClock;
+import android.util.Log;
 
 import androidx.fragment.app.FragmentFactory;
 import androidx.fragment.app.testing.FragmentScenario;
@@ -17,9 +18,13 @@ import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
 
 import com.antonchaynikov.core.data.tripmanager.TripManager;
+import com.antonchaynikov.core.injection.Injector;
 import com.antonchaynikov.triptracker.AndroidTestUtils;
 import com.antonchaynikov.triptracker.ContainerActivity;
 import com.antonchaynikov.triptracker.R;
+import com.antonchaynikov.triptracker.application.DaggerTestComponent;
+import com.antonchaynikov.triptracker.application.TestComponent;
+import com.github.tmurakami.dexopener.DexOpener;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.hamcrest.BaseMatcher;
@@ -39,6 +44,8 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class TripFragmentTest {
 
@@ -60,6 +67,7 @@ public class TripFragmentTest {
         sFirebaseAuth = FirebaseAuth.getInstance();
         CountDownLatch authInProcessLatch = new CountDownLatch(1);
         sFirebaseAuth.signInWithEmailAndPassword("test@test.test", "123456").addOnCompleteListener(t -> authInProcessLatch.countDown());
+
         while (authInProcessLatch.getCount() > 0) {
             authInProcessLatch.await();
         }
@@ -72,8 +80,13 @@ public class TripFragmentTest {
 
     @Test
     public void shouldShowStatistics_whenTripStarts() throws Exception {
-        containerActivityRule.launchActivity(new Intent(InstrumentationRegistry.getInstrumentation().getTargetContext(), ContainerActivity.class));
-        containerActivityRule.getActivity().attachFragment(new TripFragment());
+        TripFragment fragment = new TripFragment();
+
+        containerActivityRule.launchActivity(ContainerActivity.getStartIntent(InstrumentationRegistry.getInstrumentation().getTargetContext()));
+        containerActivityRule.getActivity().attachFragment(fragment);
+
+        IdlingResource idlingResource = fragment.initStatisticsIdlingResource(LOCATIONS_COUNT);
+        IdlingRegistry.getInstance().register(idlingResource);
 
         onView(withId(R.id.btn_layout_statistics)).perform(click());
 
@@ -83,8 +96,10 @@ public class TripFragmentTest {
 
     @Test
     public void shouldShowGeolocationError_whenGeolocationIsUnavailable() throws Exception {
-        containerActivityRule.launchActivity(new Intent(InstrumentationRegistry.getInstrumentation().getTargetContext(), ContainerActivity.class));
-        containerActivityRule.getActivity().attachFragment(new TripFragment());
+        TripFragment fragment = new TripFragment();
+
+        containerActivityRule.launchActivity(ContainerActivity.getStartIntent(InstrumentationRegistry.getInstrumentation().getTargetContext()));
+        containerActivityRule.getActivity().attachFragment(fragment);
 
         onView(withId(R.id.btn_layout_statistics)).perform(click());
 
@@ -95,8 +110,10 @@ public class TripFragmentTest {
 
     @Test
     public void shouldChangeActionButtonText_whenTripStarts() {
-        containerActivityRule.launchActivity(new Intent(InstrumentationRegistry.getInstrumentation().getTargetContext(), ContainerActivity.class));
-        containerActivityRule.getActivity().attachFragment(new TripFragment());
+        TripFragment fragment = new TripFragment();
+
+        containerActivityRule.launchActivity(ContainerActivity.getStartIntent(InstrumentationRegistry.getInstrumentation().getTargetContext()));
+        containerActivityRule.getActivity().attachFragment(fragment);
 
         ViewInteraction actionButtonInteraction = onView(withId(R.id.btn_layout_statistics));
         actionButtonInteraction.check(matches(withText(R.string.button_act)));

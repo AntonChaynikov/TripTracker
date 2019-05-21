@@ -3,7 +3,6 @@ package com.antonchaynikov.triptracker
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
-
 @Module
 abstract class TripActivityModule {
     @ContributesAndroidInjector(modules = [

@@ -7,16 +7,14 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-object NavigationModule {
-    @JvmStatic
+open class NavigationModule {
+
     @Provides
     fun navigationLogin(tripTrackerNavigator: TripTrackerNavigator): NavigationLogin = tripTrackerNavigator
 
-    @JvmStatic
     @Provides
     fun navigationTripScreen(tripTrackerNavigator: TripTrackerNavigator): NavigationTripScreen = tripTrackerNavigator
 
-    @JvmStatic
     @Provides
     fun tripTrackerNavigator() = TripTrackerNavigator()
 }

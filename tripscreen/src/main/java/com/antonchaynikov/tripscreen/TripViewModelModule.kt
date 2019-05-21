@@ -8,17 +8,19 @@ import com.antonchaynikov.core.viewmodel.StatisticsFormatter
 import com.google.firebase.auth.FirebaseAuth
 import com.antonchaynikov.core.data.tripmanager.TripManager
 import com.antonchaynikov.core.viewmodel.ViewModelProviders
+import javax.inject.Named
 
 @Module
 object TripViewModelModule {
 
     @JvmStatic
     @Provides
-    fun viewModel(fragment: TripFragment, factory: ViewModelFactory): TripViewModel =
+    fun viewModel(fragment: TripFragment, @Named("TripViewModel") factory: ViewModelFactory): TripViewModel =
             ViewModelProviders.of(fragment, factory).get(TripViewModel::class.java)
 
     @JvmStatic
     @Provides
+    @Named("TripViewModel")
     fun provideTripViewModelFactory(fragment: TripFragment,
                                     tripManager: TripManager,
                                     firebaseAuth: FirebaseAuth,

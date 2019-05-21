@@ -42,7 +42,7 @@ public class TripViewModel extends BasicViewModel {
 
     private TripUiState mUiState;
 
-    TripViewModel(@NonNull TripManager tripManager,
+    public TripViewModel(@NonNull TripManager tripManager,
                   @NonNull FirebaseAuth firebaseAuth,
                   @NonNull StatisticsFormatter statisticsFormatter,
                   boolean isLocationPermissionGranted) {

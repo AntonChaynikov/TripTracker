@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +20,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.test.espresso.IdlingResource;
 
+import com.antonchaynikov.core.injection.Injector;
 import com.antonchaynikov.core.viewmodel.TripStatistics;
 import com.antonchaynikov.core.viewmodel.ViewModelFragment;
 import com.antonchaynikov.tripscreen.uistate.TripUiState;
@@ -65,14 +67,13 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
                 ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) ==
                         PackageManager.PERMISSION_GRANTED;
         mSubscriptions = new CompositeDisposable();
-
-        initViewModel();
     }
 
     @Override
     public void onAttach(@NonNull Context context) {
-        AndroidSupportInjection.inject(this);
+        Injector.inject(this);
         super.onAttach(context);
+        initViewModel();
     }
 
     @Nullable

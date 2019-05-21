@@ -22,7 +22,7 @@ public class TripsListViewModel extends BasicViewModel {
     private Repository mRepository;
     private CompositeDisposable mSubscriptions = new CompositeDisposable();
 
-    TripsListViewModel(@NonNull Repository repository) {
+    public TripsListViewModel(@NonNull Repository repository) {
         mRepository = repository;
     }
 

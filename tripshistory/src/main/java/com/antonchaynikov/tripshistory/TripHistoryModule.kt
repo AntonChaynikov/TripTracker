@@ -7,16 +7,20 @@ import com.antonchaynikov.core.viewmodel.ViewModelFactory
 import com.antonchaynikov.core.viewmodel.ViewModelProviders
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
 
 @Module
 object TripHistoryModule {
-    @JvmStatic
-    @Provides
-    fun viewModel(factory: ViewModelFactory, fragment: HistoryFragment): HistoryViewModel =
-            ViewModelProviders.of(fragment, factory).get(HistoryViewModel::class.java)
 
     @JvmStatic
     @Provides
+    fun viewModel(@Named("HistoryViewModel") factory: ViewModelFactory, fragment: HistoryFragment): HistoryViewModel =
+            ViewModelProviders.of(fragment, factory).get(HistoryViewModel::class.java)
+
+
+    @JvmStatic
+    @Provides
+    @Named("HistoryViewModel")
     fun factory(repository: Repository,
                 statisticsFormatter: StatisticsFormatter,
                 fragment: HistoryFragment): ViewModelFactory =

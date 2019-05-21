@@ -9,16 +9,14 @@ import dagger.Module
 import dagger.Provides
 
 @Module(includes = [LocationSourceModule::class])
-object TripManagerModule {
+open class TripManagerModule {
 
-    @JvmStatic
     @Provides
     fun tripManager(
             repository: Repository,
             locationSource: LocationSource,
             statisticsCalculator: StatisticsCalculator): TripManager = TripManager(repository, locationSource, statisticsCalculator)
 
-    @JvmStatic
     @Provides
     fun statisticsCalculator(): StatisticsCalculator = StatisticsCalculator()
 }
