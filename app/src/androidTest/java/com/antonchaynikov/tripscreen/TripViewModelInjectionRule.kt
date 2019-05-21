@@ -4,7 +4,6 @@ import android.location.Location
 import androidx.test.platform.app.InstrumentationRegistry
 import com.antonchaynikov.core.data.location.LocationSource
 import com.antonchaynikov.core.data.location.LocationSourceModule
-import com.antonchaynikov.triptracker.application.AppComponent
 import com.antonchaynikov.triptracker.application.TripApplication
 import it.cosenonjaviste.daggermock.DaggerMockRule
 import it.cosenonjaviste.daggermock.DaggerMockRule.BuilderCustomizer

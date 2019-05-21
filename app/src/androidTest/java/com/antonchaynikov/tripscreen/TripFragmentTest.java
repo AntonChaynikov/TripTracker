@@ -83,6 +83,10 @@ public class TripFragmentTest {
         TripFragment fragment = new TripFragment();
 
         containerActivityRule.launchActivity(ContainerActivity.getStartIntent(InstrumentationRegistry.getInstrumentation().getTargetContext()));
+        if (Injector.injector instanceof TestComponent) {
+            fragment.mViewModel = ((TestComponent) Injector.injector).tripViewModel();
+            fragment.mNavigation = ((TestComponent) Injector.injector).navigation();
+        }
         containerActivityRule.getActivity().attachFragment(fragment);
 
         IdlingResource idlingResource = fragment.initStatisticsIdlingResource(LOCATIONS_COUNT);
@@ -99,6 +103,10 @@ public class TripFragmentTest {
         TripFragment fragment = new TripFragment();
 
         containerActivityRule.launchActivity(ContainerActivity.getStartIntent(InstrumentationRegistry.getInstrumentation().getTargetContext()));
+        if (Injector.injector instanceof TestComponent) {
+            fragment.mViewModel = ((TestComponent) Injector.injector).tripViewModel();
+            fragment.mNavigation = ((TestComponent) Injector.injector).navigation();
+        }
         containerActivityRule.getActivity().attachFragment(fragment);
 
         onView(withId(R.id.btn_layout_statistics)).perform(click());
@@ -113,6 +121,10 @@ public class TripFragmentTest {
         TripFragment fragment = new TripFragment();
 
         containerActivityRule.launchActivity(ContainerActivity.getStartIntent(InstrumentationRegistry.getInstrumentation().getTargetContext()));
+        if (Injector.injector instanceof TestComponent) {
+            fragment.mViewModel = ((TestComponent) Injector.injector).tripViewModel();
+            fragment.mNavigation = ((TestComponent) Injector.injector).navigation();
+        }
         containerActivityRule.getActivity().attachFragment(fragment);
 
         ViewInteraction actionButtonInteraction = onView(withId(R.id.btn_layout_statistics));

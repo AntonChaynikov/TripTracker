@@ -60,16 +60,6 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
     private boolean mPermissionGranted;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mPermissionGranted =
-                ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) ==
-                        PackageManager.PERMISSION_GRANTED;
-        mSubscriptions = new CompositeDisposable();
-    }
-
-    @Override
     public void onAttach(@NonNull Context context) {
         Injector.inject(this);
         super.onAttach(context);
@@ -102,6 +92,13 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
 
     @VisibleForTesting
     void initViewModel() {
+
+        mPermissionGranted =
+                ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) ==
+                        PackageManager.PERMISSION_GRANTED;
+
+        mSubscriptions = new CompositeDisposable();
+
         mViewModel.onLocationPermissionUpdate(mPermissionGranted);
         mSubscriptions.add(mViewModel.getAskLocationPermissionEventObservable().subscribe(event -> onLocationPermissionRequested()));
         mSubscriptions.add(mViewModel.getUiStateChangeEventObservable().subscribe(this::onUiStateUpdate));

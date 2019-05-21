@@ -7,6 +7,7 @@ import com.antonchaynikov.core.authentication.AuthModule
 import com.antonchaynikov.core.data.location.LocationSourceModule
 import com.antonchaynikov.core.injection.IInjector
 import com.antonchaynikov.core.viewmodel.CommonViewModelModule
+import com.antonchaynikov.tripscreen.NavigationTripScreen
 import com.antonchaynikov.tripscreen.TripFragment
 import com.antonchaynikov.tripscreen.TripViewModel
 import com.antonchaynikov.triptracker.NavigationModule
@@ -34,6 +35,8 @@ interface TestComponent: IInjector {
     }
 
     fun tripViewModel(): TripViewModel
+
+    fun navigation(): NavigationTripScreen
 
     fun inject(tripFragment: TripFragment)
 }
