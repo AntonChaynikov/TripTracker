@@ -9,12 +9,13 @@ import com.antonchaynikov.core.data.location.LocationSourceModule
 import com.antonchaynikov.core.data.repository.Repository
 import com.antonchaynikov.core.injection.IInjector
 import com.antonchaynikov.core.injection.Injector
+import com.antonchaynikov.triptracker.TripComponent
 import com.antonchaynikov.triptracker.application.AppComponent
 import com.antonchaynikov.triptracker.application.TripApplication
 import it.cosenonjaviste.daggermock.DaggerMockRule
 
-class TripFragmentMockInjectionRule(locations: List<Location>): DaggerMockRule<AppComponent>(
-        AppComponent::class.java, RepositoryModule(), LocationSourceModule()) {
+class TripFragmentMockInjectionRule(locations: List<Location>): DaggerMockRule<TripComponent>(
+        TripComponent::class.java, RepositoryModule(), LocationSourceModule()) {
 
     val injectedRepository: Repository
     val injectedLocationSource: MockLocationSource
@@ -26,7 +27,7 @@ class TripFragmentMockInjectionRule(locations: List<Location>): DaggerMockRule<A
         provides(LocationSource::class.java, injectedLocationSource)
         set {Injector.init(object: IInjector {
             override fun inject(fragment: Fragment) {
-
+                it.inject(fragment as TripFragment)
             }
         })}
     }
