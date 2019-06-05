@@ -10,6 +10,8 @@ buildscript {
         DAGGER = '2.22.1'
         DAGGER_MOCK = "0.8.5"
 
+        DEX_OPENER = "2.0.2"
+
         GOOGLE_MAPS_SDK = '16.0.0'
         GOOGLE_PLAY_SERVICES_BASE = '16.1.0'
 

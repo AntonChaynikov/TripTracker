@@ -6,7 +6,6 @@ import android.view.MenuInflater;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -14,23 +13,12 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.antonchaynikov.core.viewmodel.ViewModelActivity;
 
-import javax.inject.Inject;
-
-import dagger.android.AndroidInjection;
-import dagger.android.AndroidInjector;
-import dagger.android.DispatchingAndroidInjector;
-import dagger.android.support.HasSupportFragmentInjector;
-
-public class TripActivity extends ViewModelActivity implements HasSupportFragmentInjector {
-
-    @Inject
-    DispatchingAndroidInjector<Fragment> fragmentInjector;
+public class TripActivity extends ViewModelActivity {
 
     private boolean shouldShowActionBarItems;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.frame_activity);
         Toolbar toolbar = findViewById(R.id.trip_toolbar);
@@ -48,11 +36,6 @@ public class TripActivity extends ViewModelActivity implements HasSupportFragmen
             return true;
         }
         return false;
-    }
-
-    @Override
-    public AndroidInjector<Fragment> supportFragmentInjector() {
-        return fragmentInjector;
     }
 
     @Override

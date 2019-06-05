@@ -1,4 +1,4 @@
-package com.antonchaynikov.triptracker
+package com.antonchaynikov
 
 import android.app.Application
 import android.content.Context

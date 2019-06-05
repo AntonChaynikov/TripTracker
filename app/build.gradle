@@ -45,7 +45,7 @@ android {
         versionName "${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}"
         setProperty("archivesBaseName", "$rootProject.name-v$versionName")
         //testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunner 'com.antonchaynikov.triptracker.DexOpenerRunner'
+        testInstrumentationRunner 'com.antonchaynikov.DexOpenerRunner'
     }
 
     signingConfigs {
@@ -160,7 +160,7 @@ dependencies {
     androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"
 
-    androidTestImplementation 'com.github.tmurakami:dexopener:2.0.2'
+    androidTestImplementation "com.github.tmurakami:dexopener:$DEX_OPENER"
 }
 
 apply plugin: 'com.google.gms.google-services'

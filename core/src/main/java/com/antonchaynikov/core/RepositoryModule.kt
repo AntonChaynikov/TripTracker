@@ -6,7 +6,7 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-open class RepositoryModule {
+class RepositoryModule {
     @Provides
     fun repository(): Repository = FireStoreDB.getInstance()
 }

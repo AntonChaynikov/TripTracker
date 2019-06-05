@@ -9,7 +9,7 @@ import dagger.Module
 import dagger.Provides
 
 @Module(includes = [LocationSourceModule::class])
-open class TripManagerModule {
+class TripManagerModule {
 
     @Provides
     fun tripManager(

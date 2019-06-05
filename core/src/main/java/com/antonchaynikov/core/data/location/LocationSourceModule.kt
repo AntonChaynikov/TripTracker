@@ -7,7 +7,7 @@ import dagger.Module
 import dagger.Provides
 
 @Module(includes = [LocationProviderModule::class])
-open class LocationSourceModule {
+class LocationSourceModule {
     @Provides
     fun locationSource(context: Context, locationProvider: LocationProvider): LocationSource {
         val locationSource = LocationSourceImpl.getInstance(context)

@@ -7,7 +7,7 @@ import dagger.Provides
 
 //TODO return platform or servicesApi source depending on name parameter
 @Module
-open class LocationProviderModule {
+class LocationProviderModule {
 
     @Provides
     fun provide(context: Context, locationFilter: Filter<Location>): LocationProvider {

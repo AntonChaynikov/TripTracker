@@ -1,14 +1,10 @@
 package com.antonchaynikov.tripscreen;
 
 import android.Manifest;
-import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.SystemClock;
-import android.util.Log;
 
-import androidx.fragment.app.FragmentFactory;
-import androidx.fragment.app.testing.FragmentScenario;
 import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.ViewInteraction;
@@ -18,13 +14,10 @@ import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
 
 import com.antonchaynikov.core.data.tripmanager.TripManager;
-import com.antonchaynikov.core.injection.Injector;
 import com.antonchaynikov.triptracker.AndroidTestUtils;
 import com.antonchaynikov.triptracker.ContainerActivity;
 import com.antonchaynikov.triptracker.R;
-import com.antonchaynikov.triptracker.application.DaggerTestComponent;
-import com.antonchaynikov.triptracker.application.TestComponent;
-import com.github.tmurakami.dexopener.DexOpener;
+
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.hamcrest.BaseMatcher;
@@ -44,8 +37,6 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class TripFragmentTest {
 
@@ -83,10 +74,6 @@ public class TripFragmentTest {
         TripFragment fragment = new TripFragment();
 
         containerActivityRule.launchActivity(ContainerActivity.getStartIntent(InstrumentationRegistry.getInstrumentation().getTargetContext()));
-        if (Injector.injector instanceof TestComponent) {
-            fragment.mViewModel = ((TestComponent) Injector.injector).tripViewModel();
-            fragment.mNavigation = ((TestComponent) Injector.injector).navigation();
-        }
         containerActivityRule.getActivity().attachFragment(fragment);
 
         IdlingResource idlingResource = fragment.initStatisticsIdlingResource(LOCATIONS_COUNT);
@@ -103,10 +90,6 @@ public class TripFragmentTest {
         TripFragment fragment = new TripFragment();
 
         containerActivityRule.launchActivity(ContainerActivity.getStartIntent(InstrumentationRegistry.getInstrumentation().getTargetContext()));
-        if (Injector.injector instanceof TestComponent) {
-            fragment.mViewModel = ((TestComponent) Injector.injector).tripViewModel();
-            fragment.mNavigation = ((TestComponent) Injector.injector).navigation();
-        }
         containerActivityRule.getActivity().attachFragment(fragment);
 
         onView(withId(R.id.btn_layout_statistics)).perform(click());
@@ -121,10 +104,6 @@ public class TripFragmentTest {
         TripFragment fragment = new TripFragment();
 
         containerActivityRule.launchActivity(ContainerActivity.getStartIntent(InstrumentationRegistry.getInstrumentation().getTargetContext()));
-        if (Injector.injector instanceof TestComponent) {
-            fragment.mViewModel = ((TestComponent) Injector.injector).tripViewModel();
-            fragment.mNavigation = ((TestComponent) Injector.injector).navigation();
-        }
         containerActivityRule.getActivity().attachFragment(fragment);
 
         ViewInteraction actionButtonInteraction = onView(withId(R.id.btn_layout_statistics));
