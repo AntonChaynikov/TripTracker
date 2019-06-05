@@ -7,6 +7,6 @@ import dagger.Component
 
 @LoginScope
 @Component(dependencies = [AppComponent::class])
-interface LoginComponent {
+interface LaunchComponent {
     fun inject(launchFragment: LaunchFragment)
 }

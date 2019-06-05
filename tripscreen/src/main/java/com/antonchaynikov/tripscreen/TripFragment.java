@@ -61,7 +61,7 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
 
     @Override
     public void onAttach(@NonNull Context context) {
-        AndroidSupportInjection.inject(this);
+        Injector.inject(this);
         super.onAttach(context);
         initViewModel();
     }

@@ -14,12 +14,14 @@ import javax.inject.Named
 object TripViewModelModule {
 
     @JvmStatic
+    @TripsScreenScope
     @Provides
     fun viewModel(fragment: TripFragment, @Named("TripViewModel") factory: ViewModelFactory): TripViewModel =
             ViewModelProviders.of(fragment, factory).get(TripViewModel::class.java)
 
     @JvmStatic
     @Provides
+    @TripsScreenScope
     @Named("TripViewModel")
     fun provideTripViewModelFactory(fragment: TripFragment,
                                     tripManager: TripManager,

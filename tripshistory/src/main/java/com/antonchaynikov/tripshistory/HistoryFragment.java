@@ -14,6 +14,7 @@ import androidx.annotation.VisibleForTesting;
 import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.idling.CountingIdlingResource;
 
+import com.antonchaynikov.core.injection.Injector;
 import com.antonchaynikov.core.viewmodel.TripStatistics;
 import com.antonchaynikov.core.viewmodel.ViewModelFragment;
 
@@ -73,7 +74,7 @@ public class HistoryFragment extends ViewModelFragment implements OnMapReadyCall
 
     @Override
     public void onAttach(@NonNull Context context) {
-        AndroidSupportInjection.inject(this);
+        Injector.inject(this);
         super.onAttach(context);
     }
 

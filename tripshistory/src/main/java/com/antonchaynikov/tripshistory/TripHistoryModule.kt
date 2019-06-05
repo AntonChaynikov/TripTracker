@@ -12,12 +12,13 @@ import javax.inject.Named
 @Module
 object TripHistoryModule {
 
+    @HistoryScope
     @JvmStatic
     @Provides
     fun viewModel(@Named("HistoryViewModel") factory: ViewModelFactory, fragment: HistoryFragment): HistoryViewModel =
             ViewModelProviders.of(fragment, factory).get(HistoryViewModel::class.java)
 
-
+    @HistoryScope
     @JvmStatic
     @Provides
     @Named("HistoryViewModel")

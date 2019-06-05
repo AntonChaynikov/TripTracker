@@ -40,6 +40,8 @@ dependencies {
     implementation "com.google.dagger:dagger:$DAGGER"
     implementation "com.google.dagger:dagger-android-support:$DAGGER" // if you use the support libraries
 
+    implementation project(path: ':core')
+
     kapt "com.google.dagger:dagger-compiler:$DAGGER"
     kapt "com.google.dagger:dagger-android-processor:$DAGGER"
 

@@ -5,19 +5,16 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.SystemClock;
 
+import androidx.fragment.app.testing.FragmentScenario;
 import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.matcher.ViewMatchers;
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
 
 import com.antonchaynikov.core.data.tripmanager.TripManager;
 import com.antonchaynikov.triptracker.AndroidTestUtils;
-import com.antonchaynikov.triptracker.ContainerActivity;
 import com.antonchaynikov.triptracker.R;
-
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.hamcrest.BaseMatcher;
@@ -49,9 +46,6 @@ public class TripFragmentTest {
     @Rule
     public final GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION);
 
-    @Rule
-    public final ActivityTestRule<ContainerActivity> containerActivityRule = new ActivityTestRule<>(ContainerActivity.class);
-
     @BeforeClass
     public static void initTestEnv() throws Exception {
         // Authenticate as a test user
@@ -71,13 +65,11 @@ public class TripFragmentTest {
 
     @Test
     public void shouldShowStatistics_whenTripStarts() throws Exception {
-        TripFragment fragment = new TripFragment();
-
-        containerActivityRule.launchActivity(ContainerActivity.getStartIntent(InstrumentationRegistry.getInstrumentation().getTargetContext()));
-        containerActivityRule.getActivity().attachFragment(fragment);
-
-        IdlingResource idlingResource = fragment.initStatisticsIdlingResource(LOCATIONS_COUNT);
-        IdlingRegistry.getInstance().register(idlingResource);
+        FragmentScenario.launchInContainer(TripFragment.class)
+                .onFragment(fragment -> {
+                    IdlingResource idlingResource = fragment.initStatisticsIdlingResource(LOCATIONS_COUNT);
+                    IdlingRegistry.getInstance().register(idlingResource);
+                });
 
         onView(withId(R.id.btn_layout_statistics)).perform(click());
 
@@ -87,10 +79,7 @@ public class TripFragmentTest {
 
     @Test
     public void shouldShowGeolocationError_whenGeolocationIsUnavailable() throws Exception {
-        TripFragment fragment = new TripFragment();
-
-        containerActivityRule.launchActivity(ContainerActivity.getStartIntent(InstrumentationRegistry.getInstrumentation().getTargetContext()));
-        containerActivityRule.getActivity().attachFragment(fragment);
+        FragmentScenario.launchInContainer(TripFragment.class, null, R.style.AppTheme, null);
 
         onView(withId(R.id.btn_layout_statistics)).perform(click());
 
@@ -101,10 +90,7 @@ public class TripFragmentTest {
 
     @Test
     public void shouldChangeActionButtonText_whenTripStarts() {
-        TripFragment fragment = new TripFragment();
-
-        containerActivityRule.launchActivity(ContainerActivity.getStartIntent(InstrumentationRegistry.getInstrumentation().getTargetContext()));
-        containerActivityRule.getActivity().attachFragment(fragment);
+        FragmentScenario.launchInContainer(TripFragment.class);
 
         ViewInteraction actionButtonInteraction = onView(withId(R.id.btn_layout_statistics));
         actionButtonInteraction.check(matches(withText(R.string.button_act)));

@@ -16,6 +16,7 @@ import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.idling.CountingIdlingResource;
 
 import com.antonchaynikov.core.data.model.Trip;
+import com.antonchaynikov.core.injection.Injector;
 import com.antonchaynikov.core.viewmodel.ViewModelFragment;
 
 import java.util.List;
@@ -41,7 +42,7 @@ public class TripsListFragment extends ViewModelFragment {
 
     @Override
     public void onAttach(Context context) {
-        AndroidSupportInjection.inject(this);
+        Injector.inject(this);
         super.onAttach(context);
     }
 
