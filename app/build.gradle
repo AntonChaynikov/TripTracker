@@ -11,22 +11,10 @@ apply plugin: 'com.antonchaynikov.oneclickpublish'
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 
-def versionPropertiesFilePath = "version.properties"
-
-project.ext.versionPropertiesFile = rootProject.file(versionPropertiesFilePath)
-project.ext.versionProperties = new Properties()
-versionProperties.load(new FileInputStream(versionPropertiesFile))
-
-project.ext.versionMajor = Integer.parseInt(versionProperties['versionMajor'])
-project.ext.versionMinor = Integer.parseInt(versionProperties['versionMinor'])
-project.ext.versionPatch = Integer.parseInt(versionProperties['versionPatch'])
-project.ext.versionBuild = Integer.parseInt(versionProperties['versionBuild'])
-
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 oneClickPublish {
-    branchName = "master"
-    versionFilePath = versionPropertiesFilePath
+    //branchNames = ["master"]
     remoteRepoName = "origin"
 }
 
@@ -41,8 +29,8 @@ android {
         applicationId "com.antonchaynikov.triptracker"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode versionMajor * 100000 + versionMinor * 10000 + versionPatch * 1000 + versionBuild
-        versionName "${versionMajor}.${versionMinor}.${versionPatch}.${versionBuild}"
+        versionCode appVersionCode.toInteger()
+        versionName appVersionName
         setProperty("archivesBaseName", "$rootProject.name-v$versionName")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
