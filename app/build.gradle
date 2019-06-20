@@ -14,7 +14,7 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 oneClickPublish {
-    //branchNames = ["master"]
+    branchNames = ["master"]
     remoteRepoName = "origin"
 }
 
