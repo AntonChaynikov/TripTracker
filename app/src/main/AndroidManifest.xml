@@ -38,8 +38,9 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".ContainerActivity" />
 
-        <service android:name=".data.location.LocationService" />
+        <service android:name="com.antonchaynikov.core.data.location.LocationService" />
 
         <meta-data
             android:name="io.fabric.ApiKey"

@@ -1,9 +1,10 @@
 package com.antonchaynikov.triptracker.application;
 
-import com.antonchaynikov.triptracker.injection.Injector;
+import androidx.multidex.MultiDexApplication;
+
+import com.antonchaynikov.core.injection.Injector;
 import com.crashlytics.android.Crashlytics;
 
-import androidx.multidex.MultiDexApplication;
 import io.fabric.sdk.android.Fabric;
 
 public class TripApplication extends MultiDexApplication {
@@ -12,6 +13,7 @@ public class TripApplication extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
         Fabric.with(this, new Crashlytics());
-        Injector.init(getApplicationContext());
+        MainInjector.INSTANCE.init(this);
+        Injector.init(MainInjector.INSTANCE);
     }
 }

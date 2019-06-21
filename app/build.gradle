@@ -32,7 +32,8 @@ android {
         versionCode appVersionCode.toInteger()
         versionName appVersionName
         setProperty("archivesBaseName", "$rootProject.name-v$versionName")
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        //testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'com.antonchaynikov.DexOpenerRunner'
     }
 
     signingConfigs {
@@ -96,44 +97,11 @@ android {
     useLibrary 'android.test.mock'
 }
 
-ext {
-    ANDROIDX_APPCOMPAT = '1.0.2'
-    ANDROIDX_SUPPORT_V4 =  '1.0.0'
-    CONSTRAINT_LAYOUT = '2.0.0-alpha3'
-    RX_JAVA = '2.1.16'
-    RX_ANDROID = '2.1.0'
-    GOOGLE_MAPS_SDK = '16.0.0'
-    GOOGLE_PLAY_SERVICES_BASE = '16.1.0'
-    FIREBASE_CORE = '16.0.6'
-    FIREBASE_UI_AUTH = '4.3.1'
-    FIREBASE_FIRESTORE = '17.1.5'
-    ROOM = '2.1.0-alpha03'
-    GOOGLE_PALY_SERVICES_LOCATION = '16.0.0'
-    GOOGLE_PALY_SERVICES_LOCATION = '16.0.0'
-    JODA_TIME = '2.10.1'
-    JODA_CONVERT = '2.1.2'
-    MOCKITO_CORE = '2.23.4'
-    MOCKITO_INLINE = '2.13.0';
-    MOCKITO_ANDROID = '2.24.5'
-    JUNIT = '4.12'
-    ANDROIDX_TEST_RUNNER = '1.1.0'
-    ESPRESSO_CORE = '3.1.0'
-    ESPRESSO_IDLING_RESOURCE = '3.1.1';
-    CRASHLYTICS = '2.9.8'
-    ANDROID_TEST_CORE = '1.0.0'
-    ANDROID_TEST_RULES = '1.1.0'
-    DAGGER = '2.21'
-    FRAGMENT_TESTING = '1.1.0-alpha05'
-    NAV_COMPONENTS = "2.1.0-alpha01"
-    DAGGER_MOCK = "0.8.5"
-    MULTIDEX = "1.0.3"
-}
-
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "androidx.appcompat:appcompat:$ANDROIDX_APPCOMPAT"
     implementation "androidx.legacy:legacy-support-v4:$ANDROIDX_SUPPORT_V4"
-    implementation "androidx.constraintlayout:constraintlayout:$CONSTRAINT_LAYOUT"
+
     implementation "io.reactivex.rxjava2:rxjava:$RX_JAVA"
     implementation "io.reactivex.rxjava2:rxandroid:$RX_ANDROID"
     implementation "com.google.android.gms:play-services-maps:$GOOGLE_MAPS_SDK"
@@ -150,6 +118,14 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment:$NAV_COMPONENTS"
     implementation "androidx.navigation:navigation-ui:$NAV_COMPONENTS"
     implementation "com.android.support:multidex:$MULTIDEX"
+    implementation "com.google.dagger:dagger-android-support:$DAGGER" // if you use the support libraries
+
+
+    implementation project(path: ':core')
+    implementation project(path: ':login')
+    implementation project(path: ':tripscreen')
+    implementation project(path: ':tripshistory')
+    implementation project(path: ':tripslist')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
 
@@ -164,12 +140,15 @@ dependencies {
     testImplementation "com.github.fabioCollini.daggermock:daggermock:$DAGGER_MOCK"
 
     androidTestImplementation "com.github.fabioCollini.daggermock:daggermock:$DAGGER_MOCK"
+    androidTestImplementation "com.github.fabioCollini.daggermock:daggermock-kotlin:$DAGGER_MOCK"
     androidTestImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     androidTestImplementation "org.mockito:mockito-android:$MOCKITO_ANDROID"
     androidTestImplementation 'androidx.test:core:1.1.0'
     androidTestImplementation 'androidx.test:rules:1.1.1'
     androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"
+
+    androidTestImplementation "com.github.tmurakami:dexopener:$DEX_OPENER"
 }
 
 apply plugin: 'com.google.gms.google-services'
