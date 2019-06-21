@@ -10,7 +10,6 @@ import javax.inject.Singleton
 @Module
 open class NavigationModule {
 
-    @Singleton
     @Provides
     fun navigationLogin(tripTrackerNavigator: TripTrackerNavigator): NavigationLogin = tripTrackerNavigator
 

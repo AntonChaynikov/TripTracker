@@ -9,15 +9,14 @@ import com.antonchaynikov.core.data.location.LocationSourceModule
 import com.antonchaynikov.core.data.repository.Repository
 import com.antonchaynikov.core.injection.IInjector
 import com.antonchaynikov.core.injection.Injector
-import com.antonchaynikov.triptracker.TripComponent
 import com.antonchaynikov.triptracker.application.AppComponent
-import com.antonchaynikov.triptracker.application.TripApplication
 import it.cosenonjaviste.daggermock.DaggerMockRule
+import it.cosenonjaviste.daggermock.DaggerMockRule.BuilderCustomizer
 
-class TripFragmentMockInjectionRule(locations: List<Location>): DaggerMockRule<TripComponent>(
-        TripComponent::class.java, RepositoryModule(), LocationSourceModule()) {
+class TripFragmentMockInjectionRule(locations: List<Location>) : DaggerMockRule<AppComponent>(
+        AppComponent::class.java, RepositoryModule(), LocationSourceModule()) {
 
-    val injectedRepository: Repository
+    private val injectedRepository: Repository
     val injectedLocationSource: MockLocationSource
 
     init {
@@ -25,14 +24,21 @@ class TripFragmentMockInjectionRule(locations: List<Location>): DaggerMockRule<T
         injectedLocationSource = MockLocationSource(locations)
         provides(Repository::class.java, injectedRepository)
         provides(LocationSource::class.java, injectedLocationSource)
-        set {Injector.init(object: IInjector {
-            override fun inject(fragment: Fragment) {
-                it.inject(fragment as TripFragment)
-            }
-        })}
+        customizeBuilder(BuilderCustomizer<AppComponent.Builder> {
+            it.context(getContext())
+        })
+        set {
+            Injector.init(object : IInjector {
+                override fun inject(fragment: Fragment) {
+                    val comp = it
+                            .tripComponent()
+                            .fragment(fragment as TripFragment)
+                            .build()
+                    comp.inject(fragment)
+                }
+            })
+        }
     }
 
     fun getContext() = InstrumentationRegistry.getInstrumentation().targetContext
-
-    fun getApplication() = getContext().applicationContext as TripApplication
 }

@@ -91,18 +91,13 @@ public class TripViewModel extends BasicViewModel {
     }
 
     void onActionButtonClicked() {
-        Log.d(TAG, "onActionButtonClicked");
-        Log.d(TAG, mUiState.getState().name());
         if (mUiState.getState() == TripUiState.State.IDLE) {
             if (mIsLocationPermissionGranted) {
-                Log.d(TAG, "starting trip");
                 startTrip();
             } else {
-                Log.d(TAG, "asking permission");
                 mAskLocationPermissionEventObservable.onNext(true);
             }
         } else {
-            Log.d(TAG, "stopping trip");
             stopTrip();
         }
     }
@@ -128,7 +123,6 @@ public class TripViewModel extends BasicViewModel {
     }
 
     private void handleGeolocationAvailabilityChange(boolean isAvailable) {
-        Log.d(TAG, "GeolocationAvailable " + isAvailable);
         if (isAvailable) {
             showSnackbarMessage(R.string.message_geolocation_available);
         } else {

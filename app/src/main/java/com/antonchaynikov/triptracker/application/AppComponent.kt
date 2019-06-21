@@ -13,7 +13,7 @@ import com.antonchaynikov.core.viewmodel.StatisticsFormatter
 import com.antonchaynikov.login.NavigationLogin
 import com.antonchaynikov.tripscreen.NavigationTripScreen
 import com.antonchaynikov.tripscreen.TripViewModel
-import com.antonchaynikov.triptracker.NavigationModule
+import com.antonchaynikov.triptracker.*
 import com.antonchaynikov.triptracker.navigation.TripTrackerNavigator
 import com.google.firebase.auth.FirebaseAuth
 import dagger.BindsInstance
@@ -23,6 +23,7 @@ import javax.inject.Singleton
 
 @Singleton
 @Component(modules = [
+    SubcomponentsModule::class,
     TripManagerModule::class,
     RepositoryModule::class,
     CommonViewModelModule::class,
@@ -39,10 +40,9 @@ interface AppComponent {
         fun build(): AppComponent
     }
 
-    fun tripManager(): TripManager
-    fun repository(): Repository
-    fun firebaseAuth(): FirebaseAuth
-    fun statisticsFormatter(): StatisticsFormatter
-    fun navigationLogin():NavigationLogin
-    fun navigationTripScreen(): NavigationTripScreen
+    fun navigationLogin(): NavigationLogin
+    fun tripComponent(): TripComponent.Builder
+    fun historyComponent(): HistoryComponent.Builder
+    fun tripListComponent(): TripListComponent.Builder
+    fun launchComponent(): LaunchComponent.Builder
 }

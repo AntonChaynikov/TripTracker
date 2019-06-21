@@ -20,6 +20,7 @@ import io.reactivex.subjects.PublishSubject;
 public final class TripManager {
 
     private static volatile TripManager sInstance;
+    private static final String TAG = TripManager.class.getCanonicalName();
 
     private PublishSubject<Trip> mTripUpdatesStream = PublishSubject.create();
     private PublishSubject<TripCoordinate> mCoordinatesStream = PublishSubject.create();
@@ -72,6 +73,7 @@ public final class TripManager {
     }
 
     public Completable startTrip() {
+        Log.d(TAG, mLocationSource.toString());
         Trip trip = new Trip(DateTime.now().getMillis());
         return mRepository
                 .addTrip(trip)
@@ -90,7 +92,7 @@ public final class TripManager {
     }
 
     private void onTripStarted(@NonNull Trip trip) {
-        Log.d("TripManager", "onTripStarted");
+        Log.d(TAG, "onTripStarted");
         mCurrentStartedTrip = trip;
         mLocationSource.startUpdates();
     }

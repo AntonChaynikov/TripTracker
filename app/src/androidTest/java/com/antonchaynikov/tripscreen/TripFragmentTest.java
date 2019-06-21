@@ -13,8 +13,10 @@ import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.rule.GrantPermissionRule;
 
 import com.antonchaynikov.core.data.tripmanager.TripManager;
+import com.antonchaynikov.core.injection.Injector;
 import com.antonchaynikov.triptracker.AndroidTestUtils;
 import com.antonchaynikov.triptracker.R;
+import com.antonchaynikov.triptracker.application.MainInjector;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.hamcrest.BaseMatcher;
@@ -61,6 +63,7 @@ public class TripFragmentTest {
     @After
     public void tearDown() throws Exception {
         TripManager.resetInstance();
+        Injector.init(MainInjector.INSTANCE);
     }
 
     @Test

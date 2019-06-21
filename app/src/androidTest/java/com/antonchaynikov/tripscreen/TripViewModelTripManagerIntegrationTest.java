@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-public class TripViewModelTripManagerIntegration {
+public class TripViewModelTripManagerIntegrationTest {
 
     @ClassRule
     public static final RxImmediateSchedulerRule IMMEDIATE_SCHEDULER_RULE = new RxImmediateSchedulerRule();
@@ -70,11 +70,12 @@ public class TripViewModelTripManagerIntegration {
     @Test
     public void shouldEmitStatistics_onNewLocationUpdate() throws Exception {
         TestObserver<TripStatistics> statisticsObserver = TestObserver.create();
+        mViewModel.onLocationPermissionUpdate(true);
         mViewModel.getTripStatisticsStreamObservable().subscribe(statisticsObserver);
 
         mViewModel.onActionButtonClicked();
 
-        statisticsObserver.awaitCount(LOCATIONS_COUNT + 1, BaseTestConsumer.TestWaitStrategy.YIELD, TimeUnit.SECONDS.toMillis(1));
+        statisticsObserver.awaitCount(LOCATIONS_COUNT + 1);
 
         // expecting locationsCount + 1 initial default statistics update
         assertEquals(LOCATIONS_COUNT + 1, statisticsObserver.valueCount());
@@ -83,11 +84,12 @@ public class TripViewModelTripManagerIntegration {
     @Test
     public void shouldEmitMapOptions_onNewLocationUpdate() throws Exception {
         TestObserver<MapOptions> mapOptionsObserver = TestObserver.create();
+        mViewModel.onLocationPermissionUpdate(true);
         mViewModel.getMapOptionsObservable().subscribe(mapOptionsObserver);
 
         mViewModel.onActionButtonClicked();
 
-        mapOptionsObserver.awaitCount(LOCATIONS_COUNT, BaseTestConsumer.TestWaitStrategy.YIELD, TimeUnit.SECONDS.toMillis(1));
+        mapOptionsObserver.awaitCount(LOCATIONS_COUNT);
 
         assertEquals(LOCATIONS_COUNT, mapOptionsObserver.valueCount());
     }
@@ -95,7 +97,6 @@ public class TripViewModelTripManagerIntegration {
     @Test
     public void shouldEmitGeolocationError_whenGeolocationUnavailable() throws Exception {
         TestObserver<Integer> snackbarMessageObserver = TestObserver.create();
-
         mViewModel.getShowSnackbarMessageBroadcast().subscribe(snackbarMessageObserver);
 
         mViewModel.onActionButtonClicked();
