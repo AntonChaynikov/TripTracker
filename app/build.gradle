@@ -4,7 +4,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'jacoco-android'
 apply from: '../checkstyle/checkstyle.gradle'
 apply plugin: 'io.fabric'
-apply plugin: "androidx.navigation.safeargs"
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.antonchaynikov.oneclickpublish'
 
@@ -32,7 +31,6 @@ android {
         versionCode appVersionCode.toInteger()
         versionName appVersionName
         setProperty("archivesBaseName", "$rootProject.name-v$versionName")
-        //testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunner 'com.antonchaynikov.DexOpenerRunner'
     }
 
@@ -118,7 +116,7 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment:$NAV_COMPONENTS"
     implementation "androidx.navigation:navigation-ui:$NAV_COMPONENTS"
     implementation "com.android.support:multidex:$MULTIDEX"
-    implementation "com.google.dagger:dagger-android-support:$DAGGER" // if you use the support libraries
+    implementation "com.google.dagger:dagger-android-support:$DAGGER"
 
 
     implementation project(path: ':core')
@@ -143,8 +141,8 @@ dependencies {
     androidTestImplementation "com.github.fabioCollini.daggermock:daggermock-kotlin:$DAGGER_MOCK"
     androidTestImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     androidTestImplementation "org.mockito:mockito-android:$MOCKITO_ANDROID"
-    androidTestImplementation 'androidx.test:core:1.1.0'
-    androidTestImplementation 'androidx.test:rules:1.1.1'
+    androidTestImplementation 'androidx.test:core:1.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
     androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"
 
