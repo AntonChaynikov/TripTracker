@@ -18,7 +18,9 @@
             app:destination="@id/tripsListFragment" />
         <action
             android:id="@+id/action_tripFragment_to_launchFragment"
-            app:destination="@id/launchFragment" />
+            app:destination="@id/launchFragment"
+            app:popUpTo="@+id/main_nav_graph"
+            app:popUpToInclusive="true"/>
     </fragment>
 
     <fragment
@@ -42,6 +44,8 @@
         tools:layout="@layout/launch_fragment_layout" >
         <action
             android:id="@+id/action_launchFragment_to_tripFragment"
-            app:destination="@id/tripFragment" />
+            app:destination="@+id/tripFragment"
+            app:popUpTo="@+id/main_nav_graph"
+            app:popUpToInclusive="true"/>
     </fragment>
 </navigation>
