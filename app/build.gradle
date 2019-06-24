@@ -124,6 +124,7 @@ dependencies {
     implementation project(path: ':tripscreen')
     implementation project(path: ':tripshistory')
     implementation project(path: ':tripslist')
+    implementation project(path: ':about')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
 

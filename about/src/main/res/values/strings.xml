@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">about</string>
+    <string name="about_us_app_name">Trip Tracker</string>
+    <string name="about_us_description">bla bla bla a description</string>
+</resources>
