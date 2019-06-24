@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TripsList</string>
+    <string name="no_trips_trips_list">There are no trips yet</string>
 </resources>

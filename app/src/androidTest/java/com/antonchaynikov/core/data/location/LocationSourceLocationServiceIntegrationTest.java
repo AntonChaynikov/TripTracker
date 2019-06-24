@@ -6,6 +6,11 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.SystemClock;
 
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.GrantPermissionRule;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,15 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import androidx.test.core.app.ApplicationProvider;
-import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.GrantPermissionRule;
-
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
-
-import static org.junit.Assert.assertEquals;
 
 @RunWith(AndroidJUnit4ClassRunner.class)
 public class LocationSourceLocationServiceIntegrationTest {

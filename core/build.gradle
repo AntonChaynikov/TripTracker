@@ -69,8 +69,8 @@ dependencies {
 
     androidTestImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     androidTestImplementation "org.mockito:mockito-android:$MOCKITO_ANDROID"
-    androidTestImplementation 'androidx.test:core:1.1.0'
-    androidTestImplementation 'androidx.test:rules:1.1.1'
+    androidTestImplementation "androidx.test:core:$ANDROID_TEST_CORE"
+    androidTestImplementation "androidx.test:rules:$ANDROID_TEST_RULES"
     androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"
 }

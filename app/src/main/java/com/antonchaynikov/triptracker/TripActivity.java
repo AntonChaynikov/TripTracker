@@ -11,7 +11,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.antonchaynikov.core.injection.Injector;
 import com.antonchaynikov.core.viewmodel.ViewModelActivity;
 
 public class TripActivity extends ViewModelActivity {
