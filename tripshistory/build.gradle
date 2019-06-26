@@ -35,6 +35,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation "androidx.appcompat:appcompat:$ANDROIDX_APPCOMPAT"
+    implementation "androidx.constraintlayout:constraintlayout:$CONSTRAINT_LAYOUT"
 
     implementation "io.reactivex.rxjava2:rxjava:$RX_JAVA"
     implementation "io.reactivex.rxjava2:rxandroid:$RX_ANDROID"

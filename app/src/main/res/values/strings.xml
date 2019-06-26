@@ -1,7 +1,3 @@
 <resources>
     <string name="app_name">TripTracker</string>
-    <string name="statistics_caption">Statistics</string>
-    <string name="statistics_distance_description">Distance</string>
-    <string name="statistics_speed_descriptions">Speed</string>
-
 </resources>
