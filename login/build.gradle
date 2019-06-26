@@ -33,6 +33,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation "androidx.appcompat:appcompat:$ANDROIDX_APPCOMPAT"
+    implementation "androidx.constraintlayout:constraintlayout:$CONSTRAINT_LAYOUT"
     implementation "com.firebaseui:firebase-ui-auth:$FIREBASE_UI_AUTH"
     implementation "com.google.firebase:firebase-core:$FIREBASE_CORE"
     implementation "androidx.navigation:navigation-fragment:$NAV_COMPONENTS"
