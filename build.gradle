@@ -2,7 +2,7 @@
 buildscript {
 
     ext {
-        ANDROIDX_APPCOMPAT = '1.1.0-alpha04'
+        ANDROIDX_APPCOMPAT = '1.1.0-rc01'
         ANDROIDX_SUPPORT_V4 =  '1.0.0'
 
         CARD_VIEW = '1.0.0'
@@ -47,10 +47,10 @@ buildscript {
         ANDROID_TEST_CORE = '1.1.0'
         ANDROID_TEST_RULES = '1.1.1'
 
-        FRAGMENT_TESTING = '1.1.0-beta01'
-        NAV_COMPONENTS = "2.1.0-alpha05"
+        FRAGMENT_TESTING = '1.2.0-alpha01'
+        NAV_COMPONENTS = "2.1.0-alpha06"
 
-        NAV_COMPONENTS_KTX = "2.1.0-alpha05"
+        NAV_COMPONENTS_KTX = "2.1.0-alpha06"
 
         MULTIDEX = "1.0.3"
     }
@@ -63,13 +63,14 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.4.1'
-        classpath 'com.google.gms:google-services:4.2.0'
+        classpath 'com.google.gms:google-services:4.3.0'
         classpath 'org.jacoco:org.jacoco.core:0.8.0'
         classpath 'com.dicedmelon.gradle:jacoco-android:0.1.4'
         classpath 'org.codehaus.groovy:groovy-all:2.4.15'
         classpath 'io.fabric.tools:gradle:1.28.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$KOTLIN_VERSION"
         classpath 'com.github.AntonChaynikov.oneclickpublish:oneclickpublish:0.12.0'
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.1.0-alpha06"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

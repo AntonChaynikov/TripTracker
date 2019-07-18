@@ -1,4 +1,4 @@
-package com.antonchainikov.about;
+package com.antonchaynikov.about;
 
 import org.junit.Test;
 

@@ -27,7 +27,7 @@ public class TripViewModel extends BasicViewModel {
     private BehaviorSubject<TripUiState> mUiStateChangeEventObservable;
     private PublishSubject<Boolean> mAskLocationPermissionEventObservable = PublishSubject.create();
     private PublishSubject<Boolean> mGoToStatisticsObservable = PublishSubject.create();
-    private PublishSubject<Boolean> mLogoutObservable = PublishSubject.create();
+    private BehaviorSubject<Boolean> mLogoutObservable = BehaviorSubject.createDefault(false);
     private BehaviorSubject<TripStatistics> mTripStatisticsStreamObservable;
     private PublishSubject<MapOptions> mMapOptionsObservable = PublishSubject.create();
     private PublishSubject<Long> mProceedToSummaryObservable = PublishSubject.create();
@@ -86,6 +86,13 @@ public class TripViewModel extends BasicViewModel {
         return mProceedToSummaryObservable.observeOn(AndroidSchedulers.mainThread());
     }
 
+    void onStart() {
+        if (mFirebaseAuth.getCurrentUser() == null) {
+            Log.d(TripViewModel.class.getCanonicalName(), "Not authenticated");
+            onLogout();
+        }
+    }
+
     void onLocationPermissionUpdate(boolean isPermissionGranted) {
         mIsLocationPermissionGranted = isPermissionGranted;
     }
@@ -107,6 +114,14 @@ public class TripViewModel extends BasicViewModel {
     }
 
     void onLogoutButtonClicked() {
+        onLogout();
+    }
+
+    boolean isTripStarted() {
+        return mUiState.getState() == TripUiState.State.STARTED;
+    }
+
+    private void onLogout() {
         if (mUiState.getState() == TripUiState.State.STARTED) {
             mSubscriptions.add(mTripManager.finishTrip().subscribe(() -> {
                 mFirebaseAuth.signOut();
@@ -116,10 +131,6 @@ public class TripViewModel extends BasicViewModel {
             mFirebaseAuth.signOut();
             mLogoutObservable.onNext(true);
         }
-    }
-
-    boolean isTripStarted() {
-        return mUiState.getState() == TripUiState.State.STARTED;
     }
 
     private void handleGeolocationAvailabilityChange(boolean isAvailable) {

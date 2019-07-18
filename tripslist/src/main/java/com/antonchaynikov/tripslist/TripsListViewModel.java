@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.antonchaynikov.core.data.model.Trip;
 import com.antonchaynikov.core.data.repository.Repository;
 import com.antonchaynikov.core.viewmodel.BasicViewModel;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
@@ -18,12 +19,15 @@ public class TripsListViewModel extends BasicViewModel {
 
     private PublishSubject<Boolean> mShowEmptyListMessageEvent = PublishSubject.create();
     private PublishSubject<List<Trip>> mTripsListSubject = PublishSubject.create();
+    private PublishSubject<Boolean> mNavigateToMainScreen = PublishSubject.create();
 
     private Repository mRepository;
+    private FirebaseAuth mFirebaseAuth;
     private CompositeDisposable mSubscriptions = new CompositeDisposable();
 
-    public TripsListViewModel(@NonNull Repository repository) {
+    public TripsListViewModel(@NonNull Repository repository, @NonNull FirebaseAuth firebaseAuth) {
         mRepository = repository;
+        mFirebaseAuth = firebaseAuth;
     }
 
     void onStart() {
@@ -33,12 +37,21 @@ public class TripsListViewModel extends BasicViewModel {
                 .subscribe(this::onTripsLoaded));
     }
 
+    void onLogoutButtonClicked() {
+        mFirebaseAuth.signOut();
+        mNavigateToMainScreen.onNext(true);
+    }
+
     Observable<Boolean> getEmptyListEventObservable() {
         return mShowEmptyListMessageEvent;
     }
 
     Observable<List<Trip>> getTripListObservable() {
         return mTripsListSubject;
+    }
+
+    Observable<Boolean> getNavigateToMainScreenObservable() {
+        return mNavigateToMainScreen;
     }
 
     private void onTripsLoaded(@NonNull List<Trip> trips) {

@@ -3,9 +3,13 @@ package com.antonchaynikov.tripslist;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,6 +35,8 @@ public class TripsListFragment extends ViewModelFragment {
 
     @Inject
     TripsListViewModel mViewModel;
+    @Inject
+    NavigationTripsList mNavigation;
 
     private RecyclerView mRecyclerView;
     private View vProgressBar;
@@ -54,6 +60,7 @@ public class TripsListFragment extends ViewModelFragment {
         vProgressBar = view.findViewById(R.id.pb_trips_list);
         tvNoTrips = view.findViewById(R.id.tv_no_trips_trips_list);
         initViewModel();
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -78,6 +85,22 @@ public class TripsListFragment extends ViewModelFragment {
         mViewModel.onCleared();
     }
 
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_trip_toolbar, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int i = item.getItemId();
+        if (i == R.id.menu_trip_action_logout) {
+            mViewModel.onLogoutButtonClicked();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     @VisibleForTesting
     public IdlingResource getIdlingResource() {
         return mIdlingResource;
@@ -87,6 +110,7 @@ public class TripsListFragment extends ViewModelFragment {
         mSubscriptions.add(mViewModel.getEmptyListEventObservable().subscribe(event -> handleEmptyTripsList()));
         mSubscriptions.add(mViewModel.getShowProgressBarEventBroadcast().subscribe(this::handleShowProgressDialogEvent));
         mSubscriptions.add(mViewModel.getTripListObservable().subscribe(this::onTripsListLoaded));
+        mSubscriptions.add(mViewModel.getNavigateToMainScreenObservable().subscribe(this::navigateToMainScreen));
     }
 
     private void handleEmptyTripsList() {
@@ -96,6 +120,12 @@ public class TripsListFragment extends ViewModelFragment {
     private void handleShowProgressDialogEvent(boolean visible) {
         int visibilityMode = visible ? View.VISIBLE : View.GONE;
         vProgressBar.setVisibility(visibilityMode);
+    }
+
+    private void navigateToMainScreen(boolean shouldNavigate) {
+        if (shouldNavigate) {
+            mNavigation.navigateOnLogoutTripsList(this);
+        }
     }
 
     private void onTripsListLoaded(@NonNull List<Trip> trips) {

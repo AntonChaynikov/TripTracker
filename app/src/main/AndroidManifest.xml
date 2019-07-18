@@ -31,20 +31,23 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".TripActivity"
-            tools:ignore="InnerclassSeparator">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
-        <activity android:name=".ContainerActivity" />
-
         <service android:name="com.antonchaynikov.core.data.location.LocationService" />
 
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="addf454c130e9713afedaadfdba64d014c511f73" />
+
+        <activity android:name=".TripActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <nav-graph android:value="@navigation/main_nav_graph" />
+
+        </activity>
 
     </application>
 </manifest>

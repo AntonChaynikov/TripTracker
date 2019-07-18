@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -106,8 +108,14 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
         mSubscriptions.add(mViewModel.getMapOptionsObservable().subscribe(this::handleMapOptionsUpdate));
         mSubscriptions.add(mViewModel.getTripStatisticsStreamObservable().subscribe(this::handleStatisticsUpdate));
         mSubscriptions.add(mViewModel.getGotToStatisticsObservable().subscribe(event -> goToStatisticsScreen()));
-        mSubscriptions.add(mViewModel.getLogoutObservable().subscribe(event -> logout()));
+        mSubscriptions.add(mViewModel.getLogoutObservable().subscribe(this::handleLogoutEvent));
         mSubscriptions.add(mViewModel.getProceedToSummaryObservable().subscribe(this::goToSummaryScreen));
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mViewModel.onStart();
     }
 
     @Override
@@ -139,12 +147,15 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
     }
 
     @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_trip_toolbar, menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int i = item.getItemId();
-        if (i == R.id.menu_trip_action_statistics) {
-            mViewModel.onStatisticsButtonClicked();
-            return true;
-        } else if (i == R.id.menu_trip_action_logout) {
+        if (i == R.id.menu_trip_action_logout) {
             mViewModel.onLogoutButtonClicked();
             return true;
         }
@@ -195,6 +206,12 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
         tvSpeed.setText(statistics.getSpeed());
         if (mStatisticsIdlingResource != null) {
             mStatisticsIdlingResource.onItemEmitted();
+        }
+    }
+
+    private void handleLogoutEvent(boolean shouldLogout) {
+        if (shouldLogout) {
+            logout();
         }
     }
 
