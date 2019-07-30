@@ -3,6 +3,7 @@ package com.antonchaynikov.triptracker.application;
 import androidx.multidex.MultiDexApplication;
 
 import com.antonchaynikov.core.injection.Injector;
+import com.antonchaynikov.core.viewmodel.StatisticsFormatter;
 import com.crashlytics.android.Crashlytics;
 
 import io.fabric.sdk.android.Fabric;

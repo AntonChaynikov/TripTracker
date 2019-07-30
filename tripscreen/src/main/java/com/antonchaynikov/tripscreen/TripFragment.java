@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,7 +36,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import javax.inject.Inject;
 
-import dagger.android.support.AndroidSupportInjection;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class TripFragment extends ViewModelFragment implements View.OnClickListener, OnMapReadyCallback {
@@ -65,7 +63,6 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
     public void onAttach(@NonNull Context context) {
         Injector.inject(this);
         super.onAttach(context);
-        initViewModel();
     }
 
     @Nullable
@@ -115,13 +112,20 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
     @Override
     public void onStart() {
         super.onStart();
+        initViewModel();
         mViewModel.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mSubscriptions.dispose();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mSubscriptions.dispose();
+        mViewModel.onCleared();
     }
 
     @Override

@@ -6,39 +6,39 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.antonchaynikov.core.data.model.Trip;
-
-import java.util.List;
-
 class TripsAdapter extends RecyclerView.Adapter<TripsViewHolder> {
 
-    private List<Trip> mTrips;
+    private TripsProvider mTripsProvider;
+    private ItemClickListener mClickListener;
 
-    TripsAdapter(@NonNull List<Trip> trips) {
-        mTrips = trips;
+    TripsAdapter(@NonNull TripsProvider tripsProvider, @NonNull ItemClickListener clickListener) {
+        mTripsProvider = tripsProvider;
+        mClickListener = clickListener;
     }
 
     @NonNull
     @Override
     public TripsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        return new TripsViewHolder(inflater.inflate(R.layout.layout_trip_item, parent, false));
+        return new TripsViewHolder(inflater.inflate(R.layout.layout_trip_item, parent, false), mClickListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TripsViewHolder holder, int position) {
-        holder.bind(mTrips.get(position));
+        holder.bind(mTripsProvider.getTrip(position));
     }
 
     @Override
     public int getItemCount() {
-        return mTrips.size();
+        return mTripsProvider.getItemCount();
     }
 
     interface ItemClickListener {
-
         void onItemClicked(int position);
-
     }
 
+    interface TripsProvider {
+        TripsListItemModel getTrip(int position);
+        int getItemCount();
+    }
 }

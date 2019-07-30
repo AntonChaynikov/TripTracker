@@ -19,20 +19,18 @@ public class StatisticsFormatter {
     private static final int LARGEST_RELEVANT_DURATION_FIELD_INDEX = 3;
 
     private Context mAppContext;
-    private Trip mTrip;
 
     public StatisticsFormatter(@NonNull Context context) {
         mAppContext = context.getApplicationContext();
     }
 
     TripStatistics formatTrip(@NonNull Trip trip, @NonNull FormatOptions options) {
-        mTrip = trip;
         TripStatistics statistics = new TripStatistics();
-        statistics.setStartDate(formatStartDate(options.getStartDatePattern()));
-        statistics.setEndDate(formatEndDate(options.getEndDatePattern()));
-        statistics.setDuration(formatDuration());
-        statistics.setSpeed(formatSpeed(options.getUnitSpeed()));
-        statistics.setDistance(formatDistance(options.getUnitDistance()));
+        statistics.setStartDate(formatStartDate(trip, options.getStartDatePattern()));
+        statistics.setEndDate(formatEndDate(trip, options.getEndDatePattern()));
+        statistics.setDuration(formatDuration(trip));
+        statistics.setSpeed(formatSpeed(trip, options.getUnitSpeed()));
+        statistics.setDistance(formatDistance(trip, options.getUnitDistance()));
         return statistics;
     }
 
@@ -40,17 +38,17 @@ public class StatisticsFormatter {
         return formatTrip(trip, new FormatOptions());
     }
 
-    private String formatStartDate(String pattern) {
-        return dateTimeFromMillis(mTrip.getStartDate()).toString(pattern);
+    private String formatStartDate(Trip trip, String pattern) {
+        return dateTimeFromMillis(trip.getStartDate()).toString(pattern);
     }
 
-    private String formatEndDate(String pattern) {
-        return dateTimeFromMillis(mTrip.getEndDate()).toString(pattern);
+    private String formatEndDate(Trip trip, String pattern) {
+        return dateTimeFromMillis(trip.getEndDate()).toString(pattern);
     }
 
-    private String formatDuration() {
-        DateTime startTime = dateTimeFromMillis(mTrip.getStartDate());
-        DateTime endDate = dateTimeFromMillis(mTrip.getEndDate());
+    private String formatDuration(Trip trip) {
+        DateTime startTime = dateTimeFromMillis(trip.getStartDate());
+        DateTime endDate = dateTimeFromMillis(trip.getEndDate());
         Period period = new Period(startTime, endDate);
         int firstFieldIndex = getFirstNonEmptyFieldIndex(period);
         if (firstFieldIndex == -1) {
@@ -62,22 +60,22 @@ public class StatisticsFormatter {
         return generateDurationString(period);
     }
 
-    private String formatSpeed(FormatOptions.UnitSpeed unit) {
+    private String formatSpeed(Trip trip, FormatOptions.UnitSpeed unit) {
         if (unit == FormatOptions.UnitSpeed.KMH) {
             String paramString = mAppContext.getString(R.string.statistics_speed_kmh);
-            return String.format(paramString, StringUtils.numToFormattedString(mTrip.getSpeed() * 3.6, true));
+            return String.format(paramString, StringUtils.numToFormattedString(trip.getSpeed() * 3.6, true));
         }
         String paramString = mAppContext.getString(R.string.statistics_speed_mps);
-        return String.format(paramString, StringUtils.numToFormattedString(mTrip.getSpeed(), true));
+        return String.format(paramString, StringUtils.numToFormattedString(trip.getSpeed(), true));
     }
 
-    private String formatDistance(FormatOptions.UnitDistance unit) {
+    private String formatDistance(Trip trip, FormatOptions.UnitDistance unit) {
         if (unit == FormatOptions.UnitDistance.KM) {
             String paramString = mAppContext.getString(R.string.statistics_distance_km);
-            return String.format(paramString, StringUtils.numToFormattedString(mTrip.getDistance() / 1000, true));
+            return String.format(paramString, StringUtils.numToFormattedString(trip.getDistance() / 1000, true));
         }
         String paramString = mAppContext.getString(R.string.statistics_distance_m);
-        return String.format(paramString, StringUtils.numToFormattedString(mTrip.getDistance(), true));
+        return String.format(paramString, StringUtils.numToFormattedString(trip.getDistance(), true));
     }
 
     private String generateDurationString(Period period) {

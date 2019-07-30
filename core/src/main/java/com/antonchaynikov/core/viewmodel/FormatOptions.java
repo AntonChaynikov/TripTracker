@@ -2,7 +2,7 @@ package com.antonchaynikov.core.viewmodel;
 
 import androidx.annotation.Nullable;
 
-class FormatOptions {
+public class FormatOptions {
 
     static final String DATE_FORMAT_DEFAULT = "dd.MM.yy HH:mm";
     static final UnitSpeed UNIT_SPEED_DEFAULT = UnitSpeed.KMH;

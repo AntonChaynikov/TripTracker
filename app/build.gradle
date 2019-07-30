@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
-apply plugin: 'jacoco-android'
 apply from: '../checkstyle/checkstyle.gradle'
 apply plugin: 'io.fabric'
 apply plugin: 'kotlin-kapt'
@@ -16,10 +15,6 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 oneClickPublish {
     branchNames = ["master"]
     remoteRepoName = "origin"
-}
-
-jacoco {
-    toolVersion = "0.8.0"
 }
 
 android {

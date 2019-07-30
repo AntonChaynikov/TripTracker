@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.antonchaynikov.core.authentication.Auth;
 import com.antonchaynikov.core.data.model.Trip;
 import com.antonchaynikov.core.data.model.TripCoordinate;
 import com.antonchaynikov.core.data.tripmanager.TripManager;
@@ -11,7 +12,6 @@ import com.antonchaynikov.core.viewmodel.BasicViewModel;
 import com.antonchaynikov.core.viewmodel.StatisticsFormatter;
 import com.antonchaynikov.core.viewmodel.TripStatistics;
 import com.antonchaynikov.tripscreen.uistate.TripUiState;
-import com.google.firebase.auth.FirebaseAuth;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -33,7 +33,7 @@ public class TripViewModel extends BasicViewModel {
     private PublishSubject<Long> mProceedToSummaryObservable = PublishSubject.create();
 
     private TripManager mTripManager;
-    private FirebaseAuth mFirebaseAuth;
+    private Auth mAuth;
     private StatisticsFormatter mStatisticsFormatter;
 
     private CompositeDisposable mSubscriptions = new CompositeDisposable();
@@ -43,7 +43,7 @@ public class TripViewModel extends BasicViewModel {
     private TripUiState mUiState;
 
     public TripViewModel(@NonNull TripManager tripManager,
-                  @NonNull FirebaseAuth firebaseAuth,
+                  @NonNull Auth auth,
                   @NonNull StatisticsFormatter statisticsFormatter,
                   boolean isLocationPermissionGranted) {
         mUiState = TripUiState.getDefaultState();
@@ -52,7 +52,7 @@ public class TripViewModel extends BasicViewModel {
         mIsLocationPermissionGranted = isLocationPermissionGranted;
         mStatisticsFormatter = statisticsFormatter;
         mTripManager = tripManager;
-        mFirebaseAuth = firebaseAuth;
+        mAuth = auth;
         mSubscriptions.add(mTripManager.getTripUpdatesStream().subscribe(this::handleTripUpdate));
         mSubscriptions.add(mTripManager.getCoordinatesStream().subscribe(this::handleLocationUpdate));
         mSubscriptions.add(mTripManager.getGeolocationAvailabilityChangeObservable().subscribe(this::handleGeolocationAvailabilityChange));
@@ -87,7 +87,7 @@ public class TripViewModel extends BasicViewModel {
     }
 
     void onStart() {
-        if (mFirebaseAuth.getCurrentUser() == null) {
+        if (!mAuth.isSignedIn()) {
             Log.d(TripViewModel.class.getCanonicalName(), "Not authenticated");
             onLogout();
         }
@@ -114,23 +114,27 @@ public class TripViewModel extends BasicViewModel {
     }
 
     void onLogoutButtonClicked() {
-        onLogout();
+        logout();
     }
 
     boolean isTripStarted() {
         return mUiState.getState() == TripUiState.State.STARTED;
     }
 
-    private void onLogout() {
+    private void logout() {
         if (mUiState.getState() == TripUiState.State.STARTED) {
             mSubscriptions.add(mTripManager.finishTrip().subscribe(() -> {
-                mFirebaseAuth.signOut();
-                mLogoutObservable.onNext(true);
+                mAuth.signOut();
+                onLogout();
             }));
         } else {
-            mFirebaseAuth.signOut();
-            mLogoutObservable.onNext(true);
+            mAuth.signOut();
+            onLogout();
         }
+    }
+
+    private void onLogout() {
+        mLogoutObservable.onNext(true);
     }
 
     private void handleGeolocationAvailabilityChange(boolean isAvailable) {

@@ -1,13 +1,10 @@
 package com.antonchaynikov.triptracker
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
-
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -49,6 +46,7 @@ class TripActivity : AppCompatActivity() {
 
     private fun getOnDestinationChangedListener(): (NavController, NavDestination, Bundle?) -> Unit =
             { controller, destination, args ->
+
                 if (destination.id == R.id.dest_auth) {
                     bottomNavigationView.visibility = View.INVISIBLE
                 } else {

@@ -4,7 +4,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/dest_trip">
+    app:startDestination="@id/dest_trip"
+    >
 
     <fragment
         android:id="@+id/dest_trip"
@@ -29,16 +30,7 @@
         android:name="com.antonchaynikov.tripshistory.HistoryFragment"
         android:label="Summary"
         tools:layout="@layout/activity_map" >
-    </fragment>
 
-    <fragment
-        android:id="@+id/dest_statistics"
-        android:name="com.antonchaynikov.tripslist.TripsListFragment"
-        android:label="Trips"
-        tools:layout="@layout/trips_list_layout" >
-        <deepLink
-            android:id="@+id/deepLink"
-            app:uri="www.example.com" />
     </fragment>
 
     <fragment
@@ -59,6 +51,38 @@
         android:label="About Us"
         tools:layout="@layout/fragment_about_us">
 
+        <deepLink
+            android:id="@+id/deepLink"
+            app:uri="www.abc.com/" />
+
     </fragment>
+
+    <navigation
+        android:id="@+id/dest_statistics"
+        app:startDestination="@id/dest_master">
+
+        <fragment
+            android:id="@+id/dest_detail"
+            android:name="com.antonchaynikov.tripshistory.HistoryFragment"
+            android:label="Summary"
+            tools:layout="@layout/activity_map" >
+
+            <deepLink
+                android:id="@+id/deepLink2"
+                app:uri="http://www.abc.com/trips/{id}" />
+
+        </fragment>
+
+        <fragment
+            android:id="@+id/dest_master"
+            android:name="com.antonchaynikov.tripslist.TripsListFragment"
+            android:label="Trips"
+            tools:layout="@layout/trips_list_layout" >
+            <action
+                android:id="@+id/action_dest_statistics_to_dest_history"
+                app:destination="@id/dest_detail" />
+        </fragment>
+
+    </navigation>
 
 </navigation>

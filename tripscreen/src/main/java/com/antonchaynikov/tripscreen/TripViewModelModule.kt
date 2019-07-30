@@ -1,5 +1,6 @@
 package com.antonchaynikov.tripscreen
 
+import com.antonchaynikov.core.authentication.Auth
 import dagger.Module
 import dagger.Provides
 import com.antonchaynikov.core.viewmodel.BasicViewModel
@@ -25,13 +26,13 @@ object TripViewModelModule {
     @Named("TripViewModel")
     fun provideTripViewModelFactory(fragment: TripFragment,
                                     tripManager: TripManager,
-                                    firebaseAuth: FirebaseAuth,
+                                    auth: Auth,
                                     statisticsFormatter: StatisticsFormatter): ViewModelFactory {
         return object : ViewModelFactory {
             override fun <T : BasicViewModel> create(clazz: Class<T>): T {
                 return TripViewModel(
                         tripManager,
-                        firebaseAuth,
+                        auth,
                         statisticsFormatter,
                         fragment.isLocationPermissionGranted) as T
             }

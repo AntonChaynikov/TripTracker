@@ -1,5 +1,7 @@
 package com.antonchaynikov.core.utils;
 
+import androidx.annotation.NonNull;
+
 import java.util.Locale;
 
 public final class StringUtils {
@@ -22,6 +24,10 @@ public final class StringUtils {
             throw new IllegalArgumentException("Should be less than 60: " + timeFieldValue);
         }
         return String.format(Locale.getDefault(), "%02d", timeFieldValue);
+    }
+
+    public static boolean isNumber(@NonNull String string) {
+        return string.matches("-?\\d+(\\.\\d+)?");
     }
 
     private static boolean hasDecimals(Number num) {

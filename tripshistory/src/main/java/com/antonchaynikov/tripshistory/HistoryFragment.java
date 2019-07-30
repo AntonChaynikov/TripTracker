@@ -2,6 +2,7 @@ package com.antonchaynikov.tripshistory;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,6 @@ import androidx.test.espresso.idling.CountingIdlingResource;
 import com.antonchaynikov.core.injection.Injector;
 import com.antonchaynikov.core.viewmodel.TripStatistics;
 import com.antonchaynikov.core.viewmodel.ViewModelFragment;
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -27,10 +27,10 @@ import com.google.android.gms.maps.model.LatLng;
 
 import javax.inject.Inject;
 
-import dagger.android.support.AndroidSupportInjection;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class HistoryFragment extends ViewModelFragment implements OnMapReadyCallback {
+    private static final String DEEPLINK_ARG_KEY = "id";
     private static final String IDLING_RES_NAME = "HistoryFragment";
     private static final long NO_START_DATE_ARG = -1;
 
@@ -85,8 +85,13 @@ public class HistoryFragment extends ViewModelFragment implements OnMapReadyCall
     private long readStartDateArgument() {
         long tripStartDate = getArguments().getLong(getString(R.string.tripStartDate), NO_START_DATE_ARG);
         if (tripStartDate == NO_START_DATE_ARG) {
-            throw new IllegalStateException("Trips start date should have been provided as an argument");
+            String arg = getArguments().getString(DEEPLINK_ARG_KEY);
+            if (arg == null) {
+                throw new IllegalStateException("Trips start date should have been provided as an argument");
+            }
+            tripStartDate = Long.parseLong(arg);
         }
+        Log.d(HistoryFragment.class.getCanonicalName(), Long.toString(tripStartDate));
         return tripStartDate;
     }
 
