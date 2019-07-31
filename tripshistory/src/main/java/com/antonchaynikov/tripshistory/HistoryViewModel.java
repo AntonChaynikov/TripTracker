@@ -1,7 +1,6 @@
 package com.antonchaynikov.tripshistory;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
 
 import com.antonchaynikov.core.data.model.Trip;
 import com.antonchaynikov.core.data.model.TripCoordinate;

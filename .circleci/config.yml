@@ -263,7 +263,6 @@ workflows:
           branches:
             ignore: /.*/
 
-
     - deploy_fabric:
         requires:
         - build_release

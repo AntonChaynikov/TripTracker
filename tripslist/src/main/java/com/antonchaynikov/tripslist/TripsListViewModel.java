@@ -1,7 +1,5 @@
 package com.antonchaynikov.tripslist;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.antonchaynikov.core.authentication.Auth;
@@ -75,7 +73,7 @@ public class TripsListViewModel extends BasicViewModel implements TripsAdapter.T
 
     @Override
     public int getItemCount() {
-        return mTripsList == null? 0: mTripsList.size();
+        return mTripsList == null ? 0 : mTripsList.size();
     }
 
     @Override

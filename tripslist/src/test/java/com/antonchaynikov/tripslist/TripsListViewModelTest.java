@@ -17,7 +17,6 @@ import java.util.List;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.MockitoAnnotations.initMocks;
 

@@ -3,6 +3,8 @@ package com.antonchaynikov.core.data.tripmanager;
 import android.location.Location;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.antonchaynikov.core.data.location.LocationSource;
 import com.antonchaynikov.core.data.model.Trip;
 import com.antonchaynikov.core.data.model.TripCoordinate;
@@ -10,8 +12,6 @@ import com.antonchaynikov.core.data.repository.Repository;
 
 import org.joda.time.DateTime;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
