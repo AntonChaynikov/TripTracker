@@ -2,6 +2,7 @@ package com.antonchaynikov.core.data.location;
 
 import android.content.Context;
 import android.location.Location;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,19 +14,19 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
-//TODO use different providers depending on the build flavor
-class LocationProviderServicesApi extends LocationCallback implements LocationProvider {
+class LocationProviderImpl extends LocationCallback implements LocationProvider {
 
     private FusedLocationProviderClient mLocationClient;
     private LocationConsumer mConsumer;
     private Filter<Location> mFilter;
 
-    LocationProviderServicesApi(@NonNull Context context) {
+    LocationProviderImpl(@NonNull Context context) {
         mLocationClient = LocationServices.getFusedLocationProviderClient(context.getApplicationContext());
     }
 
     @Override
     public void startUpdates(@NonNull LocationConsumer consumer) throws SecurityException {
+        Log.d(LocationProviderImpl.class.getCanonicalName(), "Services api LocationProviderImpl");
         mLocationClient.requestLocationUpdates(getLocationRequest(), this, null);
         mConsumer = consumer;
     }

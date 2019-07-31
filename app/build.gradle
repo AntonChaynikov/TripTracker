@@ -119,15 +119,13 @@ dependencies {
     implementation "com.android.support:multidex:$MULTIDEX"
     implementation "com.google.dagger:dagger-android-support:$DAGGER"
 
-
     implementation project(path: ':core')
     implementation project(path: ':login')
     implementation project(path: ':tripscreen')
     implementation project(path: ':tripshistory')
     implementation project(path: ':tripslist')
     implementation project(path: ':about')
-
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
 
     debugImplementation "androidx.fragment:fragment-testing:$FRAGMENT_TESTING"
 
