@@ -6,14 +6,13 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-//TODO return platform or servicesApi source depending on name parameter
 @Module
 class LocationProviderModule {
 
     @Singleton
     @Provides
     fun provide(context: Context, locationFilter: Filter<Location>): LocationProvider {
-        val locationProvider = LocationProviderPlatform(context)
+        val locationProvider = LocationProviderImpl(context)
         locationProvider.setFilter(locationFilter)
         return locationProvider
     }

@@ -15,10 +15,13 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+    flavorDimensions "LocationServiceType"
+    productFlavors {
+        platform {
+            dimension "LocationServiceType"
+        }
+        servicesApi {
+            dimension "LocationServiceType"
         }
     }
 
@@ -40,6 +43,7 @@ dependencies {
     implementation "androidx.navigation:navigation-ui:$NAV_COMPONENTS"
     implementation "com.google.dagger:dagger:$DAGGER"
     implementation "com.google.dagger:dagger-android-support:$DAGGER" // if you use the support libraries
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
 
     implementation project(path: ':core')
 
@@ -49,8 +53,6 @@ dependencies {
     testImplementation "junit:junit:$JUNIT"
     androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"
-
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$KOTLIN_VERSION"
 }
 repositories {
     mavenCentral()
