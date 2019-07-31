@@ -4,8 +4,9 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +36,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import javax.inject.Inject;
 
-import dagger.android.support.AndroidSupportInjection;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class TripFragment extends ViewModelFragment implements View.OnClickListener, OnMapReadyCallback {
@@ -63,7 +63,6 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
     public void onAttach(@NonNull Context context) {
         Injector.inject(this);
         super.onAttach(context);
-        initViewModel();
     }
 
     @Nullable
@@ -106,14 +105,27 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
         mSubscriptions.add(mViewModel.getMapOptionsObservable().subscribe(this::handleMapOptionsUpdate));
         mSubscriptions.add(mViewModel.getTripStatisticsStreamObservable().subscribe(this::handleStatisticsUpdate));
         mSubscriptions.add(mViewModel.getGotToStatisticsObservable().subscribe(event -> goToStatisticsScreen()));
-        mSubscriptions.add(mViewModel.getLogoutObservable().subscribe(event -> logout()));
+        mSubscriptions.add(mViewModel.getLogoutObservable().subscribe(this::handleLogoutEvent));
         mSubscriptions.add(mViewModel.getProceedToSummaryObservable().subscribe(this::goToSummaryScreen));
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        initViewModel();
+        mViewModel.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mSubscriptions.dispose();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mSubscriptions.dispose();
+        mViewModel.onCleared();
     }
 
     @Override
@@ -139,12 +151,15 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
     }
 
     @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_trip_toolbar, menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int i = item.getItemId();
-        if (i == R.id.menu_trip_action_statistics) {
-            mViewModel.onStatisticsButtonClicked();
-            return true;
-        } else if (i == R.id.menu_trip_action_logout) {
+        if (i == R.id.menu_trip_action_logout) {
             mViewModel.onLogoutButtonClicked();
             return true;
         }
@@ -195,6 +210,12 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
         tvSpeed.setText(statistics.getSpeed());
         if (mStatisticsIdlingResource != null) {
             mStatisticsIdlingResource.onItemEmitted();
+        }
+    }
+
+    private void handleLogoutEvent(boolean shouldLogout) {
+        if (shouldLogout) {
+            logout();
         }
     }
 

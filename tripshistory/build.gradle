@@ -62,7 +62,7 @@ dependencies {
     testImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     testImplementation "junit:junit:$JUNIT"
     testImplementation "org.mockito:mockito-inline:$MOCKITO_INLINE"
-
+    androidTestImplementation "org.mockito:mockito-android:$MOCKITO_ANDROID"
     androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"
 }

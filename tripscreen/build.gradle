@@ -6,7 +6,6 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 28
 
-
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
@@ -14,7 +13,6 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -75,7 +73,7 @@ dependencies {
     testImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     testImplementation "junit:junit:$JUNIT"
     testImplementation "org.mockito:mockito-inline:$MOCKITO_INLINE"
-
+    androidTestImplementation "org.mockito:mockito-android:$MOCKITO_ANDROID"
     androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"
     androidTestImplementation "androidx.test.espresso:espresso-core:$ESPRESSO_CORE"
 }

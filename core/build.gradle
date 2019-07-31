@@ -67,9 +67,8 @@ dependencies {
     testImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     testImplementation "junit:junit:$JUNIT"
     testImplementation "org.mockito:mockito-inline:$MOCKITO_INLINE"
-
-    androidTestImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     androidTestImplementation "org.mockito:mockito-android:$MOCKITO_ANDROID"
+    androidTestImplementation "org.mockito:mockito-core:$MOCKITO_CORE"
     androidTestImplementation "androidx.test:core:$ANDROID_TEST_CORE"
     androidTestImplementation "androidx.test:rules:$ANDROID_TEST_RULES"
     androidTestImplementation "androidx.test:runner:$ANDROIDX_TEST_RUNNER"

@@ -13,6 +13,7 @@ import io.reactivex.android.plugins.RxAndroidPlugins;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.internal.schedulers.ExecutorScheduler;
 import io.reactivex.plugins.RxJavaPlugins;
+import io.reactivex.schedulers.Schedulers;
 
 public class RxImmediateSchedulerRule implements TestRule {
     private Scheduler immediate = new Scheduler() {

@@ -1,1 +1,1 @@
-include ':app', ':core', ':login', ':tripscreen', ':tripshistory', ':tripslist'
+include ':app', ':core', ':login', ':tripscreen', ':tripshistory', ':tripslist', ':about'

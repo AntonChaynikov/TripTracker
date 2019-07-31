@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
-apply plugin: 'jacoco-android'
 apply from: '../checkstyle/checkstyle.gradle'
 apply plugin: 'io.fabric'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.antonchaynikov.oneclickpublish'
+apply plugin: "androidx.navigation.safeargs"
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
@@ -15,10 +15,6 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 oneClickPublish {
     branchNames = ["master"]
     remoteRepoName = "origin"
-}
-
-jacoco {
-    toolVersion = "0.8.0"
 }
 
 android {
@@ -114,8 +110,8 @@ dependencies {
     implementation "com.google.dagger:dagger:$DAGGER"
     implementation "androidx.test.espresso:espresso-idling-resource:$ESPRESSO_IDLING_RESOURCE"
 
-    implementation "androidx.navigation:navigation-fragment:$NAV_COMPONENTS"
-    implementation "androidx.navigation:navigation-ui:$NAV_COMPONENTS"
+    implementation "androidx.navigation:navigation-fragment:$NAV_COMPONENTS_KTX"
+    implementation "androidx.navigation:navigation-ui:$NAV_COMPONENTS_KTX"
 
     implementation "androidx.navigation:navigation-fragment-ktx:$NAV_COMPONENTS_KTX"
     implementation "androidx.navigation:navigation-ui-ktx:$NAV_COMPONENTS_KTX"
@@ -129,6 +125,7 @@ dependencies {
     implementation project(path: ':tripscreen')
     implementation project(path: ':tripshistory')
     implementation project(path: ':tripslist')
+    implementation project(path: ':about')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
 

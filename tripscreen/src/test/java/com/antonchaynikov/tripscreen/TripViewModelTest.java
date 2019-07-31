@@ -1,12 +1,12 @@
 package com.antonchaynikov.tripscreen;
 
+import com.antonchaynikov.core.authentication.Auth;
 import com.antonchaynikov.core.data.model.Trip;
 import com.antonchaynikov.core.data.model.TripCoordinate;
 import com.antonchaynikov.core.data.tripmanager.TripManager;
 import com.antonchaynikov.core.viewmodel.StatisticsFormatter;
 import com.antonchaynikov.core.viewmodel.TripStatistics;
 import com.antonchaynikov.tripscreen.uistate.TripUiState;
-import com.google.firebase.auth.FirebaseAuth;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,7 +38,7 @@ public class TripViewModelTest {
     @Mock
     private TripManager mockTripManager;
     @Mock
-    private FirebaseAuth mockFirebaseAuth;
+    private Auth mockAuth;
     @Mock
     private StatisticsFormatter mockFormatter;
 
@@ -56,7 +56,7 @@ public class TripViewModelTest {
         doReturn(coordsStream).when(mockTripManager).getCoordinatesStream();
         doReturn(Observable.empty()).when(mockTripManager).getGeolocationAvailabilityChangeObservable();
         doReturn(new Trip()).when(mockTripManager).getCurrentTrip();
-        mTestSubject = new TripViewModel(mockTripManager, mockFirebaseAuth, mockFormatter, true);
+        mTestSubject = new TripViewModel(mockTripManager, mockAuth, mockFormatter, true);
     }
 
     @Test
@@ -300,7 +300,7 @@ public class TripViewModelTest {
         mTestSubject.getLogoutObservable().subscribe(eventObserver);
         mTestSubject.onLogoutButtonClicked();
 
-        eventObserver.assertValue(true);
+        eventObserver.assertValues(false, true);
     }
 
     @Test
@@ -326,12 +326,12 @@ public class TripViewModelTest {
         // Logout
         mTestSubject.onLogoutButtonClicked();
 
-        logoutEventObserver.assertEmpty();
+        logoutEventObserver.assertValue(false);
 
         // Trip manager finished the trip
         finishTripCompletable.onComplete();
 
-        logoutEventObserver.assertValue(true);
+        logoutEventObserver.assertValues(false, true);
     }
 
     @Test
@@ -347,7 +347,7 @@ public class TripViewModelTest {
         // Trip manager finished the trip
         finishTripCompletable.onComplete();
 
-        verify(mockFirebaseAuth).signOut();
+        verify(mockAuth).signOut();
     }
 
     @Test
@@ -360,7 +360,7 @@ public class TripViewModelTest {
         // Logout
         mTestSubject.onLogoutButtonClicked();
 
-        verify(mockFirebaseAuth, times(0)).signOut();
+        verify(mockAuth, times(0)).signOut();
     }
 
     @Test

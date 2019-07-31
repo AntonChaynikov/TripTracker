@@ -1,7 +1,5 @@
 package com.antonchaynikov.core.authentication;
 
-import com.google.firebase.auth.FirebaseAuth;
-
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -12,8 +10,8 @@ public class AuthModule {
 
     @Singleton
     @Provides
-    public FirebaseAuth provideFirebaseAuth() {
-        return FirebaseAuth.getInstance();
+    public Auth provideAuth() {
+        return TripAuth.INSTANCE;
     }
 
 }

@@ -1,7 +1,9 @@
 package com.antonchaynikov.tripslist;
 
+import com.antonchaynikov.core.authentication.Auth;
 import com.antonchaynikov.core.data.model.Trip;
 import com.antonchaynikov.core.data.repository.Repository;
+import com.antonchaynikov.core.viewmodel.StatisticsFormatter;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -16,8 +18,8 @@ import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 public class TripsListViewModelTest {
 
@@ -28,6 +30,10 @@ public class TripsListViewModelTest {
 
     @Mock
     private Repository mockRepository;
+    @Mock
+    private Auth mockAuth;
+    @Mock
+    private StatisticsFormatter mockStatisticsFormatter;
 
     private PublishSubject<List<Trip>> tripPublishSubject = PublishSubject.create();
 
@@ -35,7 +41,8 @@ public class TripsListViewModelTest {
     public void setUp() throws Exception {
         initMocks(this);
         doReturn(tripPublishSubject).when(mockRepository).getAllTrips();
-        mTestSubject = new TripsListViewModel(mockRepository);
+        doReturn(true).when(mockAuth).isSignedIn();
+        mTestSubject = new TripsListViewModel(mockRepository, mockAuth, mockStatisticsFormatter);
     }
 
     @Test
@@ -45,7 +52,9 @@ public class TripsListViewModelTest {
         mTestSubject.onStart();
         tripPublishSubject.onNext(new ArrayList<>(0));
 
-        emptyListEventObserver.assertValue(true);
+        emptyListEventObserver
+                .assertValue(true)
+                .dispose();
     }
 
     @Test
@@ -59,14 +68,13 @@ public class TripsListViewModelTest {
     }
 
     @Test
-    public void shouldBroadcastTripsList_whenListLoads() {
-        TestObserver<List<Trip>> tripListObserver = TestObserver.create();
-        mTestSubject.getTripListObservable().subscribe(tripListObserver);
+    public void shouldBroadcastTripDataLoaded_whenListLoads() {
+        TestObserver<Boolean> tripListObserver = TestObserver.create();
+        mTestSubject.getTripsDataLoadedEventObservable().subscribe(tripListObserver);
         mTestSubject.onStart();
         tripPublishSubject.onNext(Collections.singletonList(new Trip()));
 
-        List<Trip> trips = tripListObserver.values().get(0);
-        assertEquals(1, trips.size());
+        tripListObserver.assertValue(true);
     }
 
     @Test
