@@ -12,7 +12,7 @@
     <string name="statistics_duration">Duration:</string>
     <string name="statistics_caption">Statistics</string>
     <string name="statistics_distance_description">Distance</string>
-    <string name="statistics_speed_descriptions">Speed</string>
+    <string name="statistics_speed_description">Speed</string>
     <string name="statistics_distance">%s km</string>
     <string name="statistics_speed">%s km/h</string>
     <string name="tripStartDate">tripStartDate</string>

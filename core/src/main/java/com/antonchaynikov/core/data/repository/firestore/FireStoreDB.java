@@ -11,6 +11,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -87,8 +88,10 @@ public final class FireStoreDB implements Repository {
             observable.onError(e);
             e.printStackTrace();
         }
+
         if (tripsCollectionRef != null) {
             tripsCollectionRef
+                    .orderBy(Trip.FIELD_NAME_START_DATE, Query.Direction.DESCENDING)
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
