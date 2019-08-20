@@ -99,6 +99,8 @@ public class TripViewModel extends BasicViewModel {
 
     void onActionButtonClicked() {
         if (mUiState.getState() == TripUiState.State.IDLE) {
+            mUiState.transform(TripUiState.State.STARTING);
+            mUiStateChangeEventObservable.onNext(mUiState);
             if (mIsLocationPermissionGranted) {
                 startTrip();
             } else {

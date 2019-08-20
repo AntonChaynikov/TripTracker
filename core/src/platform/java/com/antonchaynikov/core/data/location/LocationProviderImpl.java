@@ -5,7 +5,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,7 +27,6 @@ class LocationProviderImpl implements LocationProvider, LocationListener {
 
     @Override
     public void startUpdates(@NonNull LocationConsumer consumer) throws SecurityException {
-        Log.d(LocationProviderImpl.class.getCanonicalName(), "platform LocationProviderImpl");
         mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 0, this);
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, this);
         mDisabledProviders = new HashSet<>(PROVIDERS_COUNT);

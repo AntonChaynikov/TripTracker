@@ -17,7 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.test.espresso.IdlingResource;
 
@@ -119,7 +118,7 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
     @Override
     public void onStop() {
         super.onStop();
-        mSubscriptions.dispose();
+        mSubscriptions.clear();
     }
 
     @Override
@@ -181,7 +180,7 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
 
     private void onLocationPermissionRequested() {
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
-        ActivityCompat.requestPermissions(getActivity(), permissions, ACCESS_FINE_LOCATION_REQUEST_CODE);
+        requestPermissions(permissions, ACCESS_FINE_LOCATION_REQUEST_CODE);
     }
 
     private void onUiStateUpdate(@NonNull TripUiState state) {

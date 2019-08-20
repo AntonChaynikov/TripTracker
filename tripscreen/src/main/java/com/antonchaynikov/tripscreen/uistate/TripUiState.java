@@ -9,9 +9,10 @@ public final class TripUiState {
     private State mState;
 
     private int mActionButtomTextId;
+    private boolean mIsButtonEnabled;
 
     public enum State {
-        STARTED, IDLE
+        STARTED, IDLE, STARTING
     }
 
     private TripUiState() {
@@ -27,11 +28,19 @@ public final class TripUiState {
         switch(state) {
             case STARTED: {
                 mActionButtomTextId = R.string.button_stop;
+                mIsButtonEnabled = true;
                 mState = State.STARTED;
+                break;
+            }
+            case STARTING: {
+                mActionButtomTextId = R.string.button_act;
+                mIsButtonEnabled = false;
+                mState = State.STARTING;
                 break;
             }
             default: {
                 mActionButtomTextId = R.string.button_act;
+                mIsButtonEnabled = true;
                 mState = State.IDLE;
                 break;
             }
