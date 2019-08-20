@@ -1,9 +1,12 @@
 package com.antonchaynikov.core.data.model;
 
+import androidx.annotation.Keep;
+
 import com.google.firebase.firestore.PropertyName;
 
 import java.util.Objects;
 
+@Keep
 public class Trip {
 
     public static final String FIELD_NAME_START_DATE = "startDate";

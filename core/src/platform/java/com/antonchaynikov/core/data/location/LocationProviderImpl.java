@@ -12,7 +12,7 @@ import java.util.Set;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-class LocationProviderPlatform implements LocationProvider, LocationListener {
+class LocationProviderImpl implements LocationProvider, LocationListener {
 
     private static final int PROVIDERS_COUNT = 2;
 
@@ -21,7 +21,7 @@ class LocationProviderPlatform implements LocationProvider, LocationListener {
     private Filter<Location> mFilter;
     private Set<String> mDisabledProviders;
 
-    LocationProviderPlatform(@NonNull Context context) {
+    LocationProviderImpl(@NonNull Context context) {
         mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
     }
 

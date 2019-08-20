@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -119,7 +120,7 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
     @Override
     public void onStop() {
         super.onStop();
-        mSubscriptions.dispose();
+        mSubscriptions.clear();
     }
 
     @Override
@@ -181,7 +182,7 @@ public class TripFragment extends ViewModelFragment implements View.OnClickListe
 
     private void onLocationPermissionRequested() {
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
-        ActivityCompat.requestPermissions(getActivity(), permissions, ACCESS_FINE_LOCATION_REQUEST_CODE);
+        requestPermissions(permissions, ACCESS_FINE_LOCATION_REQUEST_CODE);
     }
 
     private void onUiStateUpdate(@NonNull TripUiState state) {

@@ -126,7 +126,7 @@ public class HistoryFragment extends ViewModelFragment implements OnMapReadyCall
     @Override
     public void onStop() {
         super.onStop();
-        mSubscriptions.dispose();
+        mSubscriptions.clear();
     }
 
     @Override

@@ -4,8 +4,10 @@ import com.google.firebase.firestore.PropertyName;
 
 import java.util.Objects;
 
+import androidx.annotation.Keep;
 import androidx.annotation.Nullable;
 
+@Keep
 public class TripCoordinate {
 
     public static final String FIELD_NAME_DATE = "date";
