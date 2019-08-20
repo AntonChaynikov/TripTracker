@@ -9,7 +9,7 @@ public class ViewModelProvider {
     private ViewModelFactory mFactory;
 
     public ViewModelProvider(@Nullable ViewModelRegistry registry, @Nullable ViewModelFactory factory) {
-        mViewModelRegistry = registry == null? new ViewModelRegistry(): registry;
+        mViewModelRegistry = registry == null ? new ViewModelRegistry() : registry;
         mFactory = factory;
     }
 

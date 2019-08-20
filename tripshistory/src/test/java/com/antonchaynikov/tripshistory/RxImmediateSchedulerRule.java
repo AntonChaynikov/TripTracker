@@ -14,7 +14,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.internal.schedulers.ExecutorScheduler;
 import io.reactivex.plugins.RxJavaPlugins;
 
-public class RxImmediateSchedulerRule implements TestRule  {
+public class RxImmediateSchedulerRule implements TestRule {
     private Scheduler immediate = new Scheduler() {
         @Override
         public Disposable scheduleDirect(@NonNull Runnable run, long delay, @NonNull TimeUnit unit) {

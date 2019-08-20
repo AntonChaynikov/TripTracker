@@ -1,9 +1,10 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android-extensions'
+
 apply plugin: 'kotlin-android'
-apply from: '../checkstyle/checkstyle.gradle'
-apply plugin: 'io.fabric'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+
+apply plugin: 'io.fabric'
 apply plugin: 'com.antonchaynikov.oneclickpublish'
 apply plugin: "androidx.navigation.safeargs"
 

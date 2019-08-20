@@ -39,6 +39,7 @@ class TripsAdapter extends RecyclerView.Adapter<TripsViewHolder> {
 
     interface TripsProvider {
         TripsListItemModel getTrip(int position);
+
         int getItemCount();
     }
 }
