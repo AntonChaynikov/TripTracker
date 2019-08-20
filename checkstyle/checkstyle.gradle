@@ -1,7 +1,5 @@
 apply plugin: 'checkstyle'
 
-check.dependsOn 'checkstyle'
-
 checkstyle {
     toolVersion '6.5'
 
