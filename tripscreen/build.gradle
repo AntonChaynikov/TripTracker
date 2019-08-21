@@ -37,6 +37,10 @@ android {
         }
     }
 
+    kapt {
+        generateStubs = true
+    }
+
     lintOptions {
         lintConfig file("../lintConfig.xml")
         warningsAsErrors true

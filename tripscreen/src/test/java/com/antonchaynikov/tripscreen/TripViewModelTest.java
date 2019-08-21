@@ -24,6 +24,7 @@ import io.reactivex.subjects.PublishSubject;
 
 import static com.antonchaynikov.tripscreen.uistate.TripUiState.State.IDLE;
 import static com.antonchaynikov.tripscreen.uistate.TripUiState.State.STARTED;
+import static com.antonchaynikov.tripscreen.uistate.TripUiState.State.STARTING;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -75,7 +76,7 @@ public class TripViewModelTest {
         mTestSubject.onActionButtonClicked();
 
         // IDLE by default, then started
-        uiStateTestObserver.assertValues(IDLE, STARTED);
+        uiStateTestObserver.assertValues(IDLE, STARTING, STARTED);
     }
 
     @Test
@@ -88,8 +89,8 @@ public class TripViewModelTest {
         // Ends trip
         mTestSubject.onActionButtonClicked();
 
-        // IDLE by default, then started and stopped
-        uiStateTestObserver.assertValues(IDLE, STARTED, IDLE);
+        // IDLE by default, then starting, started and stopped
+        uiStateTestObserver.assertValues(IDLE, STARTING, STARTED, IDLE);
     }
 
     @Test
@@ -169,12 +170,13 @@ public class TripViewModelTest {
         mTestSubject.getUiStateChangeEventObservable().map(TripUiState::getState).subscribe(uiStateObserver);
 
         mTestSubject.onActionButtonClicked();
-        uiStateObserver.assertValue(IDLE);
+        uiStateObserver.assertValues(IDLE, STARTING);
 
         tripManagerRequest.onComplete();
 
-        uiStateObserver.assertValues(IDLE, STARTED);
+        uiStateObserver.assertValues(IDLE, STARTING, STARTED);
     }
+
 
     @Test
     public void onActionButtonClicked_whenIntendedToStopTrip_shouldCallTripManagerToStopTrip() {
@@ -198,11 +200,11 @@ public class TripViewModelTest {
         // Stopping
         mTestSubject.onActionButtonClicked();
 
-        uiStateObserver.assertValues(IDLE, STARTED);
+        uiStateObserver.assertValues(IDLE, STARTING, STARTED);
 
         tripManagerRequest.onComplete();
 
-        uiStateObserver.assertValues(IDLE, STARTED, IDLE);
+        uiStateObserver.assertValues(IDLE, STARTING, STARTED, IDLE);
     }
 
     @Test
